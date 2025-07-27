@@ -1,105 +1,340 @@
 ---
-interface Props {
-    title: string;
-    description?: string;
+export interface Props {
+	title: string;
+	description?: string;
+	heroImage?: string;
 }
 
-const { title, description = "BlondePlace - ваш гид в мире красоты и стиля" } = Astro.props;
+const { title, description = "Экспертные советы по красоте от салона BlondePlace", heroImage } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
-    <meta name="description" content={description}>
-    <link rel="canonical" href={Astro.url}>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    
-    <style>
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-            color: #333;
-            background: #fff;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        header {
-            background: linear-gradient(135deg, #ff6b9d, #c44569);
-            color: white;
-            padding: 1rem 0;
-        }
-        
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        main {
-            min-height: calc(100vh - 200px);
-            padding: 2rem 0;
-        }
-        
-        footer {
-            background: #f8f9fa;
-            padding: 2rem 0;
-            text-align: center;
-            color: #666;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="container">
-            <nav>
-                <div class="logo">BlondePlace</div>
-                <ul class="nav-links">
-                    <li><a href="/">Главная</a></li>
-                    <li><a href="/blog">Блог</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-    
-    <main>
-        <div class="container">
-            <slot />
-        </div>
-    </main>
-    
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 BlondePlace. Красота и стиль каждый день.</p>
-        </div>
-    </footer>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		
+		<!-- Canonical URL -->
+		<link rel="canonical" href={canonicalURL} />
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={Astro.url} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		{heroImage && <meta property="og:image" content={new URL(heroImage, Astro.url)} />}
+		
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={Astro.url} />
+		<meta property="twitter:title" content={title} />
+		<meta property="twitter:description" content={description} />
+		{heroImage && <meta property="twitter:image" content={new URL(heroImage, Astro.url)} />}
+		
+		<!-- Beauty-специфичные мета-теги -->
+		<meta name="author" content="BlondePlace Beauty Expert" />
+		<meta name="theme-color" content="#f8d7da" />
+		<meta name="keywords" content="салон красоты, окрашивание волос, блонд, маникюр, beauty советы, BlondePlace" />
+		
+		<!-- Preconnect для ускорения загрузки -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		
+		<!-- Google Fonts для beauty дизайна -->
+		<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+		
+		<!-- Structured Data будет добавлен в конкретных страницах -->
+	</head>
+	<body>
+		<!-- Header -->
+		<header class="site-header">
+			<nav class="navbar">
+				<div class="container">
+					<div class="nav-brand">
+						<a href="/" class="brand-link">
+							<h1 class="brand-name">BlondePlace</h1>
+							<span class="brand-tagline">Beauty Blog</span>
+						</a>
+					</div>
+					<div class="nav-menu">
+						<a href="/blog" class="nav-link">Блог</a>
+						<a href="/about" class="nav-link">О нас</a>
+						<a href="/services" class="nav-link">Услуги</a>
+						<a href="/contacts" class="nav-link">Контакты</a>
+						<a href="https://blondeplace.ru" class="nav-link salon-link" target="_blank">
+							🏪 Записаться
+						</a>
+					</div>
+				</div>
+			</nav>
+		</header>
+
+		<!-- Main Content -->
+		<main class="main-content">
+			<slot />
+		</main>
+
+		<!-- Footer -->
+		<footer class="site-footer">
+			<div class="container">
+				<div class="footer-content">
+					<div class="footer-section">
+						<h3>BlondePlace Beauty Studio</h3>
+						<p>Профессиональный салон красоты, специализирующийся на окрашивании волос, стрижках и beauty-процедурах.</p>
+						<div class="footer-cta">
+							<a href="https://blondeplace.ru" class="cta-button" target="_blank">
+								Записаться в салон
+							</a>
+						</div>
+					</div>
+					
+					<div class="footer-section">
+						<h4>Услуги салона</h4>
+						<ul class="footer-links">
+							<li><a href="/services#hair-services">Окрашивание волос</a></li>
+							<li><a href="/services#hair-services">Стрижки и укладки</a></li>
+							<li><a href="/services#nail-services">Маникюр и педикюр</a></li>
+							<li><a href="/services#beauty-services">Beauty-процедуры</a></li>
+						</ul>
+					</div>
+					
+					<div class="footer-section">
+						<h4>Полезное</h4>
+						<ul class="footer-links">
+							<li><a href="/blog">Beauty блог</a></li>
+							<li><a href="/contacts">Контакты</a></li>
+							<li><a href="/about">О салоне</a></li>
+							<li><a href="/blog">Статьи и советы</a></li>
+						</ul>
+					</div>
+				</div>
+				
+				<div class="footer-bottom">
+					<p>&copy; 2024 BlondePlace Beauty Studio. Все права защищены.</p>
+					<p class="footer-note">
+						Экспертные советы и статьи о красоте от профессионалов салона BlondePlace
+					</p>
+				</div>
+			</div>
+		</footer>
+
+		<style>
+			/* === BEAUTY DESIGN SYSTEM === */
+			:root {
+				/* BlondePlace Color Palette */
+				--blonde-gold: #f8d7da;
+				--blonde-rose: #fde2e4;
+				--beauty-pink: #fbb6ce;
+				--salon-purple: #c297b8;
+				--elegant-gray: #4a4a4a;
+				--soft-black: #2d2d2d;
+				--pure-white: #ffffff;
+				--warm-beige: #f5f5f0;
+				
+				/* Typography */
+				--font-heading: 'Playfair Display', serif;
+				--font-body: 'Inter', sans-serif;
+				
+				/* Spacing */
+				--container-max: 1200px;
+				--spacing-xs: 0.5rem;
+				--spacing-sm: 1rem;
+				--spacing-md: 1.5rem;
+				--spacing-lg: 2rem;
+				--spacing-xl: 3rem;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: var(--font-body);
+				line-height: 1.6;
+				color: var(--soft-black);
+				background-color: var(--pure-white);
+			}
+
+			.container {
+				max-width: var(--container-max);
+				margin: 0 auto;
+				padding: 0 var(--spacing-md);
+			}
+
+			/* === HEADER === */
+			.site-header {
+				background: linear-gradient(135deg, var(--blonde-gold), var(--blonde-rose));
+				box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+				position: sticky;
+				top: 0;
+				z-index: 100;
+			}
+
+			.navbar {
+				padding: var(--spacing-md) 0;
+			}
+
+			.navbar .container {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.brand-link {
+				text-decoration: none;
+				color: var(--soft-black);
+			}
+
+			.brand-name {
+				font-family: var(--font-heading);
+				font-size: 2rem;
+				font-weight: 600;
+				margin-bottom: 0.2rem;
+			}
+
+			.brand-tagline {
+				font-size: 0.9rem;
+				color: var(--elegant-gray);
+				font-weight: 300;
+			}
+
+			.nav-menu {
+				display: flex;
+				gap: var(--spacing-lg);
+			}
+
+			.nav-link {
+				text-decoration: none;
+				color: var(--soft-black);
+				font-weight: 500;
+				padding: var(--spacing-xs) var(--spacing-sm);
+				border-radius: 20px;
+				transition: all 0.3s ease;
+			}
+
+			.nav-link:hover {
+				background-color: rgba(255,255,255,0.7);
+				transform: translateY(-2px);
+			}
+
+			.salon-link {
+				background: var(--beauty-pink);
+				color: var(--pure-white);
+				font-weight: 600;
+			}
+
+			.salon-link:hover {
+				background: var(--salon-purple);
+			}
+
+			/* === MAIN CONTENT === */
+			.main-content {
+				min-height: 70vh;
+				padding: var(--spacing-xl) 0;
+			}
+
+			/* === FOOTER === */
+			.site-footer {
+				background: var(--warm-beige);
+				padding: var(--spacing-xl) 0 var(--spacing-lg);
+				margin-top: var(--spacing-xl);
+			}
+
+			.footer-content {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: var(--spacing-lg);
+				margin-bottom: var(--spacing-lg);
+			}
+
+			.footer-section h3,
+			.footer-section h4 {
+				font-family: var(--font-heading);
+				color: var(--soft-black);
+				margin-bottom: var(--spacing-md);
+			}
+
+			.footer-section p {
+				color: var(--elegant-gray);
+				margin-bottom: var(--spacing-md);
+			}
+
+			.footer-links {
+				list-style: none;
+			}
+
+			.footer-links li {
+				margin-bottom: var(--spacing-xs);
+			}
+
+			.footer-links a {
+				color: var(--elegant-gray);
+				text-decoration: none;
+				transition: color 0.3s ease;
+			}
+
+			.footer-links a:hover {
+				color: var(--beauty-pink);
+			}
+
+			.cta-button {
+				display: inline-block;
+				background: linear-gradient(135deg, var(--beauty-pink), var(--salon-purple));
+				color: var(--pure-white);
+				padding: var(--spacing-sm) var(--spacing-lg);
+				border-radius: 25px;
+				text-decoration: none;
+				font-weight: 600;
+				transition: all 0.3s ease;
+			}
+
+			.cta-button:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+			}
+
+			.footer-bottom {
+				border-top: 1px solid rgba(0,0,0,0.1);
+				padding-top: var(--spacing-md);
+				text-align: center;
+				color: var(--elegant-gray);
+				font-size: 0.9rem;
+			}
+
+			.footer-note {
+				margin-top: var(--spacing-xs);
+				font-style: italic;
+			}
+
+			/* === RESPONSIVE === */
+			@media (max-width: 768px) {
+				.navbar .container {
+					flex-direction: column;
+					gap: var(--spacing-md);
+				}
+
+				.nav-menu {
+					flex-wrap: wrap;
+					justify-content: center;
+					gap: var(--spacing-sm);
+				}
+
+				.brand-name {
+					font-size: 1.5rem;
+				}
+
+				.footer-content {
+					grid-template-columns: 1fr;
+					text-align: center;
+				}
+			}
+		</style>
+	</body>
 </html>
