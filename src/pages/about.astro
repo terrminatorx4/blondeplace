@@ -1,0 +1,392 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const pageTitle = "О нас | BlondePlace Beauty Studio - Профессиональный салон красоты";
+const pageDescription = "BlondePlace Beauty Studio - ведущий салон красоты, специализирующийся на окрашивании волос, стрижках, маникюре и beauty-процедурах. Мастера с 10+ летним опытом.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="about-hero">
+      <div class="hero-content">
+        <h1 class="page-title">О BlondePlace Beauty Studio</h1>
+        <p class="hero-subtitle">
+          Профессиональный салон красоты в сердце города
+        </p>
+      </div>
+      <div class="hero-image">
+        <div class="salon-badge">
+          ⭐ 5 лет<br>на рынке
+        </div>
+      </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="about-content">
+      <div class="content-grid">
+        <div class="content-main">
+          <h2>Наша история</h2>
+          <p>
+            BlondePlace Beauty Studio был основан в 2019 году командой профессиональных 
+            мастеров с многолетним опытом работы в индустрии красоты. Мы специализируемся 
+            на создании идеального блонда и современных техниках окрашивания волос.
+          </p>
+          
+          <p>
+            Наша философия основана на индивидуальном подходе к каждому клиенту. 
+            Мы используем только премиальные продукты и современные технологии, 
+            чтобы создать образ вашей мечты.
+          </p>
+
+          <h3>Наши принципы</h3>
+          <ul class="principles-list">
+            <li>🎨 <strong>Профессионализм</strong> - постоянное обучение и повышение квалификации</li>
+            <li>💎 <strong>Качество</strong> - используем только премиальные продукты</li>
+            <li>💫 <strong>Индивидуальность</strong> - подход к каждому клиенту уникален</li>
+            <li>🌟 <strong>Комфорт</strong> - создаем атмосферу релакса и красоты</li>
+          </ul>
+        </div>
+
+        <div class="content-sidebar">
+          <div class="info-card">
+            <h3>Наши достижения</h3>
+            <ul class="achievements">
+              <li>🏆 Лучший салон года 2023</li>
+              <li>⭐ 4.9/5 рейтинг клиентов</li>
+              <li>👑 500+ довольных клиентов</li>
+              <li>🎓 Сертифицированные мастера</li>
+            </ul>
+          </div>
+
+          <div class="info-card">
+            <h3>Рабочие часы</h3>
+            <ul class="schedule">
+              <li>Пн-Пт: 10:00 - 21:00</li>
+              <li>Суббота: 10:00 - 20:00</li>
+              <li>Воскресенье: 11:00 - 19:00</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+      <h2 class="section-title">Наша команда</h2>
+      
+      <div class="team-grid">
+        <div class="team-member">
+          <div class="member-photo">
+            <div class="photo-placeholder">👩‍💼</div>
+          </div>
+          <h3>Анна Светлова</h3>
+          <p class="member-role">Топ-колорист, основатель</p>
+          <p class="member-experience">Опыт: 12 лет</p>
+          <p class="member-description">
+            Специалист по сложным техникам окрашивания: балаяж, шатуш, 
+            омбре. Эксперт по работе с блондом.
+          </p>
+        </div>
+
+        <div class="team-member">
+          <div class="member-photo">
+            <div class="photo-placeholder">👩‍🎨</div>
+          </div>
+          <h3>Елена Золотова</h3>
+          <p class="member-role">Стилист-универсал</p>
+          <p class="member-experience">Опыт: 8 лет</p>
+          <p class="member-description">
+            Мастер стрижек и укладок. Специализируется на создании 
+            современных образов и коррекции формы лица.
+          </p>
+        </div>
+
+        <div class="team-member">
+          <div class="member-photo">
+            <div class="photo-placeholder">💅</div>
+          </div>
+          <h3>Мария Роскошная</h3>
+          <p class="member-role">Nail-мастер</p>
+          <p class="member-experience">Опыт: 6 лет</p>
+          <p class="member-description">
+            Эксперт по маникюру и педикюру. Виртуоз nail-арта 
+            и современных техник покрытия.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="cta-content">
+        <h2>Готовы к преображению?</h2>
+        <p>Запишитесь на консультацию к нашим мастерам</p>
+        <div class="cta-buttons">
+          <a href="/contacts" class="cta-primary">Записаться</a>
+          <a href="/services" class="cta-secondary">Наши услуги</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  /* About Page Styles */
+  .about-hero {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    padding: 4rem 0;
+    margin-bottom: 3rem;
+  }
+
+  .hero-content {
+    flex: 1;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 600;
+    color: #2d1810;
+    margin-bottom: 1rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+
+  .hero-image {
+    flex: 0 0 200px;
+    position: relative;
+  }
+
+  .salon-badge {
+    background: linear-gradient(135deg, #f8d7da, #fbb6ce);
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    font-weight: 600;
+    color: #2d1810;
+    font-size: 1.1rem;
+    line-height: 1.3;
+  }
+
+  .about-content {
+    margin-bottom: 4rem;
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+  }
+
+  .content-main h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #2d1810;
+    margin-bottom: 1.5rem;
+  }
+
+  .content-main h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #2d1810;
+    margin: 2rem 0 1rem;
+  }
+
+  .content-main p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #444;
+    margin-bottom: 1.5rem;
+  }
+
+  .principles-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .principles-list li {
+    padding: 0.75rem 0;
+    font-size: 1.1rem;
+    color: #555;
+  }
+
+  .info-card {
+    background: #fef7f7;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+  }
+
+  .info-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #2d1810;
+    margin-bottom: 1rem;
+  }
+
+  .achievements, .schedule {
+    list-style: none;
+    padding: 0;
+  }
+
+  .achievements li, .schedule li {
+    padding: 0.5rem 0;
+    color: #555;
+  }
+
+  .team-section {
+    margin-bottom: 4rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    text-align: center;
+    color: #2d1810;
+    margin-bottom: 3rem;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .team-member {
+    text-align: center;
+    padding: 2rem;
+    background: #fef7f7;
+    border-radius: 20px;
+  }
+
+  .member-photo {
+    margin-bottom: 1.5rem;
+  }
+
+  .photo-placeholder {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #f8d7da, #fbb6ce);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto;
+  }
+
+  .team-member h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #2d1810;
+    margin-bottom: 0.5rem;
+  }
+
+  .member-role {
+    font-weight: 600;
+    color: #c297b8;
+    margin-bottom: 0.25rem;
+  }
+
+  .member-experience {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 1rem;
+  }
+
+  .member-description {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #666;
+  }
+
+  .cta-section {
+    background: linear-gradient(135deg, #f8d7da, #fbb6ce);
+    padding: 4rem 2rem;
+    border-radius: 30px;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .cta-content h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #2d1810;
+    margin-bottom: 1rem;
+  }
+
+  .cta-content p {
+    font-size: 1.2rem;
+    color: #2d1810;
+    margin-bottom: 2rem;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cta-primary, .cta-secondary {
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .cta-primary {
+    background: #2d1810;
+    color: white;
+  }
+
+  .cta-primary:hover {
+    background: #1a0e08;
+    transform: translateY(-2px);
+  }
+
+  .cta-secondary {
+    background: white;
+    color: #2d1810;
+    border: 2px solid #2d1810;
+  }
+
+  .cta-secondary:hover {
+    background: #2d1810;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .about-hero {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .content-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+    }
+
+    .team-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style> 
