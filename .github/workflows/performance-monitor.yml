@@ -1,0 +1,179 @@
+name: 🚀 Performance Monitor & Lighthouse Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_url:
+        description: 'URL для тестирования'
+        required: true
+        default: 'https://butlerspb-blog.netlify.app'
+      check_core_web_vitals:
+        description: 'Проверить Core Web Vitals'
+        type: boolean
+        default: true
+      lighthouse_audit:
+        description: 'Запустить Lighthouse аудит'
+        type: boolean
+        default: true
+      mobile_test:
+        description: 'Тестировать мобильную версию'
+        type: boolean
+        default: true
+
+jobs:
+  lighthouse-audit:
+    name: 🔍 Lighthouse Performance Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout репозиторий
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: 📦 Установка зависимостей
+        run: |
+          npm install -g @lhci/cli lighthouse
+          echo "✅ Lighthouse CLI установлен"
+          
+      - name: 🚀 Lighthouse Desktop Audit
+        run: |
+          echo "🖥️ Запуск Lighthouse аудита для Desktop..."
+          lighthouse ${{ github.event.inputs.test_url }} \
+            --output=json \
+            --output=html \
+            --output-path=./lighthouse-desktop \
+            --chrome-flags="--headless --no-sandbox" \
+            --preset=desktop
+            
+      - name: 📱 Lighthouse Mobile Audit
+        if: ${{ github.event.inputs.mobile_test == 'true' }}
+        run: |
+          echo "📱 Запуск Lighthouse аудита для Mobile..."
+          lighthouse ${{ github.event.inputs.test_url }} \
+            --output=json \
+            --output=html \
+            --output-path=./lighthouse-mobile \
+            --chrome-flags="--headless --no-sandbox"
+            
+      - name: 📊 Анализ Core Web Vitals
+        if: ${{ github.event.inputs.check_core_web_vitals == 'true' }}
+        run: |
+          echo "📊 Анализ Core Web Vitals..."
+          # Извлекаем метрики из JSON
+          LCP=$(cat lighthouse-desktop.report.json | jq '.audits["largest-contentful-paint"].displayValue')
+          FID=$(cat lighthouse-desktop.report.json | jq '.audits["max-potential-fid"].displayValue')
+          CLS=$(cat lighthouse-desktop.report.json | jq '.audits["cumulative-layout-shift"].displayValue')
+          
+          echo "🎯 Core Web Vitals результаты:"
+          echo "LCP (Largest Contentful Paint): $LCP"
+          echo "FID (First Input Delay): $FID" 
+          echo "CLS (Cumulative Layout Shift): $CLS"
+          
+      - name: 📈 Извлечение оценок Lighthouse
+        run: |
+          echo "📈 Извлекаем оценки Lighthouse..."
+          PERFORMANCE=$(cat lighthouse-desktop.report.json | jq '.categories.performance.score * 100')
+          ACCESSIBILITY=$(cat lighthouse-desktop.report.json | jq '.categories.accessibility.score * 100')
+          PRACTICES=$(cat lighthouse-desktop.report.json | jq '.categories["best-practices"].score * 100')
+          SEO=$(cat lighthouse-desktop.report.json | jq '.categories.seo.score * 100')
+          
+          echo "🏆 Lighthouse Scores:"
+          echo "🚀 Performance: ${PERFORMANCE}%"
+          echo "♿ Accessibility: ${ACCESSIBILITY}%"
+          echo "✅ Best Practices: ${PRACTICES}%"
+          echo "🔍 SEO: ${SEO}%"
+          
+      - name: 💾 Сохранение отчетов
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: |
+            lighthouse-desktop.report.html
+            lighthouse-desktop.report.json
+            lighthouse-mobile.report.html
+            lighthouse-mobile.report.json
+          retention-days: 30
+          
+      - name: 🎯 Проверка пороговых значений
+        run: |
+          echo "🎯 Проверка соответствия стандартам..."
+          PERFORMANCE=$(cat lighthouse-desktop.report.json | jq '.categories.performance.score * 100')
+          
+          if (( $(echo "$PERFORMANCE >= 90" | bc -l) )); then
+            echo "✅ Performance отличный: ${PERFORMANCE}%"
+          elif (( $(echo "$PERFORMANCE >= 75" | bc -l) )); then
+            echo "⚠️ Performance хороший: ${PERFORMANCE}%"
+          else
+            echo "❌ Performance требует улучшения: ${PERFORMANCE}%"
+            echo "::warning::Performance score слишком низкий"
+          fi
+          
+  core-web-vitals:
+    name: 📊 Core Web Vitals Check
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.check_core_web_vitals == 'true' }}
+    
+    steps:
+      - name: 🌐 Проверка Core Web Vitals через PageSpeed API
+        run: |
+          echo "🌐 Получение данных из PageSpeed Insights API..."
+          API_URL="https://www.googleapis.com/pagespeedonline/v5/runPagespeed"
+          FULL_URL="${API_URL}?url=${{ github.event.inputs.test_url }}&category=performance"
+          
+          echo "📡 Запрос к PageSpeed API..."
+          curl -s "$FULL_URL" > pagespeed-results.json
+          
+          # Извлекаем Core Web Vitals
+          LCP=$(cat pagespeed-results.json | jq '.lighthouseResult.audits["largest-contentful-paint"].displayValue // "N/A"')
+          FID=$(cat pagespeed-results.json | jq '.lighthouseResult.audits["max-potential-fid"].displayValue // "N/A"')
+          CLS=$(cat pagespeed-results.json | jq '.lighthouseResult.audits["cumulative-layout-shift"].displayValue // "N/A"')
+          
+          echo "🎯 Real User Experience Core Web Vitals:"
+          echo "🟢 LCP: $LCP"
+          echo "🟡 FID: $FID"
+          echo "🔴 CLS: $CLS"
+          
+  seo-analysis:
+    name: 🔍 SEO Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🔍 SEO мета-теги анализ
+        run: |
+          echo "🔍 Проверка SEO мета-тегов..."
+          
+          # Получаем HTML страницы
+          curl -s "${{ github.event.inputs.test_url }}" > page.html
+          
+          # Проверяем основные SEO элементы
+          TITLE=$(grep -o '<title[^>]*>[^<]*</title>' page.html | sed 's/<[^>]*>//g')
+          META_DESC=$(grep -o '<meta[^>]*name="description"[^>]*content="[^"]*"' page.html | sed 's/.*content="\([^"]*\)".*/\1/')
+          
+          echo "📝 SEO элементы:"
+          echo "🏷️ Title: $TITLE"
+          echo "📄 Description: $META_DESC"
+          
+          # Проверка длины
+          TITLE_LENGTH=${#TITLE}
+          DESC_LENGTH=${#META_DESC}
+          
+          echo "📏 Длина элементов:"
+          echo "Title: $TITLE_LENGTH символов (оптимально: 50-60)"
+          echo "Description: $DESC_LENGTH символов (оптимально: 150-160)"
+          
+          if [ $TITLE_LENGTH -lt 30 ]; then
+            echo "::warning::Title слишком короткий"
+          elif [ $TITLE_LENGTH -gt 60 ]; then
+            echo "::warning::Title слишком длинный"
+          fi
+          
+          if [ $DESC_LENGTH -lt 120 ]; then
+            echo "::warning::Description слишком короткий"
+          elif [ $DESC_LENGTH -gt 160 ]; then
+            echo "::warning::Description слишком длинный"
+          fi 
