@@ -1,0 +1,94 @@
+[build]
+  publish = "dist"
+  command = "NODE_OPTIONS='--max-old-space-size=4096' npm run build"
+  
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
+  ASTRO_TELEMETRY_DISABLED = "1"
+  NODE_ENV = "production"
+  
+# Оптимизация для beauty контента
+[build.processing]
+  skip_processing = false
+  
+[build.processing.css]
+  bundle = true
+  minify = true
+  
+[build.processing.js] 
+  bundle = true
+  minify = true
+  
+[build.processing.html]
+  pretty_urls = true
+  
+[build.processing.images]
+  compress = true
+  
+# Headers для SEO салона красоты
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-XSS-Protection = "1; mode=block"
+    
+# Специальные headers для beauty контента
+[[headers]]
+  for = "/blog/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    
+# Beauty-специфичные заголовки для изображений
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    
+# Redirects для beauty SEO - связываем с основным сайтом салона
+[[redirects]]
+  from = "/salon"
+  to = "https://blondeplace.ru"
+  status = 301
+  
+[[redirects]]
+  from = "/appointment"
+  to = "https://blondeplace.ru/booking"
+  status = 301
+  
+[[redirects]]  
+  from = "/services"
+  to = "https://blondeplace.ru/services"
+  status = 301
+
+[[redirects]]
+  from = "/coloring"
+  to = "https://blondeplace.ru/hair-coloring"
+  status = 301
+
+[[redirects]]
+  from = "/manicure"
+  to = "https://blondeplace.ru/nail-services"
+  status = 301
+
+[[redirects]]
+  from = "/contact"
+  to = "https://blondeplace.ru/contact"
+  status = 301
+
+# Редирект для старых beauty URL (если были)
+[[redirects]]
+  from = "/beauty-tips"
+  to = "/blog?category=beauty-tips"
+  status = 301
+
+[[redirects]]
+  from = "/hair-care"
+  to = "/blog?category=hair-care"
+  status = 301
+
+# Edge функции для beauty сайта (если понадобятся)
+# [functions]
+#   directory = "netlify/functions" 
