@@ -1,0 +1,682 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const pageTitle = "Контакты | BlondePlace Beauty Studio - Запись, адрес, телефон";
+const pageDescription = "Контактная информация BlondePlace Beauty Studio: адрес салона, телефон для записи, время работы, онлайн-запись на услуги. Свяжитесь с нами удобным способом.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="contacts-hero">
+      <div class="hero-content">
+        <h1 class="page-title">Контакты</h1>
+        <p class="hero-subtitle">
+          Свяжитесь с нами удобным способом и запишитесь на процедуры
+        </p>
+      </div>
+    </section>
+
+    <!-- Contact Info Grid -->
+    <section class="contact-grid">
+      
+      <!-- Contact Information -->
+      <div class="contact-info">
+        <h2>Как с нами связаться</h2>
+        
+        <div class="contact-methods">
+          
+          <div class="contact-item">
+            <div class="contact-icon">📞</div>
+            <div class="contact-details">
+              <h3>Телефон</h3>
+              <p class="main-phone">
+                <a href="tel:+74951234567">+7 (495) 123-45-67</a>
+              </p>
+              <p class="phone-note">Звонки принимаем с 9:00 до 22:00</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">📱</div>
+            <div class="contact-details">
+              <h3>WhatsApp / Telegram</h3>
+              <p>
+                <a href="https://wa.me/74951234567" target="_blank">+7 (495) 123-45-67</a>
+              </p>
+              <p class="phone-note">Быстрые ответы 24/7</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">📧</div>
+            <div class="contact-details">
+              <h3>Email</h3>
+              <p>
+                <a href="mailto:info@blondeplace.ru">info@blondeplace.ru</a>
+              </p>
+              <p class="phone-note">Ответим в течение 2 часов</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">📍</div>
+            <div class="contact-details">
+              <h3>Адрес салона</h3>
+              <p class="address">
+                г. Москва, ул. Тверская, д. 15<br>
+                ТЦ "Галерея", 2-й этаж
+              </p>
+              <p class="phone-note">5 минут от метро "Тверская"</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">🕐</div>
+            <div class="contact-details">
+              <h3>Режим работы</h3>
+              <div class="schedule">
+                <p><strong>Пн-Пт:</strong> 10:00 - 21:00</p>
+                <p><strong>Суббота:</strong> 10:00 - 20:00</p>
+                <p><strong>Воскресенье:</strong> 11:00 - 19:00</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">🚇</div>
+            <div class="contact-details">
+              <h3>Как добраться</h3>
+              <p>
+                <strong>Метро:</strong> Тверская, Пушкинская, Чеховская<br>
+                <strong>Автобус:</strong> 15, 33, м15<br>
+                <strong>Парковка:</strong> Есть подземная парковка
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Form -->
+      <div class="booking-form">
+        <h2>Онлайн-запись</h2>
+        <p class="form-description">
+          Заполните форму, и мы перезвоним вам для подтверждения записи
+        </p>
+        
+        <form class="contact-form" id="bookingForm">
+          <div class="form-group">
+            <label for="name">Ваше имя *</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Телефон *</label>
+            <input type="tel" id="phone" name="phone" required placeholder="+7 (___) ___-__-__">
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="your@email.com">
+          </div>
+
+          <div class="form-group">
+            <label for="service">Услуга</label>
+            <select id="service" name="service">
+              <option value="">Выберите услугу</option>
+              <optgroup label="Волосы">
+                <option value="coloring">Окрашивание волос</option>
+                <option value="cutting">Стрижка</option>
+                <option value="styling">Укладка</option>
+                <option value="treatment">Уход за волосами</option>
+              </optgroup>
+              <optgroup label="Ногти">
+                <option value="manicure">Маникюр</option>
+                <option value="pedicure">Педикюр</option>
+                <option value="nail-art">Nail-арт</option>
+              </optgroup>
+              <optgroup label="Beauty">
+                <option value="eyebrows">Брови</option>
+                <option value="eyelashes">Ресницы</option>
+                <option value="makeup">Макияж</option>
+              </optgroup>
+              <optgroup label="Комплексы">
+                <option value="transformation">Комплекс "Преображение"</option>
+                <option value="blonde-package">Blonde Package</option>
+                <option value="beauty-day">Beauty Day</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="date">Желаемая дата</label>
+            <input type="date" id="date" name="date">
+          </div>
+
+          <div class="form-group">
+            <label for="time">Время</label>
+            <select id="time" name="time">
+              <option value="">Выберите время</option>
+              <option value="10:00">10:00</option>
+              <option value="11:00">11:00</option>
+              <option value="12:00">12:00</option>
+              <option value="13:00">13:00</option>
+              <option value="14:00">14:00</option>
+              <option value="15:00">15:00</option>
+              <option value="16:00">16:00</option>
+              <option value="17:00">17:00</option>
+              <option value="18:00">18:00</option>
+              <option value="19:00">19:00</option>
+              <option value="20:00">20:00</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Комментарий</label>
+            <textarea id="message" name="message" rows="4" placeholder="Расскажите о ваших пожеланиях..."></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            📅 Записаться
+          </button>
+
+          <p class="form-note">
+            * Обязательные поля<br>
+            Мы перезвоним в течение 30 минут для подтверждения
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map-section">
+      <h2>Где мы находимся</h2>
+      <div class="map-container">
+        <div class="map-placeholder">
+          <div class="map-content">
+            <h3>📍 BlondePlace Beauty Studio</h3>
+            <p>г. Москва, ул. Тверская, д. 15</p>
+            <p>ТЦ "Галерея", 2-й этаж</p>
+            <div class="map-buttons">
+              <a href="https://yandex.ru/maps/" target="_blank" class="map-btn">
+                Яндекс.Карты
+              </a>
+              <a href="https://maps.google.com/" target="_blank" class="map-btn">
+                Google Maps
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Social Media -->
+    <section class="social-section">
+      <h2>Мы в соцсетях</h2>
+      <p>Следите за нашими работами и получайте советы по уходу</p>
+      
+      <div class="social-links">
+        <a href="https://instagram.com/blondeplace" target="_blank" class="social-link instagram">
+          <span class="social-icon">📷</span>
+          <span class="social-text">
+            <strong>Instagram</strong><br>
+            @blondeplace
+          </span>
+        </a>
+
+        <a href="https://vk.com/blondeplace" target="_blank" class="social-link vk">
+          <span class="social-icon">📘</span>
+          <span class="social-text">
+            <strong>ВКонтакте</strong><br>
+            BlondePlace Studio
+          </span>
+        </a>
+
+        <a href="https://t.me/blondeplace" target="_blank" class="social-link telegram">
+          <span class="social-icon">✈️</span>
+          <span class="social-text">
+            <strong>Telegram</strong><br>
+            Новости и акции
+          </span>
+        </a>
+
+        <a href="https://youtube.com/@blondeplace" target="_blank" class="social-link youtube">
+          <span class="social-icon">🎥</span>
+          <span class="social-text">
+            <strong>YouTube</strong><br>
+            Видео-уроки
+          </span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Emergency Contact -->
+    <section class="emergency-contact">
+      <div class="emergency-content">
+        <h2>🚨 Экстренная связь</h2>
+        <p>
+          Если вы опаздываете на запись или нужна срочная помощь:
+        </p>
+        <div class="emergency-buttons">
+          <a href="tel:+74951234567" class="emergency-btn call">
+            📞 Позвонить сейчас
+          </a>
+          <a href="https://wa.me/74951234567" target="_blank" class="emergency-btn whatsapp">
+            💬 WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  /* Contacts Page Styles */
+  .contacts-hero {
+    text-align: center;
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #fef7f7, #f8d7da);
+    border-radius: 30px;
+    margin-bottom: 4rem;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    font-weight: 600;
+    color: #2d1810;
+    margin-bottom: 1rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.3rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 4rem;
+  }
+
+  .contact-info h2, .booking-form h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #2d1810;
+    margin-bottom: 2rem;
+  }
+
+  .contact-methods {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: #fef7f7;
+    border-radius: 20px;
+  }
+
+  .contact-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .contact-details h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #2d1810;
+    margin-bottom: 0.5rem;
+  }
+
+  .main-phone a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #c297b8;
+    text-decoration: none;
+  }
+
+  .main-phone a:hover {
+    color: #2d1810;
+  }
+
+  .phone-note {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+  }
+
+  .address {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #444;
+  }
+
+  .schedule p {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+  }
+
+  /* Booking Form */
+  .booking-form {
+    background: linear-gradient(135deg, #f8d7da, #fbb6ce);
+    padding: 3rem;
+    border-radius: 25px;
+  }
+
+  .form-description {
+    font-size: 1.1rem;
+    color: #2d1810;
+    margin-bottom: 2rem;
+  }
+
+  .contact-form {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: #2d1810;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 1rem;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: white;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #2d1810;
+  }
+
+  .submit-btn {
+    padding: 1.2rem 2rem;
+    background: #2d1810;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .submit-btn:hover {
+    background: #1a0e08;
+    transform: translateY(-2px);
+  }
+
+  .form-note {
+    font-size: 0.9rem;
+    color: #2d1810;
+    text-align: center;
+    margin-top: 1rem;
+    line-height: 1.5;
+  }
+
+  /* Map Section */
+  .map-section {
+    margin-bottom: 4rem;
+  }
+
+  .map-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    text-align: center;
+    color: #2d1810;
+    margin-bottom: 2rem;
+  }
+
+  .map-container {
+    border-radius: 20px;
+    overflow: hidden;
+    height: 400px;
+  }
+
+  .map-placeholder {
+    height: 100%;
+    background: linear-gradient(135deg, #f8d7da, #c297b8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .map-content {
+    text-align: center;
+    color: #2d1810;
+  }
+
+  .map-content h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .map-content p {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .map-buttons {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .map-btn {
+    padding: 0.8rem 1.5rem;
+    background: white;
+    color: #2d1810;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .map-btn:hover {
+    background: #2d1810;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Social Section */
+  .social-section {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .social-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #2d1810;
+    margin-bottom: 1rem;
+  }
+
+  .social-section p {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 3rem;
+  }
+
+  .social-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #fef7f7;
+    border-radius: 20px;
+    text-decoration: none;
+    color: #444;
+    transition: all 0.3s ease;
+  }
+
+  .social-link:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .social-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .social-text {
+    text-align: left;
+  }
+
+  .social-text strong {
+    color: #2d1810;
+    font-size: 1.1rem;
+  }
+
+  /* Emergency Contact */
+  .emergency-contact {
+    background: linear-gradient(135deg, #ffebee, #ffc1cc);
+    padding: 3rem;
+    border-radius: 25px;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .emergency-content h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #2d1810;
+    margin-bottom: 1rem;
+  }
+
+  .emergency-content p {
+    font-size: 1.2rem;
+    color: #2d1810;
+    margin-bottom: 2rem;
+  }
+
+  .emergency-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .emergency-btn {
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+
+  .emergency-btn.call {
+    background: #2d1810;
+    color: white;
+  }
+
+  .emergency-btn.call:hover {
+    background: #1a0e08;
+    transform: translateY(-3px);
+  }
+
+  .emergency-btn.whatsapp {
+    background: #25d366;
+    color: white;
+  }
+
+  .emergency-btn.whatsapp:hover {
+    background: #128c7e;
+    transform: translateY(-3px);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+    }
+
+    .contact-item {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .social-links {
+      grid-template-columns: 1fr;
+    }
+
+    .emergency-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .map-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>
+
+<script>
+  // Set minimum date to today
+  const dateInput = document.getElementById('date');
+  if (dateInput) {
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+  }
+
+  // Form submission
+  const bookingForm = document.getElementById('bookingForm');
+  if (bookingForm) {
+    bookingForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get form data
+      const formData = new FormData(bookingForm);
+      const data = Object.fromEntries(formData);
+      
+      // Simple validation
+      if (!data.name || !data.phone) {
+        alert('Пожалуйста, заполните обязательные поля');
+        return;
+      }
+      
+      // Simulate booking submission
+      alert(`Спасибо, ${data.name}! Ваша заявка принята. Мы перезвоним вам по номеру ${data.phone} в течение 30 минут.`);
+      
+      // Reset form
+      bookingForm.reset();
+    });
+  }
+</script> 
