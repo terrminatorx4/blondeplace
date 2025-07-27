@@ -1,0 +1,44 @@
+name: 🧠 Smart Fix (Исправляет конфликты, НЕ удаляет)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smart-fix:
+    permissions:
+      contents: write
+      
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Нужна полная история для восстановления
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🧠 Smart Fix Git Conflicts
+        run: node restore-and-fix.js
+
+      - name: 🚀 Commit Fixed Files
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions-bot@github.com'
+          
+          if [[ -z $(git status --porcelain) ]]; then
+            echo "✅ Все файлы уже исправлены или конфликтов не найдено."
+            exit 0
+          fi
+
+          echo "🔧 Найдены и исправлены файлы с Git конфликтами. Публикую..."
+          git add .
+          git commit -m "🧠 Умное исправление Git конфликтов (восстановление + фикс)"
+          git pull --rebase
+          git push 
