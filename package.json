@@ -1,0 +1,48 @@
+{
+  "name": "blondeplace-blog",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Блог-сателлит для салона красоты BlondePlace.ru - экспертные статьи о красоте, уходе за волосами и трендах",
+  "author": "BlondePlace Beauty Team",
+  "license": "MIT",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev", 
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "factory": "node factory.js",
+    "blitzkrieg": "node blitzkrieg-factory.js",
+    "fix-conflicts": "node fix-merge-conflicts.js",
+    "fix-yaml": "node yaml-fixer.js",
+    "quick-test": "node quick-test-netlify.js",
+    "emergency-clean": "node emergency-cleanup.js",
+    "restore-fix": "node restore-and-fix.js"
+  },
+  "dependencies": {
+    "@astrojs/netlify": "^5.5.3",
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^4.16.17",
+    "@google/generative-ai": "^0.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.9",
+    "execa": "^9.5.1",
+    "gray-matter": "^4.0.3"
+  },
+  "keywords": [
+    "beauty-blog",
+    "hair-care",
+    "salon",
+    "blonde-hair", 
+    "beauty-tips",
+    "hair-coloring",
+    "astro-blog",
+    "beauty-seo"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blondeplace-user/blondeplace-blog.git"
+  },
+  "homepage": "https://blondeplace-blog.netlify.app"
+}
