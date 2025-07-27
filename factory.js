@@ -10,7 +10,7 @@ import path from 'path';
 const BRAND_CONFIG = {
     brand: "BlondePlace",
     domain: "blondeplace.ru",
-    blog_domain: "blondeplace-blog.netlify.app",
+    blog_domain: "blondeplace.netlify.app",
     salon_name: "BlondePlace Beauty Studio",
     specialization: "Салон красоты, специализирующийся на окрашивании волос, стрижках, маникюре и beauty-процедурах",
     author: "BlondePlace Beauty Expert",
