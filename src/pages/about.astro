@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 
 const pageTitle = "О нас | BlondePlace Beauty Studio - Профессиональный салон красоты";
-const pageDescription = "BlondePlace Beauty Studio - ведущий салон красоты, специализирующийся на окрашивании волос, стрижках, маникюре и beauty-процедурах. Мастера с 10+ летним опытом.";
+const pageDescription = "BlondePlace Beauty Studio - ведущий салон красоты в Санкт-Петербурге, специализирующийся на профессиональном окрашивании волос и создании идеального блонда.";
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
@@ -12,12 +12,12 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
       <div class="hero-content">
         <h1 class="page-title">О BlondePlace Beauty Studio</h1>
         <p class="hero-subtitle">
-          Профессиональный салон красоты в сердце города
+          Профессиональный салон красоты в Санкт-Петербурге
         </p>
       </div>
       <div class="hero-image">
         <div class="salon-badge">
-          ⭐ 5 лет<br>на рынке
+          ⭐ Эксперты<br>по блонду
         </div>
       </div>
     </section>
@@ -26,17 +26,17 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
     <section class="about-content">
       <div class="content-grid">
         <div class="content-main">
-          <h2>Наша история</h2>
+          <h2>О нашем салоне</h2>
           <p>
-            BlondePlace Beauty Studio был основан в 2019 году командой профессиональных 
-            мастеров с многолетним опытом работы в индустрии красоты. Мы специализируемся 
-            на создании идеального блонда и современных техниках окрашивания волос.
+            BlondePlace Beauty Studio - это профессиональный салон красоты в Санкт-Петербурге, 
+            который специализируется на создании идеального блонда и профессиональном окрашивании волос. 
+            Мы используем только современные техники и премиальные материалы.
           </p>
           
           <p>
-            Наша философия основана на индивидуальном подходе к каждому клиенту. 
-            Мы используем только премиальные продукты и современные технологии, 
-            чтобы создать образ вашей мечты.
+            Наша команда состоит из опытных мастеров-колористов, которые постоянно совершенствуют 
+            свои навыки и следят за последними тенденциями в мире красоты. Мы создаем индивидуальный 
+            подход к каждому клиенту, учитывая особенности структуры волос и пожелания.
           </p>
 
           <h3>Наши принципы</h3>
@@ -44,74 +44,62 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
             <li>🎨 <strong>Профессионализм</strong> - постоянное обучение и повышение квалификации</li>
             <li>💎 <strong>Качество</strong> - используем только премиальные продукты</li>
             <li>💫 <strong>Индивидуальность</strong> - подход к каждому клиенту уникален</li>
-            <li>🌟 <strong>Комфорт</strong> - создаем атмосферу релакса и красоты</li>
+            <li>🌟 <strong>Экспертиза</strong> - специализируемся на сложном окрашивании</li>
+          </ul>
+
+          <h3>Наша специализация</h3>
+          <p>
+            Мы являемся экспертами в области окрашивания волос и специализируемся на следующих услугах:
+          </p>
+          <ul class="services-list">
+            <li>Мелирование с растяжкой цвета</li>
+            <li>Сложное окрашивание + стрижка</li>
+            <li>Контуринг волос</li>
+            <li>Тотал блонд с нуля и на окрашенной базе</li>
+            <li>AirTouch для длинных волос</li>
+            <li>Шатуш и тонирование</li>
           </ul>
         </div>
 
         <div class="content-sidebar">
           <div class="info-card">
-            <h3>Наши достижения</h3>
-            <ul class="achievements">
-              <li>🏆 Лучший салон года 2023</li>
-              <li>⭐ 4.9/5 рейтинг клиентов</li>
-              <li>👑 500+ довольных клиентов</li>
-              <li>🎓 Сертифицированные мастера</li>
+            <h3>Контактная информация</h3>
+            <ul class="contact-list">
+              <li>📞 +7 (981) 960-87-22</li>
+              <li>📍 г. Санкт-Петербург, Дегтярная, дом 9</li>
+              <li>🚇 м. Площадь Восстания (12 мин)</li>
+              <li>🚇 м. Александра Невского (19 мин)</li>
+              <li>🚇 м. Маяковского (12 мин)</li>
             </ul>
           </div>
 
           <div class="info-card">
             <h3>Рабочие часы</h3>
             <ul class="schedule">
-              <li>Пн-Пт: 10:00 - 21:00</li>
-              <li>Суббота: 10:00 - 20:00</li>
-              <li>Воскресенье: 11:00 - 19:00</li>
+              <li>Пн-Вс: 10:00 - 21:00</li>
+              <li>Без выходных</li>
+              <li>Запись по телефону</li>
             </ul>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Team Section -->
-    <section class="team-section">
-      <h2 class="section-title">Наша команда</h2>
-      
-      <div class="team-grid">
-        <div class="team-member">
-          <div class="member-photo">
-            <div class="photo-placeholder">👩‍💼</div>
-          </div>
-          <h3>Анна Светлова</h3>
-          <p class="member-role">Топ-колорист, основатель</p>
-          <p class="member-experience">Опыт: 12 лет</p>
-          <p class="member-description">
-            Специалист по сложным техникам окрашивания: балаяж, шатуш, 
-            омбре. Эксперт по работе с блондом.
-          </p>
-        </div>
-
-        <div class="team-member">
-          <div class="member-photo">
-            <div class="photo-placeholder">👩‍🎨</div>
-          </div>
-          <h3>Елена Золотова</h3>
-          <p class="member-role">Стилист-универсал</p>
-          <p class="member-experience">Опыт: 8 лет</p>
-          <p class="member-description">
-            Мастер стрижек и укладок. Специализируется на создании 
-            современных образов и коррекции формы лица.
-          </p>
-        </div>
-
-        <div class="team-member">
-          <div class="member-photo">
-            <div class="photo-placeholder">💅</div>
-          </div>
-          <h3>Мария Роскошная</h3>
-          <p class="member-role">Nail-мастер</p>
-          <p class="member-experience">Опыт: 6 лет</p>
-          <p class="member-description">
-            Эксперт по маникюру и педикюру. Виртуоз nail-арта 
-            и современных техник покрытия.
+    <!-- Masters Section -->
+    <section class="masters-section">
+      <h2 class="section-title">Наши мастера</h2>
+      <div class="masters-content">
+        <p>
+          В нашем салоне работают высококвалифицированные мастера-колористы с большим опытом работы. 
+          Каждый из наших специалистов является экспертом в области окрашивания волос и создания идеального блонда.
+        </p>
+        <div class="masters-link">
+          <a href="https://blondeplace.ru/#masters" target="_blank" class="masters-btn">
+            👥 Познакомиться с нашими мастерами
+          </a>
+          <p class="masters-note">
+            Подробную информацию о наших мастерах, их специализации и портфолио вы можете найти 
+            на главном сайте нашего салона.
           </p>
         </div>
       </div>
@@ -206,15 +194,28 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
     margin-bottom: 1.5rem;
   }
 
-  .principles-list {
+  .principles-list, .services-list {
     list-style: none;
     padding: 0;
   }
 
-  .principles-list li {
+  .principles-list li, .services-list li {
     padding: 0.75rem 0;
     font-size: 1.1rem;
     color: #555;
+  }
+
+  .services-list li {
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .services-list li::before {
+    content: "✓";
+    color: #d4af37;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
   }
 
   .info-card {
@@ -231,18 +232,21 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
     margin-bottom: 1rem;
   }
 
-  .achievements, .schedule {
+  .contact-list, .schedule {
     list-style: none;
     padding: 0;
   }
 
-  .achievements li, .schedule li {
+  .contact-list li, .schedule li {
     padding: 0.5rem 0;
     color: #555;
   }
 
-  .team-section {
+  .masters-section {
     margin-bottom: 4rem;
+    background: #fef7f7;
+    padding: 3rem;
+    border-radius: 20px;
   }
 
   .section-title {
@@ -250,61 +254,50 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
     font-size: 2.5rem;
     text-align: center;
     color: #2d1810;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 
-  .team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-  }
-
-  .team-member {
+  .masters-content {
     text-align: center;
-    padding: 2rem;
-    background: #fef7f7;
-    border-radius: 20px;
   }
 
-  .member-photo {
-    margin-bottom: 1.5rem;
+  .masters-content p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .photo-placeholder {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #f8d7da, #fbb6ce);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    margin: 0 auto;
+  .masters-link {
+    margin-top: 2rem;
   }
 
-  .team-member h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: #2d1810;
-    margin-bottom: 0.5rem;
-  }
-
-  .member-role {
+  .masters-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #2d1810, #4a2a1a);
+    color: white;
+    padding: 1.2rem 2.5rem;
+    border-radius: 50px;
+    text-decoration: none;
     font-weight: 600;
-    color: #c297b8;
-    margin-bottom: 0.25rem;
-  }
-
-  .member-experience {
-    font-size: 0.9rem;
-    color: #888;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
     margin-bottom: 1rem;
   }
 
-  .member-description {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #666;
+  .masters-btn:hover {
+    background: linear-gradient(135deg, #1a0e08, #2d1810);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+
+  .masters-note {
+    font-size: 0.9rem;
+    color: #777;
+    font-style: italic;
   }
 
   .cta-section {
@@ -378,10 +371,6 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
 
     .page-title {
       font-size: 2.5rem;
-    }
-
-    .team-grid {
-      grid-template-columns: 1fr;
     }
 
     .cta-buttons {
