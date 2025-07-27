@@ -1,0 +1,131 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="BlondePlace - Мир красоты и стиля">
+    <section class="hero">
+        <h1>🌸 Добро пожаловать в BlondePlace</h1>
+        <p class="hero-subtitle">Ваш персональный гид в мире красоты, стиля и ухода за собой</p>
+        <a href="/blog" class="cta-button">Перейти к блогу</a>
+    </section>
+    
+    <section class="features">
+        <h2>Что вас ждет в нашем блоге</h2>
+        <div class="features-grid">
+            <div class="feature">
+                <h3>💄 Beauty-советы</h3>
+                <p>Экспертные советы по макияжу, уходу за кожей и beauty-процедурам</p>
+            </div>
+            <div class="feature">
+                <h3>💅 Маникюр и педикюр</h3>
+                <p>Актуальные тренды nail-арта и секреты идеального маникюра</p>
+            </div>
+            <div class="feature">
+                <h3>💇‍♀️ Уход за волосами</h3>
+                <p>Профессиональные советы по окрашиванию и укладке волос</p>
+            </div>
+            <div class="feature">
+                <h3>✨ Модные тренды</h3>
+                <p>Последние новости моды и beauty-индустрии</p>
+            </div>
+        </div>
+    </section>
+</Layout>
+
+<style>
+    .hero {
+        text-align: center;
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #ffecd2, #fcb69f);
+        margin: -2rem -20px 3rem -20px;
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        color: #666;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .cta-button {
+        display: inline-block;
+        background: linear-gradient(135deg, #ff6b9d, #c44569);
+        color: white;
+        padding: 15px 40px;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3);
+    }
+    
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(255, 107, 157, 0.4);
+    }
+    
+    .features {
+        margin: 4rem 0;
+    }
+    
+    .features h2 {
+        text-align: center;
+        margin-bottom: 3rem;
+        color: #333;
+        font-size: 2.2rem;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+    
+    .feature {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .feature:hover {
+        transform: translateY(-5px);
+    }
+    
+    .feature h3 {
+        color: #c44569;
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+    }
+    
+    .feature p {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    @media (max-width: 768px) {
+        .hero h1 {
+            font-size: 2.2rem;
+        }
+        
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .hero {
+            padding: 3rem 0;
+        }
+    }
+</style>
