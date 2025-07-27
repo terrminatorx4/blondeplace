@@ -1,0 +1,950 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Beauty Coworking - BlondePlace">
+	<main>
+		<section class="hero-section">
+			<div class="container">
+				<h1>Beauty Coworking</h1>
+				<p class="lead">Аренда оборудованных кабинетов для мастеров красоты</p>
+			</div>
+		</section>
+
+		<section class="coworking-section">
+			<div class="container">
+				<div class="intro-block">
+					<h2>Что такое Beauty Coworking?</h2>
+					<p class="intro-text">
+						Beauty Coworking BlondePlace — это современное пространство для независимых мастеров красоты. 
+						Мы предоставляем полностью оборудованные кабинеты с профессиональной техникой для почасовой 
+						или посуточной аренды.
+					</p>
+					<div class="benefits-grid">
+						<div class="benefit-item">
+							<span class="benefit-icon">💼</span>
+							<h3>Готовый бизнес</h3>
+							<p>Полностью оборудованные кабинеты с мебелью и профессиональной техникой</p>
+						</div>
+						<div class="benefit-item">
+							<span class="benefit-icon">💰</span>
+							<h3>Минимальные вложения</h3>
+							<p>Никаких затрат на аренду, ремонт и покупку оборудования</p>
+						</div>
+						<div class="benefit-item">
+							<span class="benefit-icon">🎯</span>
+							<h3>Гибкий график</h3>
+							<p>Арендуйте кабинет тогда, когда вам удобно - от 2 часов до целого дня</p>
+						</div>
+						<div class="benefit-item">
+							<span class="benefit-icon">📍</span>
+							<h3>Престижное место</h3>
+							<p>Центр Санкт-Петербурга, удобная транспортная доступность</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="spaces-section">
+					<h2>Доступные пространства</h2>
+					<div class="spaces-grid">
+						<div class="space-card">
+							<div class="space-image">
+								<span class="space-emoji">💇‍♀️</span>
+							</div>
+							<div class="space-info">
+								<h3>Кабинет парикмахера</h3>
+								<ul class="space-features">
+									<li>Профессиональное кресло Takara Belmont</li>
+									<li>Мойка с качественной сантехникой</li>
+									<li>Климазон для сушки волос</li>
+									<li>Стерилизатор инструментов</li>
+									<li>Большое зеркало с подсветкой</li>
+									<li>Система хранения для инструментов</li>
+								</ul>
+								<div class="space-pricing">
+									<span class="price-label">От</span>
+									<span class="price">800 ₽/час</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="space-card">
+							<div class="space-image">
+								<span class="space-emoji">💅</span>
+							</div>
+							<div class="space-info">
+								<h3>Кабинет маникюра</h3>
+								<ul class="space-features">
+									<li>Маникюрный стол с вытяжкой</li>
+									<li>Эргономичные кресла для клиента и мастера</li>
+									<li>УФ и LED лампы для сушки</li>
+									<li>Фрезер для аппаратного маникюра</li>
+									<li>Ультразвуковая ванна</li>
+									<li>Стерилизатор сухожарового типа</li>
+								</ul>
+								<div class="space-pricing">
+									<span class="price-label">От</span>
+									<span class="price">600 ₽/час</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="space-card">
+							<div class="space-image">
+								<span class="space-emoji">🧴</span>
+							</div>
+							<div class="space-info">
+								<h3>Кабинет косметолога</h3>
+								<ul class="space-features">
+									<li>Косметологическая кушетка</li>
+									<li>Аппарат для ультразвуковой чистки</li>
+									<li>Лампа-лупа с подсветкой</li>
+									<li>Вапоризатор для распаривания</li>
+									<li>Шкаф для косметических средств</li>
+									<li>Дарсонваль и другие аппараты</li>
+								</ul>
+								<div class="space-pricing">
+									<span class="price-label">От</span>
+									<span class="price">700 ₽/час</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="space-card">
+							<div class="space-image">
+								<span class="space-emoji">👁️</span>
+							</div>
+							<div class="space-info">
+								<h3>Кабинет для бровей и ресниц</h3>
+								<ul class="space-features">
+									<li>Регулируемая кушетка</li>
+									<li>Кольцевая лампа с регулировкой света</li>
+									<li>Тележка с инструментами</li>
+									<li>Набор для окрашивания бровей</li>
+									<li>Материалы для ламинирования</li>
+									<li>Стерилизационные боксы</li>
+								</ul>
+								<div class="space-pricing">
+									<span class="price-label">От</span>
+									<span class="price">500 ₽/час</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="pricing-section">
+					<h2>Тарифы и условия</h2>
+					<div class="pricing-grid">
+						<div class="pricing-card">
+							<h3>Почасовая аренда</h3>
+							<div class="pricing-details">
+								<p><strong>Минимальная аренда:</strong> 2 часа</p>
+								<p><strong>Время работы:</strong> 10:00 - 21:00</p>
+								<p><strong>Включено:</strong></p>
+								<ul>
+									<li>Использование оборудования</li>
+									<li>Расходные материалы (базовые)</li>
+									<li>Уборка после сеанса</li>
+									<li>Wi-Fi и кондиционер</li>
+								</ul>
+							</div>
+							<div class="pricing-note">
+								<p>Идеально для: разовых клиентов, тестирования локации</p>
+							</div>
+						</div>
+
+						<div class="pricing-card featured">
+							<h3>Дневная аренда</h3>
+							<div class="pricing-badge">Популярно</div>
+							<div class="pricing-details">
+								<p><strong>Стоимость:</strong> 4 000 - 6 000 ₽/день</p>
+								<p><strong>Время:</strong> 8 часов работы</p>
+								<p><strong>Включено:</strong></p>
+								<ul>
+									<li>Всё из почасового тарифа</li>
+									<li>Дополнительные расходники</li>
+									<li>Место для хранения материалов</li>
+									<li>Возможность записи клиентов подряд</li>
+								</ul>
+							</div>
+							<div class="pricing-note">
+								<p>Идеально для: постоянной работы, больше 5 клиентов в день</p>
+							</div>
+						</div>
+
+						<div class="pricing-card">
+							<h3>Абонемент</h3>
+							<div class="pricing-details">
+								<p><strong>Стоимость:</strong> 15 000 - 25 000 ₽/месяц</p>
+								<p><strong>Условия:</strong> фиксированные дни недели</p>
+								<p><strong>Включено:</strong></p>
+								<ul>
+									<li>Всё из дневного тарифа</li>
+									<li>Персональный ящик для инструментов</li>
+									<li>Скидка 20% на дополнительные часы</li>
+									<li>Приоритет при бронировании</li>
+								</ul>
+							</div>
+							<div class="pricing-note">
+								<p>Идеально для: постоянной работы, построения клиентской базы</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="services-section">
+					<h2>Дополнительные услуги</h2>
+					<div class="services-grid">
+						<div class="service-item">
+							<span class="service-icon">📸</span>
+							<h3>Фотосессия работ</h3>
+							<p>Профессиональная съемка ваших работ для портфолио и соцсетей</p>
+							<span class="service-price">от 2 000 ₽</span>
+						</div>
+
+						<div class="service-item">
+							<span class="service-icon">💼</span>
+							<h3>Хранение материалов</h3>
+							<p>Персональный шкафчик для ваших инструментов и косметики</p>
+							<span class="service-price">1 500 ₽/месяц</span>
+						</div>
+
+						<div class="service-item">
+							<span class="service-icon">🧹</span>
+							<h3>Дополнительная уборка</h3>
+							<p>Глубокая уборка кабинета после сложных процедур</p>
+							<span class="service-price">500 ₽</span>
+						</div>
+
+						<div class="service-item">
+							<span class="service-icon">📱</span>
+							<h3>Онлайн-запись</h3>
+							<p>Подключение к нашей системе онлайн-записи клиентов</p>
+							<span class="service-price">бесплатно</span>
+						</div>
+
+						<div class="service-item">
+							<span class="service-icon">🎓</span>
+							<h3>Консультации и обучение</h3>
+							<p>Мастер-классы и консультации по развитию бизнеса</p>
+							<span class="service-price">от 3 000 ₽</span>
+						</div>
+
+						<div class="service-item">
+							<span class="service-icon">🤝</span>
+							<h3>Партнерская программа</h3>
+							<p>Приведи мастера и получи скидку на аренду</p>
+							<span class="service-price">скидка 10%</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="requirements-section">
+					<h2>Требования к мастерам</h2>
+					<div class="requirements-content">
+						<div class="requirements-list">
+							<h3>Обязательные требования:</h3>
+							<ul>
+								<li>✅ Профильное образование или сертификаты</li>
+								<li>✅ Опыт работы от 6 месяцев</li>
+								<li>✅ Портфолио работ (не менее 20 фото)</li>
+								<li>✅ Медицинская книжка</li>
+								<li>✅ Собственные расходные материалы</li>
+								<li>✅ Знание санитарных норм</li>
+							</ul>
+						</div>
+
+						<div class="requirements-list">
+							<h3>Дополнительные плюсы:</h3>
+							<ul>
+								<li>⭐ Клиентская база в Санкт-Петербурге</li>
+								<li>⭐ Активные социальные сети</li>
+								<li>⭐ Положительные отзывы</li>
+								<li>⭐ Знание английского языка</li>
+								<li>⭐ Участие в beauty-мероприятиях</li>
+								<li>⭐ Специализация на премиум-услугах</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div class="application-section">
+					<h2>Как стать резидентом</h2>
+					<div class="application-steps">
+						<div class="step-item">
+							<div class="step-number">1</div>
+							<div class="step-content">
+								<h3>Подача заявки</h3>
+								<p>Заполните форму ниже или напишите нам в WhatsApp. Приложите портфолио и документы об образовании.</p>
+							</div>
+						</div>
+
+						<div class="step-item">
+							<div class="step-number">2</div>
+							<div class="step-content">
+								<h3>Собеседование</h3>
+								<p>Встреча с администратором, просмотр кабинетов, обсуждение условий сотрудничества.</p>
+							</div>
+						</div>
+
+						<div class="step-item">
+							<div class="step-number">3</div>
+							<div class="step-content">
+								<h3>Тестовый период</h3>
+								<p>Первая неделя работы на специальных условиях для взаимной проверки.</p>
+							</div>
+						</div>
+
+						<div class="step-item">
+							<div class="step-number">4</div>
+							<div class="step-content">
+								<h3>Заключение договора</h3>
+								<p>Оформление официального партнерства и начало постоянной работы.</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="application-form">
+						<h3>Оставить заявку</h3>
+						<form class="coworking-form">
+							<div class="form-row">
+								<div class="form-group">
+									<label for="master-name">Имя и фамилия *</label>
+									<input type="text" id="master-name" name="master-name" required>
+								</div>
+								<div class="form-group">
+									<label for="master-phone">Телефон *</label>
+									<input type="tel" id="master-phone" name="master-phone" required placeholder="+7 (___) ___-__-__">
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label for="master-email">Email</label>
+									<input type="email" id="master-email" name="master-email">
+								</div>
+								<div class="form-group">
+									<label for="master-specialty">Специализация *</label>
+									<select id="master-specialty" name="master-specialty" required>
+										<option value="">Выберите специализацию</option>
+										<option value="hairdresser">Парикмахер</option>
+										<option value="colorist">Колорист</option>
+										<option value="nail-master">Мастер маникюра/педикюра</option>
+										<option value="cosmetologist">Косметолог</option>
+										<option value="brow-master">Мастер по бровям и ресницам</option>
+										<option value="massage">Массажист</option>
+										<option value="universal">Универсальный мастер</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label for="master-experience">Опыт работы *</label>
+								<select id="master-experience" name="master-experience" required>
+									<option value="">Выберите опыт</option>
+									<option value="6months-1year">6 месяцев - 1 год</option>
+									<option value="1-3years">1 - 3 года</option>
+									<option value="3-5years">3 - 5 лет</option>
+									<option value="5plus">Более 5 лет</option>
+								</select>
+							</div>
+
+							<div class="form-group">
+								<label for="master-schedule">Желаемый график</label>
+								<textarea id="master-schedule" name="master-schedule" rows="3" placeholder="Например: пн, ср, пт с 12:00 до 20:00"></textarea>
+							</div>
+
+							<div class="form-group">
+								<label for="master-portfolio">Ссылка на портфолио</label>
+								<input type="url" id="master-portfolio" name="master-portfolio" placeholder="Instagram, сайт или облачное хранилище">
+							</div>
+
+							<div class="form-group">
+								<label for="master-comment">Дополнительная информация</label>
+								<textarea id="master-comment" name="master-comment" rows="4" placeholder="Расскажите о себе, своих навыках и планах..."></textarea>
+							</div>
+
+							<button type="submit" class="submit-btn">Отправить заявку</button>
+							
+							<p class="form-note">
+								* Обязательные поля<br>
+								Мы свяжемся с вами в течение 24 часов
+							</p>
+						</form>
+					</div>
+				</div>
+
+				<div class="contact-section">
+					<h2>Контакты Beauty Coworking</h2>
+					<div class="contact-grid">
+						<div class="contact-method">
+							<span class="contact-icon">📞</span>
+							<div>
+								<h3>Телефон</h3>
+								<p><a href="tel:+78123567890">+7 (812) 356-78-90</a></p>
+								<small>Ежедневно с 10:00 до 21:00</small>
+							</div>
+						</div>
+
+						<div class="contact-method">
+							<span class="contact-icon">📱</span>
+							<div>
+								<h3>WhatsApp</h3>
+								<p><a href="https://wa.me/78123567890">+7 (812) 356-78-90</a></p>
+								<small>Быстрые ответы и консультации</small>
+							</div>
+						</div>
+
+						<div class="contact-method">
+							<span class="contact-icon">📧</span>
+							<div>
+								<h3>Email</h3>
+								<p><a href="mailto:coworking@blondeplace.ru">coworking@blondeplace.ru</a></p>
+								<small>Подробные консультации</small>
+							</div>
+						</div>
+
+						<div class="contact-method">
+							<span class="contact-icon">📍</span>
+							<div>
+								<h3>Адрес</h3>
+								<p>СПб, ул. Рубинштейна, 23, 2 этаж</p>
+								<small>5 минут от метро "Достоевская"</small>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	.hero-section {
+		background: linear-gradient(135deg, #f5f1eb 0%, #e8ddd4 100%);
+		padding: 80px 0;
+		text-align: center;
+	}
+
+	.hero-section h1 {
+		font-size: 3em;
+		color: #8b6f47;
+		margin-bottom: 20px;
+	}
+
+	.lead {
+		font-size: 1.3em;
+		color: #6b5b3d;
+		max-width: 600px;
+		margin: 0 auto;
+	}
+
+	.coworking-section {
+		padding: 60px 0;
+	}
+
+	.container {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 20px;
+	}
+
+	.intro-block {
+		margin-bottom: 80px;
+		text-align: center;
+	}
+
+	.intro-block h2 {
+		color: #8b6f47;
+		font-size: 2.5em;
+		margin-bottom: 30px;
+	}
+
+	.intro-text {
+		font-size: 1.2em;
+		color: #666;
+		max-width: 800px;
+		margin: 0 auto 50px;
+		line-height: 1.6;
+	}
+
+	.benefits-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: 30px;
+		margin-top: 50px;
+	}
+
+	.benefit-item {
+		background: white;
+		padding: 30px;
+		border-radius: 15px;
+		box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+		text-align: center;
+		transition: transform 0.3s ease;
+	}
+
+	.benefit-item:hover {
+		transform: translateY(-5px);
+	}
+
+	.benefit-icon {
+		font-size: 3em;
+		display: block;
+		margin-bottom: 20px;
+	}
+
+	.benefit-item h3 {
+		color: #8b6f47;
+		margin-bottom: 15px;
+		font-size: 1.3em;
+	}
+
+	.benefit-item p {
+		color: #666;
+		line-height: 1.5;
+	}
+
+	.spaces-section,
+	.pricing-section,
+	.services-section,
+	.requirements-section,
+	.application-section,
+	.contact-section {
+		margin-bottom: 80px;
+	}
+
+	.spaces-section h2,
+	.pricing-section h2,
+	.services-section h2,
+	.requirements-section h2,
+	.application-section h2,
+	.contact-section h2 {
+		color: #8b6f47;
+		font-size: 2.5em;
+		text-align: center;
+		margin-bottom: 50px;
+	}
+
+	.spaces-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 30px;
+	}
+
+	.space-card {
+		background: white;
+		border-radius: 20px;
+		overflow: hidden;
+		box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+		transition: transform 0.3s ease;
+	}
+
+	.space-card:hover {
+		transform: translateY(-5px);
+	}
+
+	.space-image {
+		background: linear-gradient(135deg, #f5f1eb 0%, #e8ddd4 100%);
+		padding: 40px;
+		text-align: center;
+	}
+
+	.space-emoji {
+		font-size: 4em;
+	}
+
+	.space-info {
+		padding: 30px;
+	}
+
+	.space-info h3 {
+		color: #8b6f47;
+		font-size: 1.5em;
+		margin-bottom: 20px;
+	}
+
+	.space-features {
+		list-style: none;
+		padding: 0;
+		margin-bottom: 30px;
+	}
+
+	.space-features li {
+		padding: 8px 0;
+		border-bottom: 1px solid #f0f0f0;
+		color: #666;
+	}
+
+	.space-features li::before {
+		content: "✓";
+		color: #d4af37;
+		font-weight: bold;
+		margin-right: 10px;
+	}
+
+	.space-pricing {
+		text-align: center;
+		padding: 20px;
+		background: #f8f5f0;
+		border-radius: 10px;
+	}
+
+	.price-label {
+		color: #666;
+		font-size: 0.9em;
+	}
+
+	.price {
+		color: #d4af37;
+		font-size: 2em;
+		font-weight: bold;
+		display: block;
+	}
+
+	.pricing-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+		gap: 30px;
+	}
+
+	.pricing-card {
+		background: white;
+		padding: 40px;
+		border-radius: 20px;
+		box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+		position: relative;
+		transition: transform 0.3s ease;
+	}
+
+	.pricing-card:hover {
+		transform: translateY(-5px);
+	}
+
+	.pricing-card.featured {
+		border: 3px solid #d4af37;
+		transform: scale(1.05);
+	}
+
+	.pricing-card h3 {
+		color: #8b6f47;
+		font-size: 1.5em;
+		margin-bottom: 20px;
+		text-align: center;
+	}
+
+	.pricing-badge {
+		position: absolute;
+		top: -10px;
+		right: 30px;
+		background: #d4af37;
+		color: white;
+		padding: 5px 15px;
+		border-radius: 15px;
+		font-size: 0.9em;
+		font-weight: bold;
+	}
+
+	.pricing-details p {
+		margin-bottom: 10px;
+		color: #333;
+	}
+
+	.pricing-details ul {
+		list-style: none;
+		padding: 0;
+		margin: 15px 0;
+	}
+
+	.pricing-details li {
+		padding: 5px 0;
+		color: #666;
+	}
+
+	.pricing-details li::before {
+		content: "✓";
+		color: #d4af37;
+		font-weight: bold;
+		margin-right: 10px;
+	}
+
+	.pricing-note {
+		background: #f8f5f0;
+		padding: 15px;
+		border-radius: 10px;
+		margin-top: 20px;
+	}
+
+	.pricing-note p {
+		margin: 0;
+		font-style: italic;
+		color: #8b6f47;
+		font-weight: bold;
+	}
+
+	.services-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 25px;
+	}
+
+	.service-item {
+		background: white;
+		padding: 30px;
+		border-radius: 15px;
+		box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		text-align: center;
+		transition: transform 0.3s ease;
+	}
+
+	.service-item:hover {
+		transform: translateY(-3px);
+	}
+
+	.service-icon {
+		font-size: 2.5em;
+		display: block;
+		margin-bottom: 15px;
+	}
+
+	.service-item h3 {
+		color: #8b6f47;
+		margin-bottom: 10px;
+	}
+
+	.service-item p {
+		color: #666;
+		margin-bottom: 15px;
+		line-height: 1.5;
+	}
+
+	.service-price {
+		color: #d4af37;
+		font-weight: bold;
+		font-size: 1.1em;
+	}
+
+	.requirements-content {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 50px;
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	.requirements-list h3 {
+		color: #8b6f47;
+		margin-bottom: 20px;
+	}
+
+	.requirements-list ul {
+		list-style: none;
+		padding: 0;
+	}
+
+	.requirements-list li {
+		padding: 10px 0;
+		border-bottom: 1px solid #f0f0f0;
+		color: #666;
+	}
+
+	.application-steps {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: 30px;
+		margin-bottom: 50px;
+	}
+
+	.step-item {
+		display: flex;
+		align-items: flex-start;
+		gap: 20px;
+	}
+
+	.step-number {
+		background: #d4af37;
+		color: white;
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: bold;
+		font-size: 1.2em;
+		flex-shrink: 0;
+	}
+
+	.step-content h3 {
+		color: #8b6f47;
+		margin-bottom: 10px;
+	}
+
+	.step-content p {
+		color: #666;
+		line-height: 1.5;
+	}
+
+	.application-form {
+		background: #f8f5f0;
+		padding: 40px;
+		border-radius: 20px;
+		box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+	}
+
+	.application-form h3 {
+		color: #8b6f47;
+		font-size: 2em;
+		margin-bottom: 30px;
+		text-align: center;
+	}
+
+	.form-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 20px;
+	}
+
+	.form-group {
+		margin-bottom: 20px;
+	}
+
+	.form-group label {
+		display: block;
+		margin-bottom: 8px;
+		color: #8b6f47;
+		font-weight: bold;
+	}
+
+	.form-group input,
+	.form-group select,
+	.form-group textarea {
+		width: 100%;
+		padding: 12px 15px;
+		border: 2px solid #e8ddd4;
+		border-radius: 10px;
+		font-size: 1em;
+		transition: border-color 0.3s ease;
+	}
+
+	.form-group input:focus,
+	.form-group select:focus,
+	.form-group textarea:focus {
+		outline: none;
+		border-color: #d4af37;
+	}
+
+	.submit-btn {
+		width: 100%;
+		background: #8b6f47;
+		color: white;
+		padding: 15px 30px;
+		border: none;
+		border-radius: 10px;
+		font-size: 1.1em;
+		font-weight: bold;
+		cursor: pointer;
+		transition: background-color 0.3s ease;
+		margin-bottom: 15px;
+	}
+
+	.submit-btn:hover {
+		background: #d4af37;
+	}
+
+	.form-note {
+		font-size: 0.9em;
+		color: #666;
+		text-align: center;
+		line-height: 1.4;
+	}
+
+	.contact-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: 30px;
+	}
+
+	.contact-method {
+		display: flex;
+		align-items: flex-start;
+		gap: 15px;
+		background: white;
+		padding: 25px;
+		border-radius: 15px;
+		box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+	}
+
+	.contact-method .contact-icon {
+		font-size: 2em;
+		min-width: 50px;
+		text-align: center;
+	}
+
+	.contact-method h3 {
+		color: #8b6f47;
+		margin-bottom: 5px;
+	}
+
+	.contact-method p {
+		margin-bottom: 5px;
+	}
+
+	.contact-method a {
+		color: #8b6f47;
+		text-decoration: none;
+		font-weight: bold;
+	}
+
+	.contact-method a:hover {
+		color: #d4af37;
+	}
+
+	.contact-method small {
+		color: #666;
+		font-size: 0.9em;
+	}
+
+	@media (max-width: 768px) {
+		.hero-section h1 {
+			font-size: 2em;
+		}
+
+		.benefits-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.spaces-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.pricing-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.pricing-card.featured {
+			transform: none;
+		}
+
+		.requirements-content {
+			grid-template-columns: 1fr;
+		}
+
+		.application-steps {
+			grid-template-columns: 1fr;
+		}
+
+		.form-row {
+			grid-template-columns: 1fr;
+		}
+
+		.contact-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.application-form {
+			padding: 25px;
+		}
+	}
+</style> 
