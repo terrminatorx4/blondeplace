@@ -26,17 +26,6 @@
       "**/*.xml"
     ]
 
-[[plugins]]
-  package = "netlify-plugin-minify-html"
-  
-  [plugins.inputs]
-    # Optimized settings for performance
-    removeComments = true
-    collapseWhitespace = true
-    removeRedundantAttributes = true
-    minifyCSS = true
-    minifyJS = true
-
 # 🎯 LIGHTHOUSE QUALITY CONTROL
 [[plugins]]
   package = "@netlify/plugin-lighthouse"
