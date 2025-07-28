@@ -9,7 +9,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test:seo": "lighthouse https://blondeplace.netlify.app --view",
+    "test:seo": "node test-seo.js",
     "test:speed": "curl -w '@curl-format.txt' -o /dev/null -s https://blondeplace.netlify.app"
   },
   "dependencies": {
@@ -22,7 +22,6 @@
     "@astrojs/sitemap": "^3.2.1"
   },
   "devDependencies": {
-    "@netlify/plugin-sitemap": "^0.8.1",
-    "netlify-plugin-minify-html": "^0.4.0"
+    "@netlify/plugin-sitemap": "^0.8.1"
   }
 }
