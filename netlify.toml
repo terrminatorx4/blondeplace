@@ -1,6 +1,7 @@
+# BlondePlace Netlify Config (Butler Logic)
 [build]
-  publish = "dist"
-  command = "NODE_OPTIONS='--max-old-space-size=4096' npm run build"
+  publish = "blondeplace-blog/dist"
+  command = "npm run build"
   
 [build.environment]
   NODE_VERSION = "18"
@@ -8,7 +9,7 @@
   ASTRO_TELEMETRY_DISABLED = "1"
   NODE_ENV = "production"
   
-# Оптимизация для beauty контента
+# Простые настройки как в Butler
 [build.processing]
   skip_processing = false
   
@@ -23,10 +24,7 @@
 [build.processing.html]
   pretty_urls = true
   
-[build.processing.images]
-  compress = true
-  
-# Headers для SEO салона красоты
+# Beauty-специфичные headers
 [[headers]]
   for = "/*"
   [headers.values]
@@ -35,60 +33,23 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     X-XSS-Protection = "1; mode=block"
     
-# Специальные headers для beauty контента
 [[headers]]
   for = "/blog/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     
-# Beauty-специфичные заголовки для изображений
-[[headers]]
-  for = "/images/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    
-# Redirects для beauty SEO - связываем с основным сайтом салона
+# Redirects для beauty SEO
 [[redirects]]
   from = "/salon"
   to = "https://blondeplace.ru"
   status = 301
   
 [[redirects]]
-  from = "/appointment"
-  to = "https://blondeplace.ru/booking"
-  status = 301
-  
-[[redirects]]  
   from = "/services"
-  to = "https://blondeplace.ru/services"
-  status = 301
-
-[[redirects]]
-  from = "/coloring"
-  to = "https://blondeplace.ru/hair-coloring"
-  status = 301
-
-[[redirects]]
-  from = "/manicure"
-  to = "https://blondeplace.ru/nail-services"
+  to = "https://blondeplace.ru/#services"
   status = 301
 
 [[redirects]]
   from = "/contact"
-  to = "https://blondeplace.ru/contact"
+  to = "https://blondeplace.ru/#about"
   status = 301
-
-# Редирект для старых beauty URL (если были)
-[[redirects]]
-  from = "/beauty-tips"
-  to = "/blog?category=beauty-tips"
-  status = 301
-
-[[redirects]]
-  from = "/hair-care"
-  to = "/blog?category=hair-care"
-  status = 301
-
-# Edge функции для beauty сайта (если понадобятся)
-# [functions]
-#   directory = "netlify/functions" 
