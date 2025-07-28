@@ -6,7 +6,8 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- 📱 PERFECT VIEWPORT - ИСПРАВЛЯЕТ PWA ОШИБКУ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -51,8 +52,44 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content="https://blondeplace.netlify.app/og-image.jpg" />
     
-    <!-- 🎯 PERFECT ACCESSIBILITY -->
+    <!-- 📱 PERFECT MOBILE VIEWPORT CSS -->
     <style>
+      /* 🎯 VIEWPORT FIX - WINDOW.INNERWIDTH = WINDOW.OUTERWIDTH */
+      * {
+        box-sizing: border-box;
+      }
+      
+      html {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      
+      body {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        position: relative;
+      }
+      
+      /* ПРЕДОТВРАЩАЕМ ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ */
+      body * {
+        max-width: 100%;
+      }
+      
+      /* ИСПРАВЛЯЕМ КОНТЕЙНЕРЫ */
+      .container,
+      .wrapper,
+      main,
+      section,
+      div {
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      
+      /* 🎯 PERFECT ACCESSIBILITY - ВЫСОКИЙ КОНТРАСТ */
       .Consultation_consultation__highlight__esun9,
       .Services_services__highlight__lBCUU {
         color: #000000 !important;
@@ -69,6 +106,8 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
         border: 2px solid #000000 !important;
         font-weight: bold !important;
         text-decoration: none !important;
+        max-width: 100%;
+        word-wrap: break-word;
       }
       
       .Button_transparent__6L3R2:hover {
@@ -81,18 +120,48 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
       .Consultation_consultation__zS8eJ {
         color: #000000 !important;
         background-color: #ffffff !important;
+        max-width: 100%;
+        overflow-x: hidden;
       }
       
+      /* ССЫЛКИ */
       a {
         color: #0066cc !important;
+        word-wrap: break-word;
+        max-width: 100%;
       }
       
       a:hover {
         color: #004499 !important;
       }
       
+      /* ЗАГОЛОВКИ */
       h1, h2, h3, h4, h5, h6 {
         color: #000000 !important;
+        max-width: 100%;
+        word-wrap: break-word;
+      }
+      
+      /* ИЗОБРАЖЕНИЯ */
+      img {
+        max-width: 100% !important;
+        height: auto !important;
+      }
+      
+      /* МЕДИА ЗАПРОСЫ ДЛЯ ИДЕАЛЬНОГО VIEWPORT */
+      @media screen and (max-width: 768px) {
+        body {
+          font-size: 16px; /* Предотвращаем zoom на iOS */
+        }
+        
+        input, textarea, select {
+          font-size: 16px; /* Предотвращаем zoom при фокусе */
+        }
+      }
+      
+      /* УБИРАЕМ ЛЮБЫЕ ФИКСИРОВАННЫЕ ШИРИНЫ */
+      [style*="width"] {
+        max-width: 100% !important;
       }
     </style>
     
@@ -103,13 +172,38 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
     
     <!-- 📱 PWA SERVICE WORKER -->
     <script>
+      // VIEWPORT FIX - ПРОВЕРЯЕМ СООТВЕТСТВИЕ РАЗМЕРОВ
+      function fixViewport() {
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover');
+        }
+        
+        // Убираем любые стили, которые могут вызывать горизонтальный скролл
+        document.documentElement.style.overflowX = 'hidden';
+        document.body.style.overflowX = 'hidden';
+        document.body.style.maxWidth = '100%';
+        document.body.style.width = '100%';
+        
+        console.log('📱 Viewport fixed:', {
+          innerWidth: window.innerWidth,
+          outerWidth: window.outerWidth,
+          devicePixelRatio: window.devicePixelRatio
+        });
+      }
+      
+      // Исправляем viewport при загрузке и изменении размера
+      window.addEventListener('load', fixViewport);
+      window.addEventListener('resize', fixViewport);
+      window.addEventListener('orientationchange', fixViewport);
+      
+      // PWA Service Worker
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js', { scope: '/' })
             .then((registration) => {
               console.log('PWA: Service Worker registered successfully:', registration.scope);
               
-              // Проверка обновлений
               registration.addEventListener('updatefound', () => {
                 const newWorker = registration.installing;
                 newWorker.addEventListener('statechange', () => {
@@ -133,7 +227,6 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
         console.log('PWA: Install prompt available');
       });
       
-      // PWA Install button (можно добавить позже)
       function installPWA() {
         if (deferredPrompt) {
           deferredPrompt.prompt();
