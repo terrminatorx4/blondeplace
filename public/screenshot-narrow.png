@@ -1,0 +1,18 @@
+<svg width="750" height="1334" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100%" height="100%" fill="#ffffff"/>
+    <rect x="0" y="0" width="100%" height="200" fill="#ff6b9d"/>
+    <text x="50%" y="100" text-anchor="middle" fill="#ffffff" font-size="48" font-family="Arial, sans-serif" font-weight="bold">BLONDE PLACE</text>
+    <text x="50%" y="150" text-anchor="middle" fill="#ffffff" font-size="24" font-family="Arial, sans-serif">Салон красоты</text>
+    
+    <rect x="50" y="250" width="650" height="100" fill="#f8f9fa" rx="10"/>
+    <text x="70" y="285" fill="#000000" font-size="24" font-weight="bold">🎨 Окрашивание волос</text>
+    <text x="70" y="315" fill="#666666" font-size="18">Профессиональное окрашивание</text>
+    
+    <rect x="50" y="370" width="650" height="100" fill="#f8f9fa" rx="10"/>
+    <text x="70" y="405" fill="#000000" font-size="24" font-weight="bold">✂️ Стрижки</text>
+    <text x="70" y="435" fill="#666666" font-size="18">Современные стрижки</text>
+    
+    <rect x="50" y="490" width="650" height="100" fill="#f8f9fa" rx="10"/>
+    <text x="70" y="525" fill="#000000" font-size="24" font-weight="bold">💅 Маникюр</text>
+    <text x="70" y="555" fill="#666666" font-size="18">Качественный маникюр</text>
+  </svg>
