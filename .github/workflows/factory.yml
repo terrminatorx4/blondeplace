@@ -1,4 +1,4 @@
-name: 🎨 BlondePlace Beauty Content Factory
+name: 🚀 BlondePlace Beauty Factory (MEGA POWER)
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ on:
       threads:
         description: 'Количество потоков'
         required: true
-        default: '3'
+        default: '10'
         type: string
 
 env:
@@ -27,16 +27,16 @@ env:
 
 jobs:
   beauty-content-generation:
-    name: 🎨 Генерация Beauty Контента (Поток ${{ matrix.thread }})
+    name: 🎨 Генерация Beauty Контента (BEAUTY ПОТОК #${{ matrix.thread }})
     runs-on: ubuntu-latest
     
     strategy:
       matrix:
-        thread: [1, 2, 3, 4, 5]
-      max-parallel: 5
+        thread: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+      max-parallel: 20
       fail-fast: false
     
-    if: matrix.thread <= fromJSON(github.event.inputs.threads || '3')
+    if: matrix.thread <= fromJSON(github.event.inputs.threads || '10')
     
     steps:
       - name: 🛒 Checkout repository
@@ -77,12 +77,12 @@ jobs:
           git config --global user.email 'beauty-bot@blondeplace.ru'
           git config --global pull.rebase false
           
-          echo "--- 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Начинаю генерацию ---"
+          echo "--- 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Начинаю генерацию beauty контента ---"
           
           npm run factory
           
           if [[ -z $(git status --porcelain) ]]; then
-            echo "✅ 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Новых статей для этого потока не найдено. Миссия завершена."
+            echo "✅ 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Новых beauty статей для этого потока не найдено. Beauty миссия завершена."
             exit 0
           fi
 
