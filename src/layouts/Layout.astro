@@ -6,21 +6,25 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- PWA VIEWPORT FIX (LIGHTHOUSE) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href={Astro.url} />
     
-    <!-- PWA THEME COLOR (LIGHTHOUSE FIX) -->
+    <!-- SECURITY CSP HEADER (BEST PRACTICES FIX) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://blondeplace.ru; media-src 'self'; connect-src 'self' https://api.indexnow.org; frame-src 'self' https://www.google.com;" />
+    
+    <!-- PWA THEME COLOR -->
     <meta name="theme-color" content="#ff6b9d" />
     <meta name="msapplication-TileColor" content="#ff6b9d" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="BLONDE PLACE" />
     
-    <!-- FAVICON (YANDEX REQUIREMENTS) -->
+    <!-- FAVICON -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -51,12 +55,36 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content="https://blondeplace.netlify.app/og-image.jpg" />
     
+    <!-- ACCESSIBILITY CONTRAST FIX -->
+    <style>
+      /* LIGHTHOUSE ACCESSIBILITY FIXES */
+      .Consultation_consultation__highlight__esun9,
+      .Services_services__highlight__lBCUU {
+        color: #ffffff !important;
+        background-color: #ff6b9d !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+        font-weight: bold !important;
+      }
+      
+      .Button_transparent__6L3R2 {
+        color: #ffffff !important;
+        background-color: #ff6b9d !important;
+        border: 2px solid #ff6b9d !important;
+      }
+      
+      .Button_transparent__6L3R2:hover {
+        background-color: #e55a87 !important;
+        border-color: #e55a87 !important;
+      }
+    </style>
+    
     <slot name="head" />
   </head>
   <body>
     <slot />
     
-    <!-- PWA SERVICE WORKER REGISTRATION -->
+    <!-- PWA SERVICE WORKER -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
