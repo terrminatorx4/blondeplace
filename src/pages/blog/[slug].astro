@@ -3,44 +3,44 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 
 export async function getStaticPaths() {
-  console.log('🐛 [DEBUG] getStaticPaths called');
-  
-  try {
-    const posts = await getCollection('posts');
-    console.log('🐛 [DEBUG] Posts found:', posts.length);
-    
-    if (posts.length === 0) {
-      console.log('🚨 [ERROR] NO POSTS FOUND!');
-      return [];
-    }
-    
-    console.log('🐛 [DEBUG] First post:', posts[0]?.slug, posts[0]?.data?.title);
-    
-    const paths = posts.map((post) => {
-      console.log('🐛 [DEBUG] Creating path for:', post.slug);
-      return {
-        params: { slug: post.slug },
-        props: post,
-      };
-    });
-    
-    console.log('🐛 [DEBUG] Total paths created:', paths.length);
-    return paths;
-    
-  } catch (error) {
-    console.error('🚨 [ERROR] getStaticPaths failed:', error);
-    return [];
-  }
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: post,
+  }));
 }
 
 const post = Astro.props;
 const { Content } = await post.render();
+
+const ogImage = post.data.heroImage || 'https://blondeplace.netlify.app/og-image.jpg';
+const pageUrl = `https://blondeplace.netlify.app/blog/${post.slug}/`;
 ---
 
-<Layout 
-  title={post.data.title} 
-  description={post.data.description}
->
+<Layout title={post.data.title} description={post.data.description}>
+  <!-- Дополнительные SEO мета-теги -->
+  <meta slot="head" name="keywords" content={post.data.keywords} />
+  <meta slot="head" name="author" content={post.data.author} />
+  <meta slot="head" name="robots" content="index, follow" />
+  <link slot="head" rel="canonical" href={pageUrl} />
+  
+  <!-- OpenGraph мета-теги -->
+  <meta slot="head" property="og:title" content={post.data.title} />
+  <meta slot="head" property="og:description" content={post.data.description} />
+  <meta slot="head" property="og:image" content={ogImage} />
+  <meta slot="head" property="og:url" content={pageUrl} />
+  <meta slot="head" property="og:type" content="article" />
+  <meta slot="head" property="og:site_name" content="BLONDE PLACE" />
+  
+  <!-- Twitter Card -->
+  <meta slot="head" name="twitter:card" content="summary_large_image" />
+  <meta slot="head" name="twitter:title" content={post.data.title} />
+  <meta slot="head" name="twitter:description" content={post.data.description} />
+  <meta slot="head" name="twitter:image" content={ogImage} />
+  
+  <!-- Structured Data -->
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(post.data.schema)} />
+
   <article class="container">
     <header class="article-header">
       <h1 class="article-title">{post.data.title}</h1>
