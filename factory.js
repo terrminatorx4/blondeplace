@@ -13,7 +13,7 @@ const SITE_URL = "https://blondeplace.netlify.app";
 const BRAND_NAME = "BlondePlace";
 const BRAND_BLOG_NAME = `Блог ${BRAND_NAME}`;
 const BRAND_AUTHOR_NAME = `Эксперт ${BRAND_NAME}`;
-const FALLBACK_IMAGE_URL = "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?q=80&w=2126&auto=format&fit=crop";
+const FALLBACK_IMAGE_URL = "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2070&auto=format&fit=crop";
 
 // --- MODEL CONFIGURATION ---
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
