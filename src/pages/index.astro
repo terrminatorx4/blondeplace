@@ -1,625 +1,620 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getCollection } from 'astro:content';
-
-// Получаем последние статьи
-const allPosts = await getCollection('posts');
-const recentPosts = allPosts
-  .sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf())
-  .slice(0, 6);
-
-const pageTitle = "BLONDE PLACE - салон красоты комфорт класса в Санкт-Петербурге";
-const pageDescription = "BLONDE PLACE - ЭТО ОАЗИС УЕДИНЕНИЯ И КОМФОРТА, ГДЕ КАЖДЫЙ КЛИЕНТ ОКРУЖЕН ВНИМАНИЕМ НАИВЫСШЕГО УРОВНЯ. Открытый клуб для блондинок и ценителей блонда.";
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
-  <div class="container">
-    <!-- Hero Section -->
-    <section class="hero-section section-hero">
-      <div class="hero-content">
-        <div class="hero-text">
-          <h1 class="hero-title">
-            BLONDE PLACE<br>
-            <span class="highlight">салон красоты комфорт класса</span>
-          </h1>
-          <p class="hero-description">
-            BLONDE PLACE - ЭТО ОАЗИС УЕДИНЕНИЯ И КОМФОРТА, ГДЕ КАЖДЫЙ  
-            КЛИЕНТ ОКРУЖЕН ВНИМАНИЕМ НАИВЫСШЕГО УРОВНЯ.
-          </p>
-          <p class="hero-subtitle">
-            BLONDE PLACE - открытый клуб для блондинок и ценителей блонда!<br>
-            Философия BLONDE PLACE - качественный, дорогой и ухоженный блонд
-          </p>
-          <div class="hero-cta">
-            <button class="btn btn-primary">
-              ОСТАВЬТЕ ЗАЯВКУ НА КОНСУЛЬТАЦИЮ И ПОЛУЧИТЕ СКИДКУ 10%
-            </button>
-            <a href="tel:+79819608722" class="btn btn-secondary">
-              📞 Записаться
+<Layout title="Blonde Place - Салон красоты комфорт класса">
+  <!-- EXACT COPY OF ORIGINAL HOMEPAGE STRUCTURE -->
+  
+  <!-- Video Counter -->
+  <div class="CounterVideo_video__nJkxH" style="display: none;">
+    <button class="CounterVideo_video__closeButton__elmXT">X</button>
+    <video src="/video/video.MP4" autoplay muted playsinline controls></video>
+  </div>
+
+  <!-- Intro Section -->
+  <section class="Intro_intro__KtS_m" id="about">
+    <div class="Intro_intro__wrapper__l4yH_">
+      <div class="Intro_intro__heading__ecA75">
+        <div>
+          <h1 class="Intro_intro__header__59R5S">BLONDE PLACE</h1>
+          <h2 class="Intro_intro__subheader__UcGJf">салон красоты комфорт класса</h2>
+        </div>
+        <div class="Intro_intro__text__tg9mO">
+          САЛОН КРАСОТЫ <span class="Intro_intro__bold__V_0Fm">«BLOND PLACE»</span> - ЭТО ОАЗИС УЕДИНЕНИЯ И КОМФОРТА, ГДЕ КАЖДЫЙ<br/>
+          КЛИЕНТ ОКРУЖЕН ВНИМАНИЕМ НАИВЫСШЕГО УРОВНЯ.
+        </div>
+      </div>
+      <div class="Intro_intro__content__t_LLo">
+        <div>
+          <div>
+            <div class="Options_option__row__Zy1FE">
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>мелирование с растяжкой цвета</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>мелирование</p>
+                </div>
+              </div>
+            </div>
+            <div class="Options_option__row__Zy1FE">
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>сложное окрашивание+стрижка</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>контуринг</p>
+                </div>
+              </div>
+            </div>
+            <div class="Options_option__row__Zy1FE">
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>окрашивание корней</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>тотал блонд с нуля</p>
+                </div>
+              </div>
+            </div>
+            <div class="Options_option__row__Zy1FE">
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>шатуш</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>AirTouch ниже плеч</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>тонирование</p>
+                </div>
+              </div>
+            </div>
+            <div class="Options_option__row__Zy1FE">
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>тотал блонд (окрашенная база)</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>AirTouch ниже плеч</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="Intro_intro__image__5TyEE">
+          <img src="/intro/woman.png" alt="decoration image"/>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Consultation Section -->
+  <section class="Consultation_consultation__zS8eJ">
+    <div class="Consultation_consultation__wrapper__mfUpf">
+      <p class="Consultation_consultation__heading__WznDy">
+        ОСТАВЬТЕ ЗАЯВКУ НА КОНСУЛЬТАЦИЮ И ПОЛУЧИТЕ<br/>
+        <span class="Consultation_consultation__highlight__esun9">СКИДКУ 10%</span> НА ПЕРВОЕ ПОСЕЩЕНИЕ САЛОНА
+      </p>
+      <div class="Consultation_consultation__form__U9Yc_">
+        <div class="Form_formContainer__2f_0_">
+          <form class="Form_form__1rVfE" data-form="true" action="#" method="post">
+            <div class="Form_form__content__GBaKX" data-forminputs="true">
+              <div class="Form_form__controlContainer__aOeaW">
+                <input class="Form_form__control__A_71K" id="name" type="text" placeholder="Ваше имя" name="name" value=""/>
+              </div>
+              <div class="Form_form__controlContainer__aOeaW">
+                <input class="Form_form__control__A_71K" id="telephone" type="text" placeholder="+7 (999) 999-99-99" name="telephone" value=""/>
+              </div>
+            </div>
+            <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ Button_text__CeUC5 Form_form__button__RuNzC">Отправить</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Info Section -->
+  <section class="Info_info__l_tdY">
+    <div class="Info_info__wrapper__oVhN4">
+      <div class="Info_info__imgContainer__XX0gl">
+        <div class="Info_info__phoneContainer__sOoD2">
+          <img src="/info/phone.png" alt="phone"/>
+          <div class="Info_info__buttonContainer__UiyiL">
+            <a href="https://dikidi.ru/699327" target="_blank">
+              <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ Button_text__CeUC5 Info_info__applyButton__GGkQ3">Записаться</button>
+            </a>
+            <a href="https://dikidi.ru/699327" target="_blank">
+              <button class="Button_button__C0__L Button_black-transparent__jvtuc Button_text-black__LdsvQ Button_text__CeUC5 Info_info__lastButton__ybtZZ">Повторить последнюю запись</button>
             </a>
           </div>
         </div>
-        <div class="hero-visual">
-          <div class="hero-decoration">
-            <!-- Минималистичные декоративные элементы -->
-          </div>
+        <div class="Info_info__scissors__jKO3q">
+          <img src="/info/scissors.png" alt="scissors"/>
         </div>
       </div>
-    </section>
-
-    <!-- Services Section -->
-    <section class="services-section section">
-      <h2 class="section-title">Наши услуги:</h2>
-      <div class="services-grid grid grid-3">
-        <div class="service-card card">
-          <h3>мелирование с растяжкой цвета</h3>
-        </div>
-        <div class="service-card card">
-          <h3>мелирование</h3>
-        </div>
-        <div class="service-card card">
-          <h3>сложное окрашивание+стрижка</h3>
-        </div>
-        <div class="service-card card">
-          <h3>контуринг</h3>
-        </div>
-        <div class="service-card card">
-          <h3>окрашивание корней</h3>
-        </div>
-        <div class="service-card card">
-          <h3>тотал блонд с нуля</h3>
-        </div>
-        <div class="service-card card">
-          <h3>шатуш</h3>
-        </div>
-        <div class="service-card card">
-          <h3>AirTouch ниже плеч</h3>
-        </div>
-        <div class="service-card card">
-          <h3>тонирование</h3>
-        </div>
-        <div class="service-card card">
-          <h3>тотал блонд (окрашенная база)</h3>
-        </div>
-      </div>
-      <div class="services-cta text-center mt-4">
-        <a href="/services/" class="btn btn-primary">Все услуги</a>
-        <a href="/contacts/" class="btn btn-secondary">Онлайн запись</a>
-      </div>
-    </section>
-
-    <!-- Why Choose Us Section -->
-    <section class="why-section section">
-      <h2 class="section-title">Почему именно "BLONDE PLACE?"</h2>
-      <div class="features-grid grid grid-3">
-        <div class="feature-card card">
-          <h3>БРЕНДОВАЯ КОСМЕТИКА</h3>
-          <p>В BLONDE PLACE выполняем работу на профессиональной косметике Estel. Гарантируем Вам уединение, комфорт и внимание самого наивысшего уровня</p>
-        </div>
-        <div class="feature-card card">
-          <h3>УДОБНОЕ РАСПОЛОЖЕНИЕ</h3>
-          <p>Салон красоты BLONDE PLACE располагается в самом центре Санкт-Петербурга</p>
-        </div>
-        <div class="feature-card card">
-          <h3>КОНЦЕПТУАЛЬНЫЙ ПОДХОД</h3>
-          <p>1. Не окрашиваем волосы тёмных оттенков<br>
-          2. Если вам нужно первоначальное лечение волос, а затем окрашивание, не рекомендуем записываться сразу на окрашивание волос<br>
-          3. 18+<br>
-          4. Мы ценим доброжелательный настрой и приятную атмосферу, и также хотим взаимности<br>
-          5. Запись осуществляется без предоплаты</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Beauty Coworking Section -->
-    <section class="coworking-section section">
-      <div class="coworking-content grid grid-2">
-        <div class="coworking-info">
-          <h2>Beauty coworking</h2>
-          <p>
-            Бьюти-коворкинг Blonde Place в Санкт-Петербурге представляет собой современное решение для специалистов beauty-индустрии. Формат coworking позволяет как новичкам, так и опытным мастерам создать комфортное рабочее пространство без больших затрат.
+      <div class="Info_info__content__of298">
+        <div class="Info_info__textContainer__sFJG3">
+          <p class="Info_info__heading__Scd_0">
+            <span class="Info_info__highlightBold__ywbMn">BLONDE PLACE</span> - открытый клуб для<br/>
+            блондинок и ценителей блонда!
           </p>
-          <p>
-            Новички могут быстро начать зарабатывать, используя уже предоставленное оборудование и накапливая опыт и портфолио. Опытные мастера могут работать более независимо, избегая неудобств домашнего офиса и высоких комиссий салонов, что дает возможность устанавливать собственные цены.
+          <p class="Info_info__text__O2TG4">
+            Философия <span class="Info_info__highlightSemi__GZBnX">BLONDE PLACE</span> -<br/>
+            качественный, дорогой и ухоженный<br/>
+            блонд
           </p>
-          <a href="/beauty-coworking/" class="btn btn-primary">Выбрать место</a>
         </div>
-        <div class="coworking-rates">
-          <h3>Наши тарифы</h3>
-          <div class="rate-card card">
-            <div class="rate-price">500₽</div>
-            <div class="rate-description">1 день (до 9 часов работы)<br>* ТЕСТОВЫЙ ДЕНЬ</div>
-          </div>
-          <div class="rate-card card">
-            <div class="rate-price">1200₽</div>
-            <div class="rate-description">1 день (до 9 часов работы)<br>* ВКЛ УБОРКУ И РАСХОДНЫЕ МАТЕРИАЛЫ</div>
-          </div>
-          <div class="rate-card card">
-            <div class="rate-price">15.000₽</div>
-            <div class="rate-description">1 месяц (до 30 рабочих смен)<br>* ВКЛ УБОРКУ И ЛОКЕР ДЛЯ ХРАНЕНИЯ</div>
-          </div>
-        </div>
+        <a href="https://yandex.com/maps/-/CHRtF6kZ">
+          <button class="Button_button__C0__L Button_transparent__6L3R2 Button_text-black__LdsvQ Button_text__CeUC5 Info_info__button__x3Nsv">Как нас найти</button>
+        </a>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Masters Section -->
-    <section class="masters-section section">
-      <h2 class="section-title">Наши мастера:</h2>
-      <div class="masters-grid grid grid-4">
-        <div class="master-card card">
-          <h3>Колорист - тонирование, мелирование</h3>
-          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
-        </div>
-        <div class="master-card card">
-          <h3>Мастер по кератину</h3>
-          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
-        </div>
-        <div class="master-card card">
-          <h3>Мастер по цветным окрашиваниям</h3>
-          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
-        </div>
-        <div class="master-card card">
-          <h3>Колорист блонд, однотонные, тонирование</h3>
-          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
-        </div>
-        <div class="master-card card">
-          <h3>Бровист - лэшмейкер</h3>
-          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
-        </div>
-        <div class="master-card card">
-          <h3>Команда BLONDE PLACE</h3>
-          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
-        </div>
+  <!-- Services Section -->
+  <section class="Services_services__ShMKK" id="services">
+    <div class="Services_services__wrapper__ZaS_9">
+      <div class="Services_services__headingBox__BqI_r">
+        <img src="/discount/divider.png" alt=""/>
+        <h3 class="Services_services__heading__GWWHl">Наши <span class="Services_services__highlight__lBCUU">услуги</span><span class="Services_services__colon__X2sXK">:</span></h3>
       </div>
-    </section>
-
-    <!-- Location & Contact Section -->
-    <section class="contacts-section section">
-      <h2 class="section-title">Наши контакты</h2>
-      <div class="contact-content grid grid-2">
-        <div class="contact-info">
-          <div class="contact-item">
-            <strong>📞 Телефон:</strong>
-            <a href="tel:+79819608722">+7 (981) 960-87-22</a>
-          </div>
-          <div class="contact-item">
-            <strong>📍 Адрес:</strong>
-            <span>г. Санкт-Петербург, Дегтярная, дом 9</span>
-          </div>
-          <div class="contact-item">
-            <strong>🚇 Метро:</strong>
-            <span>
-              м. Площадь Восстания, 12 мин<br>
-              м. Александра Невского, 19 мин<br>
-              м. Маяковского, 12 мин
-            </span>
-          </div>
-        </div>
-        <div class="reviews-section">
-          <div class="rating-block">
-            <div class="rating-stars">★★★★★</div>
-            <div class="rating-score">4,8</div>
-            <div class="rating-text">218 отзывов · 337 оценок</div>
-          </div>
-          <a href="https://yandex.ru/maps/" target="_blank" class="btn btn-secondary">Яндекс карты</a>
-          <button class="btn btn-primary">Оставить отзыв</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Blog Posts Section -->
-    {recentPosts.length > 0 && (
-      <section class="recent-posts-section section">
-        <h2 class="section-title">Новостная лента:</h2>
-        <p class="section-subtitle">
-          Фото работ, видео-ролики с укладками, секреты по уходу и много полезной, интересной информации в нашем блоге.
-        </p>
-        <div class="posts-grid grid grid-3">
-          {recentPosts.map((post) => (
-            <article class="post-card card">
-              <div class="post-image">
-                {post.data.heroImage ? (
-                  <img src={post.data.heroImage} alt={post.data.title} loading="lazy" />
-                ) : (
-                  <div class="post-placeholder">
-                    <div class="placeholder-text">📝</div>
-                  </div>
-                )}
+      <div class="Services_services__content__u3Y0j">
+        <div class="Services_services__options__ShecG">
+          <div>
+            <div class="Options_option__row__Zy1FE">
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>мелирование с растяжкой цвета</p>
+                </div>
               </div>
-              <div class="post-content">
-                <h3 class="post-title">
-                  <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
-                </h3>
-                <p class="post-excerpt">{post.data.description}</p>
-                <a href={`/blog/${post.slug}/`} class="read-more">
-                  Читать далее →
-                </a>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>мелирование</p>
+                </div>
               </div>
-            </article>
-          ))}
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>сложное окрашивание+стрижка</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>контуринг</p>
+                </div>
+              </div>
+            </div>
+            <div class="Options_option__row__Zy1FE">
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>окрашивание корней</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>тотал блонд с нуля</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>шатуш</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>AirTouch ниже плеч</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>тонирование</p>
+                </div>
+              </div>
+            </div>
+            <div class="Options_option__row__Zy1FE">
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>тотал блонд (окрашенная база)</p>
+                </div>
+              </div>
+              <div class="Options_option__item__LqVeF" data-item="true">
+                <div class="Options_option__text__wAqR5">
+                  <p>AirTouch ниже плеч</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="blog-cta text-center mt-4">
-          <a href="/blog/" class="btn btn-primary">Переходите, изучайте, вдохновляйтесь вместе с нами!</a>
-        </div>
-      </section>
-    )}
-
-    <!-- Final CTA Section -->
-    <section class="final-cta-section">
-      <div class="cta-content">
-        <h2>Получите скидку 10% на первое посещение салона BLONDE PLACE</h2>
-        <p>
-          Вы можете получить скидку 10% на первый визит в наш салон.
-          Скидка действует на все услуги салона.
-          Заполните форму ниже и мы свяжемся с Вами в течение 20 минут.
-        </p>
-        <div class="cta-buttons">
-          <button class="btn btn-primary btn-large">
-            Оставить заявку
-          </button>
-          <a href="tel:+79819608722" class="btn btn-secondary">
-            📞 Позвонить
+        <div class="Services_services__buttonContainer__qzQAw">
+          <a href="https://dikidi.ru/699327">
+            <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ Button_text__CeUC5 Services_services__buttonOnline__JWcRh">Онлайн запись</button>
           </a>
+          <a class="Button_button__C0__L Button_transparent__6L3R2 Button_text__CeUC5 Services_services__buttonQuestion__hgySc" href="https://t.me/Blondeplace">Задать вопрос</a>
         </div>
+        <img src="/services/brush.png" alt="brush" class="Services_services__brush__RzudP"/>
       </div>
-    </section>
-  </div>
+    </div>
+  </section>
 
-  <style>
-    /* Hero Section в стиле blondeplace.ru */
-    .hero-section {
-      background: linear-gradient(135deg, rgba(248, 246, 244, 0.95) 0%, rgba(250, 249, 247, 0.95) 100%);
-      border-radius: 20px;
-      margin-bottom: 4rem;
-    }
+  <!-- Rest of sections will continue in next step... -->
 
-    .hero-content {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 3rem;
-      align-items: center;
-      padding: 3rem;
-    }
-
-    .hero-title {
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      margin-bottom: 2rem;
-      line-height: 1.2;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #2a2a2a;
-    }
-
-    .highlight {
-      color: #d4a574;
-      font-weight: 600;
-      text-transform: lowercase;
-      font-size: 0.8em;
-    }
-
-    .hero-description {
-      font-size: 1.1rem;
-      color: #2a2a2a;
-      margin-bottom: 1.5rem;
-      line-height: 1.5;
-      font-weight: 600;
-    }
-
-    .hero-subtitle {
-      font-size: 1rem;
-      color: #666;
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
-    .hero-cta {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .hero-visual {
-      position: relative;
-      height: 300px;
-      background: linear-gradient(135deg, rgba(245, 213, 184, 0.3) 0%, rgba(230, 196, 168, 0.3) 100%);
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Services Section */
-    .services-section {
-      margin-bottom: 4rem;
-    }
-
-    .service-card {
-      text-align: center;
-      padding: 1.5rem;
-      min-height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .service-card h3 {
-      font-size: 1rem;
-      font-weight: 500;
-      color: #2a2a2a;
-      text-transform: lowercase;
-      line-height: 1.3;
-    }
-
-    /* Features Section */
-    .feature-card {
-      padding: 2rem;
-      text-align: left;
-    }
-
-    .feature-card h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #2a2a2a;
-      margin-bottom: 1rem;
-      text-transform: uppercase;
-    }
-
-    .feature-card p {
-      color: #666;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    /* Coworking Section */
-    .coworking-section {
-      background: rgba(248, 246, 244, 0.5);
-      border-radius: 20px;
-      padding: 3rem 2rem;
-      margin-bottom: 4rem;
-    }
-
-    .coworking-info h2 {
-      margin-bottom: 1.5rem;
-      color: #2a2a2a;
-    }
-
-    .coworking-info p {
-      font-size: 0.95rem;
-      color: #666;
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-    }
-
-    .coworking-rates h3 {
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-
-    .rate-card {
-      text-align: center;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .rate-price {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #d4a574;
-      margin-bottom: 1rem;
-    }
-
-    .rate-description {
-      font-size: 0.9rem;
-      color: #666;
-      line-height: 1.4;
-    }
-
-    /* Masters Section */
-    .master-card {
-      text-align: center;
-      padding: 1.5rem;
-    }
-
-    .master-card h3 {
-      font-size: 0.95rem;
-      color: #2a2a2a;
-      margin-bottom: 1rem;
-      line-height: 1.3;
-    }
-
-    .master-link {
-      color: #d4a574;
-      text-decoration: underline;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .master-link:hover {
-      color: #b8956a;
-    }
-
-    /* Contacts Section */
-    .contact-item {
-      margin-bottom: 1.5rem;
-    }
-
-    .contact-item strong {
-      display: block;
-      color: #2a2a2a;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .contact-item a {
-      color: #d4a574;
-      font-weight: 500;
-      text-decoration: none;
-    }
-
-    .contact-item a:hover {
-      text-decoration: underline;
-    }
-
-    .contact-item span {
-      color: #666;
-    }
-
-    .reviews-section {
-      text-align: center;
-    }
-
-    .rating-block {
-      margin-bottom: 2rem;
-    }
-
-    .rating-stars {
-      font-size: 1.5rem;
-      color: #ffd700;
-      margin-bottom: 0.5rem;
-    }
-
-    .rating-score {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #2a2a2a;
-      margin-bottom: 0.5rem;
-    }
-
-    .rating-text {
-      font-size: 0.9rem;
-      color: #666;
-    }
-
-    /* Posts Section */
-    .post-card {
-      overflow: hidden;
-    }
-
-    .post-image {
-      height: 150px;
-      overflow: hidden;
-      margin-bottom: 1rem;
-    }
-
-    .post-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .post-card:hover .post-image img {
-      transform: scale(1.02);
-    }
-
-    .post-placeholder {
-      height: 100%;
-      background: linear-gradient(135deg, #f5d5b8, #e6c4a8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      border-radius: 10px;
-    }
-
-    .placeholder-text {
-      font-size: 2rem;
-    }
-
-    .post-title a {
-      color: #2a2a2a;
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: 600;
-      line-height: 1.3;
-    }
-
-    .post-title a:hover {
-      color: #d4a574;
-    }
-
-    .post-excerpt {
-      color: #666;
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-      line-height: 1.5;
-    }
-
-    .read-more {
-      color: #d4a574;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .read-more:hover {
-      text-decoration: underline;
-    }
-
-    /* Final CTA Section */
-    .final-cta-section {
-      background: linear-gradient(135deg, rgba(245, 213, 184, 0.2) 0%, rgba(230, 196, 168, 0.2) 100%);
-      padding: 4rem 3rem;
-      border-radius: 20px;
-      text-align: center;
-      margin-top: 4rem;
-    }
-
-    .final-cta-section h2 {
-      color: #2a2a2a;
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-    }
-
-    .final-cta-section p {
-      font-size: 1.1rem;
-      color: #666;
-      margin-bottom: 2rem;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .cta-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn-large {
-      padding: 1rem 2.5rem;
-      font-size: 1rem;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .hero-content {
-        grid-template-columns: 1fr;
-        padding: 2rem;
-        text-align: center;
-      }
-
-      .hero-visual {
-        height: 200px;
-      }
-
-      .coworking-content {
-        grid-template-columns: 1fr;
-      }
-
-      .contact-content {
-        grid-template-columns: 1fr;
-      }
-
-      .final-cta-section {
-        padding: 3rem 2rem;
-      }
-
-      .final-cta-section h2 {
-        font-size: 1.5rem;
-      }
-    }
-  </style>
 </Layout>
+
+<style>
+  /* EXACT CSS FROM ORIGINAL SITE */
+  
+  /* Video Counter */
+  .CounterVideo_video__nJkxH {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .CounterVideo_video__closeButton__elmXT {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+  }
+
+  /* Intro Section */
+  .Intro_intro__KtS_m {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #faf9f7 0%, #f8f6f4 100%);
+  }
+
+  .Intro_intro__wrapper__l4yH_ {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .Intro_intro__heading__ecA75 {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .Intro_intro__header__59R5S {
+    font-family: 'Exo', sans-serif;
+    font-size: 4rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .Intro_intro__subheader__UcGJf {
+    font-family: 'Exo', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #B8956A;
+    margin: 10px 0 30px;
+    line-height: 1.3;
+  }
+
+  .Intro_intro__text__tg9mO {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .Intro_intro__bold__V_0Fm {
+    font-weight: 700;
+    color: #333;
+  }
+
+  .Intro_intro__content__t_LLo {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .Intro_intro__image__5TyEE {
+    text-align: center;
+  }
+
+  .Intro_intro__image__5TyEE img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Options */
+  .Options_option__row__Zy1FE {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  .Options_option__item__LqVeF {
+    background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
+    border-radius: 25px;
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .Options_option__item__LqVeF:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 213, 184, 0.4);
+  }
+
+  .Options_option__text__wAqR5 p {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+  }
+
+  /* Consultation Section */
+  .Consultation_consultation__zS8eJ {
+    padding: 80px 0;
+    background: #fff;
+  }
+
+  .Consultation_consultation__wrapper__mfUpf {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .Consultation_consultation__heading__WznDy {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 40px;
+    line-height: 1.3;
+  }
+
+  .Consultation_consultation__highlight__esun9 {
+    color: #B8956A;
+  }
+
+  .Consultation_consultation__form__U9Yc_ {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Form Styles */
+  .Form_formContainer__2f_0_ {
+    width: 100%;
+  }
+
+  .Form_form__1rVfE {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .Form_form__content__GBaKX {
+    display: flex;
+    gap: 20px;
+  }
+
+  .Form_form__controlContainer__aOeaW {
+    flex: 1;
+  }
+
+  .Form_form__control__A_71K {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid #f0f0f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+
+  .Form_form__control__A_71K:focus {
+    outline: none;
+    border-color: #B8956A;
+  }
+
+  .Form_form__button__RuNzC {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 10px;
+  }
+
+  /* Info Section */
+  .Info_info__l_tdY {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #faf9f7 0%, #f8f6f4 100%);
+  }
+
+  .Info_info__wrapper__oVhN4 {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .Info_info__imgContainer__XX0gl {
+    position: relative;
+  }
+
+  .Info_info__phoneContainer__sOoD2 {
+    position: relative;
+    text-align: center;
+  }
+
+  .Info_info__buttonContainer__UiyiL {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .Info_info__applyButton__GGkQ3,
+  .Info_info__lastButton__ybtZZ {
+    padding: 15px 30px;
+    font-weight: 600;
+    border-radius: 10px;
+  }
+
+  .Info_info__scissors__jKO3q {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    z-index: 2;
+  }
+
+  .Info_info__textContainer__sFJG3 {
+    margin-bottom: 30px;
+  }
+
+  .Info_info__heading__Scd_0 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+
+  .Info_info__highlightBold__ywbMn {
+    color: #B8956A;
+    font-weight: 700;
+  }
+
+  .Info_info__text__O2TG4 {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+  }
+
+  .Info_info__highlightSemi__GZBnX {
+    color: #B8956A;
+    font-weight: 600;
+  }
+
+  .Info_info__button__x3Nsv {
+    padding: 15px 30px;
+    font-weight: 600;
+    border-radius: 10px;
+  }
+
+  /* Services Section */
+  .Services_services__ShMKK {
+    padding: 80px 0;
+    background: #fff;
+  }
+
+  .Services_services__wrapper__ZaS_9 {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .Services_services__headingBox__BqI_r {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .Services_services__heading__GWWHl {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin: 20px 0;
+  }
+
+  .Services_services__highlight__lBCUU {
+    color: #B8956A;
+  }
+
+  .Services_services__colon__X2sXK {
+    color: #B8956A;
+  }
+
+  .Services_services__content__u3Y0j {
+    position: relative;
+  }
+
+  .Services_services__options__ShecG {
+    margin-bottom: 50px;
+  }
+
+  .Services_services__buttonContainer__qzQAw {
+    text-align: center;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .Services_services__buttonOnline__JWcRh,
+  .Services_services__buttonQuestion__hgySc {
+    padding: 15px 30px;
+    font-weight: 600;
+    border-radius: 10px;
+  }
+
+  .Services_services__brush__RzudP {
+    position: absolute;
+    bottom: -40px;
+    right: 20px;
+    width: 100px;
+    opacity: 0.3;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .Intro_intro__header__59R5S {
+      font-size: 2.5rem;
+    }
+
+    .Intro_intro__content__t_LLo {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .Info_info__wrapper__oVhN4 {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .Form_form__content__GBaKX {
+      flex-direction: column;
+    }
+
+    .Services_services__buttonContainer__qzQAw {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .Options_option__row__Zy1FE {
+      justify-content: center;
+    }
+  }
+</style>
