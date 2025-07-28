@@ -6,8 +6,8 @@
   "main": "factory.js",
   "scripts": {
     "factory": "node factory.js",
-    "build-astro": "cd blondeplace-blog && astro build",
-    "build": "npm run build-astro && node postbuild.js",
+    "build-blog": "cd blondeplace-blog && npm install && npm run build",
+    "build": "npm run build-blog && node postbuild.js",
     "dev": "cd blondeplace-blog && npm run dev",
     "preview": "cd blondeplace-blog && npm run preview"
   },
