@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Блокируем AI ботов
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+# Sitemap
+Sitemap: https://blondeplace.netlify.app/sitemap.xml
