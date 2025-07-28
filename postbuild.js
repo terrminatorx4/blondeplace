@@ -1,13 +1,37 @@
-// Файл: postbuild.js (Версия 3.0, "Динамический Навигатор")
+// BlondePlace Postbuild - Copied from Butler Logic
 import fs from 'fs/promises';
 import path from 'path';
 
-const SITE_URL = 'https://butlerspb-blog.netlify.app';
-const DIST_DIR = './dist';
+const SITE_URL = 'https://blondeplace.netlify.app';
+const DIST_DIR = './blondeplace-blog/dist';
+
+async function findHtmlFiles(dir) {
+  const files = [];
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await findHtmlFiles(fullPath));
+    } else if (entry.name.endsWith('.html')) {
+      files.push(fullPath);
+    }
+  }
+  
+  return files;
+}
 
 async function generateSitemap() {
-  console.log('--- Запуск Динамического Генератора Sitemap.xml ---');
+  console.log('--- BlondePlace Sitemap Generator (Butler Logic) ---');
   try {
+    // Проверяем существование dist директории
+    try {
+      await fs.access(DIST_DIR);
+    } catch (error) {
+      console.log('[INFO] Dist directory not found, skipping sitemap generation');
+      return;
+    }
+
     // Рекурсивно ищем все HTML файлы в папке сборки 'dist'
     const files = await findHtmlFiles(DIST_DIR);
 
@@ -21,11 +45,18 @@ async function generateSitemap() {
         // Убираем '.html' для всех остальных
         relativePath = relativePath.slice(0, -5);
       }
+      
+      // Убираем начальный слеш если есть
+      if (relativePath.startsWith('/')) {
+        relativePath = relativePath.slice(1);
+      }
+      
       return `
     <url>
         <loc>${SITE_URL}/${relativePath}</loc>
         <lastmod>${new Date().toISOString()}</lastmod>
         <priority>0.8</priority>
+        <changefreq>daily</changefreq>
     </url>`;
     });
 
@@ -35,27 +66,13 @@ async function generateSitemap() {
 </urlset>`;
 
     await fs.writeFile(path.join(DIST_DIR, 'sitemap.xml'), sitemapContent);
-    console.log(`[✔] Sitemap.xml успешно сгенерирован! Найдено ${urls.length} страниц.`);
+    console.log(`[✔] BlondePlace Sitemap.xml successfully generated! Found ${urls.length} pages.`);
 
   } catch (error) {
-    console.error('[!] Критическая ошибка при генерации Sitemap.xml:', error);
-    process.exit(1); // Проваливаем сборку, если sitemap не создался
+    console.error('[!] Error generating sitemap:', error);
+    // НЕ прерываем сборку из-за sitemap
   }
 }
 
-// Вспомогательная функция для поиска всех .html файлов
-async function findHtmlFiles(dir) {
-    let htmlFiles = [];
-    const dirents = await fs.readdir(dir, { withFileTypes: true });
-    for (const dirent of dirents) {
-        const res = path.resolve(dir, dirent.name);
-        if (dirent.isDirectory()) {
-            htmlFiles = htmlFiles.concat(await findHtmlFiles(res));
-        } else if (res.endsWith('.html')) {
-            htmlFiles.push(res);
-        }
-    }
-    return htmlFiles;
-}
-
+// Запускаем генерацию sitemap
 generateSitemap();
