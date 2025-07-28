@@ -21,14 +21,13 @@ const pageDescription = post.data.description;
 <Layout title={pageTitle} description={pageDescription}>
   <main class="blog-post">
     <div class="container">
-      <!-- Hero Image Section -->
+      <!-- Hero Image Section с ФИКСИРОВАННЫМ РАЗМЕРОМ -->
       {post.data.heroImage && (
-        <div class="hero-image">
+        <div class="hero-image-container">
           <img 
             src={post.data.heroImage} 
             alt={post.data.title}
-            width="1200"
-            height="630"
+            class="hero-image"
             loading="eager"
             decoding="async"
           />
@@ -74,17 +73,25 @@ const pageDescription = post.data.description;
     padding: 2rem;
   }
   
-  .hero-image {
+  /* КРИТИЧЕСКИ ВАЖНО: ФИКСИРУЕМ РАЗМЕР HERO IMAGE */
+  .hero-image-container {
     margin-bottom: 2rem;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    /* ОГРАНИЧИВАЕМ МАКСИМАЛЬНУЮ ВЫСОТУ */
+    max-height: 400px;
+    width: 100%;
+    position: relative;
   }
   
-  .hero-image img {
+  .hero-image {
     width: 100%;
-    height: auto;
+    height: 400px; /* ФИКСИРОВАННАЯ ВЫСОТА */
+    object-fit: cover; /* ОБРЕЗАЕМ БЕЗ ИСКАЖЕНИЯ */
+    object-position: center; /* ЦЕНТРИРУЕМ */
     display: block;
+    border-radius: 15px;
   }
   
   .post-header {
@@ -202,6 +209,7 @@ const pageDescription = post.data.description;
     color: #ff6b9d;
   }
   
+  /* МОБИЛЬНАЯ АДАПТАЦИЯ */
   @media (max-width: 768px) {
     .post-title {
       font-size: 2rem;
@@ -209,6 +217,14 @@ const pageDescription = post.data.description;
     
     .container {
       padding: 1rem;
+    }
+    
+    .hero-image {
+      height: 250px; /* УМЕНЬШАЕМ НА МОБИЛЬНОМ */
+    }
+    
+    .hero-image-container {
+      max-height: 250px;
     }
     
     .cta-buttons {
