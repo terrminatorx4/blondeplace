@@ -1,18 +1,35 @@
-name: 🚨 Emergency Content Factory
+name: 🚀 BlondePlace Beauty Factory (Atomic Lock)
 
 on:
   workflow_dispatch:
     inputs:
       topic_count:
-        description: 'Количество статей'
+        description: 'Количество статей для генерации'
         required: true
         default: '1'
         type: choice
-        options: ['1', '5', '10', '20']
+        options:
+          - '1'
+          - '5'
+          - '10'
+          - '20'
+      category:
+        description: 'Категория статей'
+        required: true
+        default: 'hair-care'
+        type: choice
+        options:
+          - 'hair-care'
+          - 'hair-coloring'
+          - 'nail-care'
+          - 'beauty-tips'
+          - 'salon-news'
 
 jobs:
-  emergency:
+  generate_and_publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
     strategy:
       matrix:
         thread: ${{ fromJson(format('[{0}]', join(range(1, fromJson(github.event.inputs.topic_count) + 1), ', '))) }}
@@ -20,63 +37,113 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: ✅ Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
-      - run: npm install @octokit/rest --no-save
+          cache: 'npm'
 
-      - name: Generate Emergency Content
+      - name: 🔧 Install Dependencies
+        run: |
+          npm install
+          echo "Dependencies installed successfully"
+
+      - name: 🔑 Get API Keys from Pool
+        id: get-keys
+        run: |
+          echo "🔑 Processing API keys for thread ${{ matrix.thread }}"
+          
+          # Получаем ключи из GitHub Secrets (пул из 20 ключей)
+          GEMINI_KEYS_RAW="${{ secrets.GEMINI_API_KEYS_POOL }}"
+          OPENROUTER_KEYS_RAW="${{ secrets.OPENROUTER_API_KEYS_POOL }}"
+          
+          if [ -z "$GEMINI_KEYS_RAW" ] || [ -z "$OPENROUTER_KEYS_RAW" ]; then
+            echo "❌ API keys are empty!"
+            exit 1
+          fi
+          
+          # Создаем массивы ключей
+          echo "$GEMINI_KEYS_RAW" | tr ',' '\n' > gemini_keys.txt
+          echo "$OPENROUTER_KEYS_RAW" | tr ',' '\n' > openrouter_keys.txt
+          
+          # Вычисляем индекс для текущего потока (1-20 -> 1-20)
+          THREAD_NUM=${{ matrix.thread }}
+          INDEX=$(( ($THREAD_NUM - 1) % 20 + 1 ))
+          
+          # Получаем ключи по индексу
+          GEMINI_KEY=$(sed -n "${INDEX}p" gemini_keys.txt | tr -d '[:space:]')
+          OPENROUTER_KEY=$(sed -n "${INDEX}p" openrouter_keys.txt | tr -d '[:space:]')
+          
+          # Проверяем что ключи получены
+          if [ -z "$GEMINI_KEY" ] || [ -z "$OPENROUTER_KEY" ]; then
+            echo "❌ Failed to get API keys for thread $THREAD_NUM"
+            echo "📝 Using fallback keys..."
+            GEMINI_KEY=$(head -n1 gemini_keys.txt | tr -d '[:space:]')
+            OPENROUTER_KEY=$(head -n1 openrouter_keys.txt | tr -d '[:space:]')
+          fi
+          
+          # Выводим в переменные окружения
+          echo "GEMINI_API_KEY=$GEMINI_KEY" >> $GITHUB_ENV
+          echo "OPENROUTER_API_KEY=$OPENROUTER_KEY" >> $GITHUB_ENV
+          
+          echo "✅ Thread $THREAD_NUM using key index: $INDEX"
+          
+          # Очищаем временные файлы
+          rm -f gemini_keys.txt openrouter_keys.txt
+
+      - name: 🏭 Generate Content (Thread ${{ matrix.thread }})
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MODEL_CHOICE: "gemini"
+          BATCH_SIZE: "1"
+          THREAD_ID: ${{ matrix.thread }}
+          CATEGORY: ${{ github.event.inputs.category }}
         run: |
-          cat > gen.mjs << 'EOF'
-          import { Octokit } from '@octokit/rest';
-          const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-          const thread = '${{ matrix.thread }}';
-          const timestamp = Date.now();
-          const slug = 'emergency-beauty-' + thread + '-' + timestamp;
-          const content = `---
-title: "Экстренная красота BLONDE PLACE (поток ${thread})"
-description: "Срочная помощь красоте от экспертов BLONDE PLACE"
-pubDate: "${new Date().toISOString()}"
-author: "BLONDE PLACE Emergency Team"
-heroImage: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=2070&auto=format&fit=crop&t=${timestamp}"
-category: "beauty-tips"
-tags: ["экстренная помощь", "BLONDE PLACE"]
-keywords: "экстренная помощь красоте, BLONDE PLACE, beauty SOS"
----
+          git config --global user.name 'BlondePlace Beauty Bot'
+          git config --global user.email 'beauty-bot@blondeplace.ru'
+          
+          echo "--- 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Начинаю генерацию beauty контента ---"
+          
+          # Запускаем factory.js через npm script
+          npm run factory
+          
+          if [[ -z $(git status --porcelain) ]]; then
+            echo "✅ Thread ${{ matrix.thread }}: Контент уже существует или не создан"
+            exit 0
+          fi
+          
+          echo "🔥 Thread ${{ matrix.thread }}: Найден новый beauty контент. Публикую..."
+          
+          git add src/content/posts/*.md
+          git commit -m "🎨 Beauty content from thread ${{ matrix.thread }} (${{ github.event.inputs.category }})"
+          git pull --rebase
+          git push
 
-# Экстренная помощь красоте в BLONDE PLACE
-
-🚨 Thread ${thread}: Когда красота требует немедленного вмешательства!
-
-## Наши экстренные услуги:
-- Срочная коррекция окрашивания
-- Экспресс-восстановление волос  
-- SOS-уход за кожей
-- Быстрый маникюр
-
-## Контакты для экстренной записи:
-📞 **Телефон**: +7 (981) 960-87-22
-💬 **Телеграм**: @Blondeplace  
-🌐 **Онлайн**: dikidi.ru/699327
-
-*Emergency content created by thread ${thread} at ${new Date().toLocaleString('ru-RU')}*
-`;
-          await octokit.rest.repos.createOrUpdateFileContents({
-            owner: 'terrminatorx4', 
-            repo: 'blondeplace', 
-            path: `src/content/posts/${slug}.md`,
-            message: `🚨 Emergency beauty content from thread ${thread}`,
-            content: Buffer.from(content).toString('base64')
-          });
-          console.log('✅ Emergency content created:', slug);
-          EOF
-          node gen.mjs
-
-      - name: Success Report
+      - name: 🎉 Thread Success
+        if: success()
         run: |
-          echo "✅ Thread ${{ matrix.thread }} completed successfully"
-          echo "🚨 Emergency content generated"
+          echo "✅ BEAUTY THREAD ${{ matrix.thread }} COMPLETED"
+          echo "📂 Category: ${{ github.event.inputs.category }}"
+          echo "🎨 Beauty content generated successfully"
+
+  completion:
+    needs: generate_and_publish
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: 🎊 Beauty Factory Report
+        run: |
+          echo "🚀 BLONDE PLACE BEAUTY FACTORY COMPLETED"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 Generated articles: ${{ github.event.inputs.topic_count }}"
+          echo "📂 Category: ${{ github.event.inputs.category }}"
+          echo "🌐 Site: https://blondeplace.netlify.app/"
+          echo "🔗 Blog: https://blondeplace.netlify.app/blog/"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎉 Beauty mission accomplished!"
