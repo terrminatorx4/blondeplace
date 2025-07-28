@@ -1,7 +1,7 @@
-# BlondePlace Netlify Config (Butler Logic)
+# BlondePlace Netlify Config (Emergency Fix)
 [build]
   publish = "blondeplace-blog/dist"
-  command = "npm run build"
+  command = "npm run build-astro && node postbuild.js"
   
 [build.environment]
   NODE_VERSION = "18"
@@ -9,7 +9,7 @@
   ASTRO_TELEMETRY_DISABLED = "1"
   NODE_ENV = "production"
   
-# Простые настройки как в Butler
+# Simple processing
 [build.processing]
   skip_processing = false
   
@@ -24,7 +24,7 @@
 [build.processing.html]
   pretty_urls = true
   
-# Beauty-специфичные headers
+# Headers
 [[headers]]
   for = "/*"
   [headers.values]
@@ -38,7 +38,7 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     
-# Redirects для beauty SEO
+# Redirects
 [[redirects]]
   from = "/salon"
   to = "https://blondeplace.ru"
