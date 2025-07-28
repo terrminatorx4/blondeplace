@@ -38,7 +38,7 @@ const { title, description } = Astro.props;
           </a>
         </div>
         <div>
-          <button class="Button_button__C0__L Button_light__Q3_1u Button_text__CeUC5 BurgerMenu_burgerMenu__selector__40hqg">
+          <button class="Button_button__C0__L Button_light__Q3_1u Button_text__CeUC5 BurgerMenu_burgerMenu__selector__40hqg" onclick="toggleBurgerMenu()">
             <img src="/header/menu-open.svg" alt="Menu icon" />
           </button>
         </div>
@@ -57,11 +57,12 @@ const { title, description } = Astro.props;
         <slot />
       </main>
 
-      <!-- Burger Menu -->
-      <div class="BurgerMenu_burgerMenu__ZWXCi">
+      <!-- Burger Menu with BLOG LINK -->
+      <div class="BurgerMenu_burgerMenu__ZWXCi" id="burgerMenu">
         <ul class="BurgerMenu_burgerMenu__list__YbyPX">
           <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#about">о нас</a></li>
           <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#services">наши услуги</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="/blog/">📝 блог</a></li>
           <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#discount">получите скидку</a></li>
           <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#why">почему BLONDE PLACE</a></li>
           <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#coworking">коворкинг</a></li>
@@ -84,6 +85,7 @@ const { title, description } = Astro.props;
             <div class="Footer_footer__linksContainer__eQ_Ra">
               <div class="Footer_footer__link__pEe8_"><a href="#about">о нас</a></div>
               <div class="Footer_footer__link__pEe8_"><a href="#services">наши услуги</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="/blog/">блог</a></div>
               <div class="Footer_footer__link__pEe8_"><a href="#discount">получите скидку</a></div>
               <div class="Footer_footer__link__pEe8_"><a href="#why">почему BLONDE PLACE</a></div>
               <div class="Footer_footer__link__pEe8_"><a href="#coworking">коворкинг</a></div>
@@ -130,6 +132,17 @@ const { title, description } = Astro.props;
     </footer>
   </div>
 
+  <script>
+    function toggleBurgerMenu() {
+      const menu = document.getElementById('burgerMenu');
+      if (menu.style.right === '0px') {
+        menu.style.right = '-100%';
+      } else {
+        menu.style.right = '0px';
+      }
+    }
+  </script>
+
   <style is:global>
     /* EXACT CSS FROM ORIGINAL SITE */
     * {
@@ -174,6 +187,9 @@ const { title, description } = Astro.props;
       position: sticky;
       top: 0;
       z-index: 1000;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
     }
 
     .Header_header__log__AnD1i {
