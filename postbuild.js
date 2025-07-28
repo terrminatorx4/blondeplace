@@ -1,9 +1,9 @@
-// Emergency Simplified Postbuild
+// BlondePlace Postbuild - Root Structure
 import { readdir, writeFile, access } from 'fs/promises';
 import { join, relative } from 'path';
 
 const SITE_URL = 'https://blondeplace.netlify.app';
-const DIST_DIR = './blondeplace-blog/dist';
+const DIST_DIR = './dist';
 
 async function findHtmlFiles(dir) {
   try {
@@ -28,7 +28,7 @@ async function findHtmlFiles(dir) {
 }
 
 async function generateSitemap() {
-  console.log('--- Emergency Sitemap Generator ---');
+  console.log('--- BlondePlace Sitemap Generator (Root) ---');
   
   try {
     // Check if dist exists
@@ -63,6 +63,7 @@ async function generateSitemap() {
         <loc>${SITE_URL}/${relativePath}</loc>
         <lastmod>${new Date().toISOString()}</lastmod>
         <priority>0.8</priority>
+        <changefreq>daily</changefreq>
     </url>`;
     });
 
@@ -72,7 +73,7 @@ ${urls.join('\n')}
 </urlset>`;
 
     await writeFile(join(DIST_DIR, 'sitemap.xml'), sitemapContent);
-    console.log(`✅ Sitemap generated with ${urls.length} pages`);
+    console.log(`✅ BlondePlace Sitemap generated with ${urls.length} pages`);
 
   } catch (error) {
     console.log('Error generating sitemap:', error.message);
