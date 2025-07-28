@@ -1,12 +1,14 @@
 ---
-title: "Комфорт для мастера – залог успеха BlondePlace"
-description: "В BlondePlace мы заботимся о комфорте каждого!  Удобное кресло для мастера – это не просто мебель, а инвестиция в здоровье и продуктивность.  Эргономичная спинка, регулируемая высота и мягкое сиденье позволяют избежать боли в спине и шее, обеспечивая максимальное удобство в течение всего рабочего дня.  Выбирайте лучшее для себя и своих мастеров!"
+title: "Комфорт для мастера – залог успеха..."
+description: "В BlondePlace мы заботимся о комфорте каждого!  Удобное кресло для мастера – это не просто мебель, а инвестиция в здоровье и продуктивность.  Эргономичная сп..."
 keywords: "кресло мастера, эргономичное кресло, салон красоты, BlondePlace, удобство, здоровье, комфорт"
 pubDate: "2025-07-28T16:52:00.184Z"
 author: "Эксперт BlondePlace"
 heroImage: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2070&auto=format&fit=crop"
 schema: {"@context":"https://schema.org","@type":"HowTo","name":"Комфорт для мастера – залог успеха BlondePlace","description":"В BlondePlace мы заботимся о комфорте каждого!  Удобное кресло для мастера – это не просто мебель, а инвестиция в здоровье и продуктивность.  Эргономичная спинка, регулируемая высота и мягкое сиденье позволяют избежать боли в спине и шее, обеспечивая максимальное удобство в течение всего рабочего дня.  Выбирайте лучшее для себя и своих мастеров!","image":{"@type":"ImageObject","url":"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2070&auto=format&fit=crop"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","reviewCount":820,"bestRating":"5","worstRating":"1"},"publisher":{"@type":"Organization","name":"Блог BlondePlace","logo":{"@type":"ImageObject","url":"https://blondeplace.netlify.app/favicon.ico"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://blondeplace.netlify.app/blog/kreslo-dlya-mastera/"}}
+category: "beauty-tips"
 ---
+
 # Идеальное кресло для мастера: комфорт и эргономика в BlondePlace
 
 ## Почему выбор кресла для мастера так важен?
