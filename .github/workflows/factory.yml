@@ -57,46 +57,67 @@ jobs:
           npm install
           echo "Dependencies installed successfully"
 
-      - name: 🔑 Get API Keys from Pool
+      - name: 🔑 Get API Keys from Pool (IMPROVED)
         if: ${{ matrix.thread <= fromJson(github.event.inputs.thread_count) }}
         id: get-keys
         run: |
           echo "🔑 Processing API keys for thread ${{ matrix.thread }}"
           
-          # Получаем ключи из GitHub Secrets (пул из 20 ключей)
+          # Получаем ключи из GitHub Secrets
           GEMINI_KEYS_RAW="${{ secrets.GEMINI_API_KEYS_POOL }}"
           OPENROUTER_KEYS_RAW="${{ secrets.OPENROUTER_API_KEYS_POOL }}"
           
-          if [ -z "$GEMINI_KEYS_RAW" ] || [ -z "$OPENROUTER_KEYS_RAW" ]; then
-            echo "❌ API keys are empty!"
-            exit 1
+          echo "📊 Gemini keys available: $([ -n "$GEMINI_KEYS_RAW" ] && echo "YES" || echo "NO")"
+          echo "📊 OpenRouter keys available: $([ -n "$OPENROUTER_KEYS_RAW" ] && echo "YES" || echo "NO")"
+          
+          # ПРОВЕРЯЕМ НАЛИЧИЕ НУЖНОЙ МОДЕЛИ
+          if [ "${{ github.event.inputs.model_choice }}" == "gemini" ]; then
+            if [ -z "$GEMINI_KEYS_RAW" ]; then
+              echo "❌ Gemini model selected but no Gemini keys available!"
+              exit 1
+            fi
+          elif [ "${{ github.event.inputs.model_choice }}" == "openrouter" ]; then
+            if [ -z "$OPENROUTER_KEYS_RAW" ]; then
+              echo "❌ OpenRouter model selected but no OpenRouter keys available!"
+              echo "💡 Tip: Add OPENROUTER_API_KEYS_POOL secret or use 'gemini' model"
+              exit 1
+            fi
           fi
           
-          # Создаем массивы ключей
-          echo "$GEMINI_KEYS_RAW" | tr ',' '\n' > gemini_keys.txt
-          echo "$OPENROUTER_KEYS_RAW" | tr ',' '\n' > openrouter_keys.txt
+          # Создаем массивы ключей ТОЛЬКО если они есть
+          if [ -n "$GEMINI_KEYS_RAW" ]; then
+            echo "$GEMINI_KEYS_RAW" | tr ',' '\n' > gemini_keys.txt
+            GEMINI_COUNT=$(wc -l < gemini_keys.txt)
+            echo "📊 Gemini keys loaded: $GEMINI_COUNT"
+          fi
           
-          # Вычисляем индекс для текущего потока (1-20 -> 1-20)
+          if [ -n "$OPENROUTER_KEYS_RAW" ]; then
+            echo "$OPENROUTER_KEYS_RAW" | tr ',' '\n' > openrouter_keys.txt
+            OPENROUTER_COUNT=$(wc -l < openrouter_keys.txt)
+            echo "📊 OpenRouter keys loaded: $OPENROUTER_COUNT"
+          fi
+          
+          # Вычисляем индекс для текущего потока
           THREAD_NUM=${{ matrix.thread }}
           INDEX=$(( ($THREAD_NUM - 1) % 20 + 1 ))
           
-          # Получаем ключи по индексу
-          GEMINI_KEY=$(sed -n "${INDEX}p" gemini_keys.txt | tr -d '[:space:]')
-          OPENROUTER_KEY=$(sed -n "${INDEX}p" openrouter_keys.txt | tr -d '[:space:]')
+          # Получаем ключи в зависимости от выбранной модели
+          if [ "${{ github.event.inputs.model_choice }}" == "gemini" ]; then
+            GEMINI_KEY=$(sed -n "${INDEX}p" gemini_keys.txt | tr -d '[:space:]')
+            if [ -z "$GEMINI_KEY" ]; then
+              GEMINI_KEY=$(head -n1 gemini_keys.txt | tr -d '[:space:]')
+            fi
+            echo "GEMINI_API_KEY_CURRENT=$GEMINI_KEY" >> $GITHUB_ENV
+            echo "✅ Thread $THREAD_NUM using Gemini key index: $INDEX"
           
-          # Проверяем что ключи получены
-          if [ -z "$GEMINI_KEY" ] || [ -z "$OPENROUTER_KEY" ]; then
-            echo "❌ Failed to get API keys for thread $THREAD_NUM"
-            echo "📝 Using fallback keys..."
-            GEMINI_KEY=$(head -n1 gemini_keys.txt | tr -d '[:space:]')
-            OPENROUTER_KEY=$(head -n1 openrouter_keys.txt | tr -d '[:space:]')
+          elif [ "${{ github.event.inputs.model_choice }}" == "openrouter" ]; then
+            OPENROUTER_KEY=$(sed -n "${INDEX}p" openrouter_keys.txt | tr -d '[:space:]')
+            if [ -z "$OPENROUTER_KEY" ]; then
+              OPENROUTER_KEY=$(head -n1 openrouter_keys.txt | tr -d '[:space:]')
+            fi
+            echo "OPENROUTER_API_KEY_CURRENT=$OPENROUTER_KEY" >> $GITHUB_ENV
+            echo "✅ Thread $THREAD_NUM using OpenRouter key index: $INDEX"
           fi
-          
-          # ИСПРАВЛЯЕМ НАЗВАНИЯ ПЕРЕМЕННЫХ ДЛЯ FACTORY.JS
-          echo "GEMINI_API_KEY_CURRENT=$GEMINI_KEY" >> $GITHUB_ENV
-          echo "OPENROUTER_API_KEY_CURRENT=$OPENROUTER_KEY" >> $GITHUB_ENV
-          
-          echo "✅ Thread $THREAD_NUM using key index: $INDEX"
           
           # Очищаем временные файлы
           rm -f gemini_keys.txt openrouter_keys.txt
