@@ -3,13 +3,40 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="BLONDE PLACE - Салон красоты комфорт класса">
-  <!-- EXACT COPY OF ORIGINAL HOMEPAGE STRUCTURE -->
-  
-  <!-- Video Counter -->
-  <div class="CounterVideo_video__nJkxH" style="display: none;">
-    <button class="CounterVideo_video__closeButton__elmXT">X</button>
-    <video src="/video/video.MP4" autoplay muted playsinline controls></video>
-  </div>
+  <!-- HEADER WITH NAVIGATION -->
+  <header class="Header_header__container">
+    <div class="Header_header__wrapper">
+      <div class="Header_header__logo">
+        <a href="/">
+          <img src="/favicon.svg" alt="BLONDE PLACE" width="40" height="40" />
+          <span>BLONDE PLACE</span>
+        </a>
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <nav class="Header_header__nav">
+        <a href="#about">О нас</a>
+        <a href="#services">Услуги</a>
+        <a href="#discount">Скидка 10%</a>
+        <a href="#coworking">Коворкинг</a>
+        <a href="/blog/">Блог</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
+      
+      <!-- CTA Buttons -->
+      <div class="Header_header__cta">
+        <a href="tel:+79819608722" class="Header_cta__phone">📞</a>
+        <a href="https://dikidi.ru/699327" class="Header_cta__book">Записаться</a>
+      </div>
+      
+      <!-- Mobile Menu Button -->
+      <button class="Header_burger__btn" id="burgerBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
 
   <!-- Intro Section -->
   <section class="Intro_intro__KtS_m" id="about">
@@ -63,41 +90,17 @@ import Layout from '../layouts/Layout.astro';
                 </div>
               </div>
             </div>
-            <div class="Options_option__row__Zy1FE">
-              <div class="Options_option__item__LqVeF" data-item="true">
-                <div class="Options_option__text__wAqR5">
-                  <p>шатуш</p>
-                </div>
-              </div>
-              <div class="Options_option__item__LqVeF" data-item="true">
-                <div class="Options_option__text__wAqR5">
-                  <p>AirTouch ниже плеч</p>
-                </div>
-              </div>
-            </div>
-            <div class="Options_option__row__Zy1FE">
-              <div class="Options_option__item__LqVeF" data-item="true">
-                <div class="Options_option__text__wAqR5">
-                  <p>тонирование</p>
-                </div>
-              </div>
-              <div class="Options_option__item__LqVeF" data-item="true">
-                <div class="Options_option__text__wAqR5">
-                  <p>тотал блонд (окрашенная база)</p>
-                </div>
-              </div>
-            </div>
-            <div class="Options_option__row__Zy1FE">
-              <div class="Options_option__item__LqVeF" data-item="true">
-                <div class="Options_option__text__wAqR5">
-                  <p>AirTouch ниже плеч</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
         <div class="Intro_intro__image__5TyEE">
-          <img src="/intro/woman.png" alt="decoration image"/>
+          <img 
+            src="/intro/woman.png" 
+            alt="decoration image"
+            width="300"
+            height="400"
+            loading="eager"
+            decoding="async"
+          />
         </div>
       </div>
     </div>
@@ -134,7 +137,14 @@ import Layout from '../layouts/Layout.astro';
     <div class="Info_info__wrapper__oVhN4">
       <div class="Info_info__imgContainer__XX0gl">
         <div class="Info_info__phoneContainer__sOoD2">
-          <img src="/info/phone.png" alt="phone"/>
+          <img 
+            src="/info/phone.png" 
+            alt="phone"
+            width="200"
+            height="300"
+            loading="lazy"
+            decoding="async"
+          />
           <div class="Info_info__buttonContainer__UiyiL">
             <a href="https://dikidi.ru/699327" target="_blank">
               <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ Button_text__CeUC5 Info_info__applyButton__GGkQ3">📱<br/>Записаться</button>
@@ -145,7 +155,14 @@ import Layout from '../layouts/Layout.astro';
           </div>
         </div>
         <div class="Info_info__scissors__jKO3q">
-          <img src="/info/scissors.png" alt="scissors"/>
+          <img 
+            src="/info/scissors.png" 
+            alt="scissors"
+            width="80"
+            height="80"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </div>
       <div class="Info_info__content__of298">
@@ -172,7 +189,14 @@ import Layout from '../layouts/Layout.astro';
   <section class="Services_services__ShMKK" id="services">
     <div class="Services_services__wrapper__ZaS_9">
       <div class="Services_services__headingBox__BqI_r">
-        <img src="/discount/divider.png" alt=""/>
+        <img 
+          src="/discount/divider.png" 
+          alt="divider"
+          width="100"
+          height="20"
+          loading="lazy"
+          decoding="async"
+        />
         <h3 class="Services_services__heading__GWWHl">✨<br/>Наши <span class="Services_services__highlight__lBCUU">услуги</span><span class="Services_services__colon__X2sXK">:</span></h3>
       </div>
       <div class="Services_services__content__u3Y0j">
@@ -243,11 +267,19 @@ import Layout from '../layouts/Layout.astro';
         </div>
         <div class="Services_services__buttonContainer__qzQAw">
           <a href="https://dikidi.ru/699327">
-            <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ Button_text__CeUC5 Services_services__buttonOnline__JWcRh">Онлайн запись</button>
+            <button class="Button_button__C0__L Button_accent__improved Button_text__CeUC5 Services_services__buttonOnline__JWcRh">Онлайн запись</button>
           </a>
-          <a class="Button_button__C0__L Button_transparent__6L3R2 Button_text__CeUC5 Services_services__buttonQuestion__hgySc" href="https://t.me/Blondeplace">Задать вопрос</a>
+          <a class="Button_button__C0__L Button_secondary__improved Button_text__CeUC5 Services_services__buttonQuestion__hgySc" href="https://t.me/Blondeplace">Задать вопрос</a>
         </div>
-        <img src="/services/brush.png" alt="brush" class="Services_services__brush__RzudP"/>
+        <img 
+          src="/services/brush.png" 
+          alt="brush" 
+          class="Services_services__brush__RzudP"
+          width="200"
+          height="150"
+          loading="lazy"
+          decoding="async"
+        />
       </div>
       <!-- БЛОГ ССЫЛКА -->
       <div class="Services_services__blog__link">
@@ -279,8 +311,38 @@ import Layout from '../layouts/Layout.astro';
           </div>
         </div>
         <a href="/beauty-coworking">
-          <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ">Подробнее</button>
+          <button class="Button_button__C0__L Button_accent__improved Button_text__CeUC5">Подробнее</button>
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacts Section -->
+  <section class="Contacts_contacts__section" id="contacts">
+    <div class="Contacts_contacts__wrapper">
+      <h2 class="Contacts_contacts__title">📞 Контакты</h2>
+      <div class="Contacts_contacts__grid">
+        <div class="Contacts_contact__item">
+          <div class="Contacts_contact__icon">📱</div>
+          <div class="Contacts_contact__info">
+            <h3>Телефон</h3>
+            <a href="tel:+79819608722">+7 (981) 960-87-22</a>
+          </div>
+        </div>
+        <div class="Contacts_contact__item">
+          <div class="Contacts_contact__icon">💬</div>
+          <div class="Contacts_contact__info">
+            <h3>Телеграм</h3>
+            <a href="https://t.me/Blondeplace">@Blondeplace</a>
+          </div>
+        </div>
+        <div class="Contacts_contact__item">
+          <div class="Contacts_contact__icon">🌐</div>
+          <div class="Contacts_contact__info">
+            <h3>Онлайн запись</h3>
+            <a href="https://dikidi.ru/699327">dikidi.ru/699327</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -288,44 +350,157 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
-  /* EXACT CSS FROM ORIGINAL SITE */
-  
-  /* Reset */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  /* Video Counter */
-  .CounterVideo_video__nJkxH {
+  /* HEADER STYLES */
+  .Header_header__container {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9);
-    z-index: 10000;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 107, 157, 0.1);
+  }
+
+  .Header_header__wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    height: 70px;
   }
 
-  .CounterVideo_video__closeButton__elmXT {
+  .Header_header__logo a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    color: #333;
+    font-size: 1.2rem;
+  }
+
+  .Header_header__nav {
+    display: flex;
+    gap: 30px;
+  }
+
+  .Header_header__nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    position: relative;
+  }
+
+  .Header_header__nav a:hover {
+    color: #ff6b9d;
+  }
+
+  .Header_header__nav a::after {
+    content: '';
     position: absolute;
-    top: 20px;
-    right: 20px;
-    background: #fff;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #ff6b9d;
+    transition: width 0.3s ease;
   }
 
-  /* Intro Section */
+  .Header_header__nav a:hover::after {
+    width: 100%;
+  }
+
+  .Header_header__cta {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .Header_cta__phone {
+    font-size: 1.5rem;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+  }
+
+  .Header_cta__phone:hover {
+    transform: scale(1.1);
+  }
+
+  .Header_cta__book {
+    background: #ff6b9d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .Header_cta__book:hover {
+    background: #e55a8a;
+    transform: translateY(-2px);
+  }
+
+  .Header_burger__btn {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .Header_burger__btn span {
+    width: 25px;
+    height: 3px;
+    background: #333;
+    transition: all 0.3s ease;
+  }
+
+  /* IMPROVED BUTTON STYLES */
+  .Button_accent__improved {
+    background: #ff6b9d !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 30px !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .Button_accent__improved:hover {
+    background: #e55a8a !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3) !important;
+  }
+
+  .Button_secondary__improved {
+    background: transparent !important;
+    color: #ff6b9d !important;
+    border: 2px solid #ff6b9d !important;
+    padding: 13px 28px !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .Button_secondary__improved:hover {
+    background: #ff6b9d !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+  }
+
+  /* EXISTING STYLES WITH SPACING FIX */
+  body {
+    padding-top: 70px;
+  }
+
   .Intro_intro__KtS_m {
-    padding: 60px 0;
+    padding: 80px 0 60px;
     background: linear-gradient(135deg, #faf9f7 0%, #f8f6f4 100%);
   }
 
@@ -484,16 +659,22 @@ import Layout from '../layouts/Layout.astro';
   .Button_light__Q3_1u {
     background: #B8956A;
     color: #fff;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-weight: 600;
   }
 
   .Button_light__Q3_1u:hover {
     background: #a0855c;
+    transform: translateY(-2px);
   }
 
   .Button_transparent__6L3R2 {
     background: transparent;
     border: 2px solid #B8956A;
     color: #B8956A;
+    padding: 13px 28px;
+    border-radius: 10px;
   }
 
   .Button_transparent__6L3R2:hover {
@@ -610,8 +791,76 @@ import Layout from '../layouts/Layout.astro';
     color: #333;
   }
 
+  /* Contacts Section */
+  .Contacts_contacts__section {
+    padding: 80px 0;
+    background: #fff;
+  }
+
+  .Contacts_contacts__wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .Contacts_contacts__title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 40px;
+  }
+
+  .Contacts_contacts__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+  }
+
+  .Contacts_contact__item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+  }
+
+  .Contacts_contact__item:hover {
+    transform: translateY(-5px);
+  }
+
+  .Contacts_contact__icon {
+    font-size: 2rem;
+  }
+
+  .Contacts_contact__info h3 {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 5px;
+  }
+
+  .Contacts_contact__info a {
+    color: #ff6b9d;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .Contacts_contact__info a:hover {
+    text-decoration: underline;
+  }
+
   /* Mobile Responsive */
   @media (max-width: 768px) {
+    .Header_header__nav {
+      display: none;
+    }
+
+    .Header_burger__btn {
+      display: flex;
+    }
+
     .Intro_intro__content__t_LLo {
       grid-template-columns: 1fr;
       gap: 40px;
@@ -630,5 +879,23 @@ import Layout from '../layouts/Layout.astro';
     .Options_option__row__Zy1FE {
       justify-content: center;
     }
+
+    .Intro_intro__header__59R5S {
+      font-size: 2.5rem;
+    }
   }
 </style>
+
+<!-- Mobile Menu JavaScript -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const burgerBtn = document.getElementById('burgerBtn');
+    const mobileMenu = document.getElementById('burgerMenu');
+    
+    if (burgerBtn && mobileMenu) {
+      burgerBtn.addEventListener('click', function() {
+        mobileMenu.classList.toggle('active');
+      });
+    }
+  });
+</script>
