@@ -1,84 +1,58 @@
-// BlondePlace Postbuild - Root Structure
-import { readdir, writeFile, access } from 'fs/promises';
-import { join, relative } from 'path';
+console.log('📦 Starting post-build process...');
 
-const SITE_URL = 'https://blondeplace.netlify.app';
-const DIST_DIR = './dist';
+// ПРОСТАЯ SITEMAP ГЕНЕРАЦИЯ
+import fs from 'fs';
+import path from 'path';
 
-async function findHtmlFiles(dir) {
-  try {
-    const files = [];
-    const entries = await readdir(dir, { withFileTypes: true });
-    
-    for (const entry of entries) {
-      const fullPath = join(dir, entry.name);
-      if (entry.isDirectory()) {
-        const subFiles = await findHtmlFiles(fullPath);
-        files.push(...subFiles);
-      } else if (entry.name.endsWith('.html')) {
-        files.push(fullPath);
-      }
-    }
-    
-    return files;
-  } catch (error) {
-    console.log('Error reading directory:', error.message);
-    return [];
-  }
-}
+const siteUrl = 'https://blondeplace.netlify.app';
+const distDir = './dist';
 
-async function generateSitemap() {
-  console.log('--- BlondePlace Sitemap Generator (Root) ---');
+function generateSitemap() {
+  console.log('🗺️ Generating sitemap...');
   
-  try {
-    // Check if dist exists
-    await access(DIST_DIR);
-  } catch (error) {
-    console.log('Dist directory not found, skipping sitemap');
-    return;
-  }
-
-  try {
-    const files = await findHtmlFiles(DIST_DIR);
-    
-    if (files.length === 0) {
-      console.log('No HTML files found');
-      return;
-    }
-
-    const urls = files.map(file => {
-      let relativePath = relative(DIST_DIR, file).replace(/\\/g, '/');
-      
-      if (relativePath.endsWith('index.html')) {
-        relativePath = relativePath.slice(0, -10);
-      } else if (relativePath.endsWith('.html')) {
-        relativePath = relativePath.slice(0, -5);
-      }
-      
-      if (relativePath.startsWith('/')) {
-        relativePath = relativePath.slice(1);
-      }
-      
-      return `    <url>
-        <loc>${SITE_URL}/${relativePath}</loc>
-        <lastmod>${new Date().toISOString()}</lastmod>
-        <priority>0.8</priority>
-        <changefreq>daily</changefreq>
-    </url>`;
-    });
-
-    const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
+  const urls = [
+    { url: '/', priority: '1.0', changefreq: 'daily' },
+    { url: '/services/', priority: '0.9', changefreq: 'weekly' },
+    { url: '/about/', priority: '0.8', changefreq: 'monthly' },
+    { url: '/contacts/', priority: '0.8', changefreq: 'monthly' },
+    { url: '/beauty-coworking/', priority: '0.7', changefreq: 'monthly' },
+    { url: '/blog/', priority: '0.6', changefreq: 'daily' }
+  ];
+  
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.join('\n')}
+${urls.map(item => `  <url>
+    <loc>${siteUrl}${item.url}</loc>
+    <changefreq>${item.changefreq}</changefreq>
+    <priority>${item.priority}</priority>
+  </url>`).join('\n')}
 </urlset>`;
 
-    await writeFile(join(DIST_DIR, 'sitemap.xml'), sitemapContent);
-    console.log(`✅ BlondePlace Sitemap generated with ${urls.length} pages`);
-
-  } catch (error) {
-    console.log('Error generating sitemap:', error.message);
-  }
+  fs.writeFileSync(path.join(distDir, 'sitemap.xml'), sitemap);
+  console.log('✅ Sitemap generated');
 }
 
-// Run sitemap generation
-generateSitemap().catch(console.error);
+function generateRobots() {
+  console.log('🤖 Generating robots.txt...');
+  
+  const robots = `User-agent: *
+Allow: /
+
+Sitemap: ${siteUrl}/sitemap.xml`;
+
+  fs.writeFileSync(path.join(distDir, 'robots.txt'), robots);
+  console.log('✅ Robots.txt generated');
+}
+
+// ГЕНЕРИРУЕМ ФАЙЛЫ
+try {
+  if (fs.existsSync(distDir)) {
+    generateSitemap();
+    generateRobots();
+    console.log('✅ Post-build completed successfully');
+  } else {
+    console.error('❌ Dist directory not found');
+  }
+} catch (error) {
+  console.error('❌ Post-build error:', error.message);
+}
