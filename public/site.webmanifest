@@ -1,19 +1,16 @@
 {
-  "name": "BLONDE PLACE - Салон красоты в СПб",
+  "name": "BLONDE PLACE - Салон красоты",
   "short_name": "BLONDE PLACE",
-  "description": "Профессиональные услуги красоты: окрашивание волос, маникюр, уход за кожей. Beauty коворкинг в центре Санкт-Петербурга.",
+  "description": "Профессиональные услуги красоты в центре СПб: окрашивание волос, стрижки, маникюр, уход за кожей. Beauty коворкинг.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "theme_color": "#ff6b9d",
   "background_color": "#ffffff",
-  "categories": [
-    "beauty",
-    "lifestyle",
-    "health"
-  ],
-  "scope": "/",
   "lang": "ru",
+  "dir": "ltr",
+  "categories": ["beauty", "lifestyle", "business"],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -38,6 +35,42 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Наши услуги",
+      "short_name": "Услуги",
+      "description": "Посмотреть все услуги салона",
+      "url": "/#services",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Записаться",
+      "short_name": "Запись",
+      "description": "Записаться на консультацию",
+      "url": "https://t.me/Blondeplace",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshot-narrow.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ]
 }
