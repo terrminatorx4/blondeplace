@@ -6,35 +6,18 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href={Astro.url} />
     
-    <!-- PRELOAD CRITICAL RESOURCES FOR SPEED -->
-    <link rel="preload" href="/favicon.svg" as="image" type="image/svg+xml" />
-    <link rel="dns-prefetch" href="//images.unsplash.com" />
+    <!-- FAVICON -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     
     <!-- PWA THEME COLOR -->
     <meta name="theme-color" content="#ff6b9d" />
-    <meta name="msapplication-TileColor" content="#ff6b9d" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="BLONDE PLACE" />
-    
-    <!-- FAVICON -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    
-    <!-- PWA MANIFEST -->
-    <link rel="manifest" href="/site.webmanifest" />
-    
-    <!-- PWA ICONS -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
     
     <!-- Google & Yandex Verification -->
     <meta name="google-site-verification" content="QmTdEF5xHLHXsL1FEcotg-xZTPfD14z9BxH6D64b0ds" />
@@ -55,9 +38,8 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content="https://blondeplace.netlify.app/og-image.jpg" />
     
-    <!-- CRITICAL CSS INLINED FOR SPEED -->
+    <!-- CRITICAL CSS INLINED -->
     <style>
-      /* CRITICAL STYLES ONLY - ABOVE THE FOLD */
       .Consultation_consultation__highlight__esun9,
       .Services_services__highlight__lBCUU {
         color: #000000 !important;
@@ -74,7 +56,6 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
         font-weight: bold !important;
       }
       
-      /* PERFORMANCE: Hide non-critical content until loaded */
       .Services_services__ShMKK,
       .Consultation_consultation__zS8eJ {
         color: #000000 !important;
@@ -86,19 +67,5 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
   </head>
   <body>
     <slot />
-    
-    <!-- DEFER SERVICE WORKER FOR BETTER PERFORMANCE -->
-    <script nonce="lighthouse-perfect">
-      // Defer SW registration until page is loaded
-      window.addEventListener('load', () => {
-        if ('serviceWorker' in navigator) {
-          setTimeout(() => {
-            navigator.serviceWorker.register('/sw.js', { scope: '/' })
-              .then(() => console.log('PWA ready'))
-              .catch(() => console.log('PWA failed'));
-          }, 1000);
-        }
-      });
-    </script>
   </body>
 </html>
