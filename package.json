@@ -1,29 +1,22 @@
 {
-  "name": "blondeplace-beauty-blog",
+  "name": "blondeplace-beauty-generator",
+  "version": "1.0.0",
+  "description": "BlondePlace Beauty Content Generator",
   "type": "module",
-  "version": "0.0.1",
+  "main": "factory.js",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro",
     "factory": "node factory.js",
-    "audit": "node auditor.js",
-    "fix": "node fixer.js",
-    "surgeon": "node surgeon.js"
+    "build": "cd blondeplace-blog && npm run build",
+    "dev": "cd blondeplace-blog && npm run dev",
+    "preview": "cd blondeplace-blog && npm run preview"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astrojs/netlify": "^5.5.3",
-    "@astrojs/sitemap": "^3.2.1",
-    "astro": "^4.16.18",
-    "typescript": "^5.6.3"
-  },
-  "devDependencies": {
     "@google/generative-ai": "^0.21.0",
     "node-fetch": "^3.3.2",
-    "execa": "^9.4.0",
-    "sharp": "^0.33.5"
-  }
+    "gray-matter": "^4.0.3",
+    "execa": "^8.0.1"
+  },
+  "keywords": ["beauty", "content-generation", "blondeplace", "astro"],
+  "author": "BlondePlace Beauty Team",
+  "license": "MIT"
 }
