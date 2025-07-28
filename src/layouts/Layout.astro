@@ -11,145 +11,127 @@ const { title, description } = Astro.props;
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="description" content={description || "BLONDE PLACE - салон красоты комфорт класса в Санкт-Петербурге. Профессиональное окрашивание волос, мелирование, сложное окрашивание."} />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description || "Blonde Place - Салон красоты комфорт класса!"} />
   <title>{title}</title>
+  <meta name="author" content="tevenix" />
+  <meta name="keywords" content="салон красоты, комфорт класс, уход за волосами, окрашивание, блонд, мелирование, тонирование" />
   
-  <!-- Google Fonts - exactly like blondeplace.ru -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Exact same font as original -->
+  <link href="https://fonts.googleapis.com/css2?family=Exo:wght@300;400;500;700&display=swap&subset=cyrillic" rel="stylesheet" />
+  <link rel="icon" href="/favicon.png" sizes="any" />
 </head>
-<body>
-  <!-- EXACT COPY OF blondeplace.ru HEADER -->
-  <header class="main-header">
-    <div class="header-container">
-      <!-- Logo - exactly like original -->
-      <div class="logo">
-        <div class="logo-text">BLONDEPLACE</div>
+<body class="__className_893524">
+  <div class="Layout_layout__OUE_I">
+    <!-- EXACT HEADER COPY FROM ORIGINAL -->
+    <header class="Header_header__elx5B">
+      <div>
+        <h1 class="Header_header__log__AnD1i">BLONDEPLACE</h1>
       </div>
-      
-      <!-- Right buttons - exactly like original -->
-      <div class="header-buttons">
-        <button class="header-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/>
-            <path d="M12 6c-3.309 0-6 2.691-6 6s2.691 6 6 6 6-2.691 6-6-2.691-6-6-6zm0 10c-2.206 0-4-1.794-4-4s1.794-4 4-4 4 1.794 4 4-1.794 4-4 4z"/>
-          </svg>
-        </button>
-        <button class="header-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 6L9 17l-5-5"/>
-          </svg>
-        </button>
-        <button class="header-menu-btn">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+      <div class="Header_header__buttons__qM_hW">
+        <div class="Header_header__links__SqUHS">
+          <a class="Button_button__C0__L Button_light__Q3_1u Button_icon__zM_AX Header_header__buttonTg__jPP8I" href="https://t.me/bpcoworking">
+            <img src="/header/telegram-icon.svg" alt="Telegram Icon" />
+          </a>
+          <a class="Button_button__C0__L Button_light__Q3_1u Button_icon__zM_AX Header_header__button___lZf0" href="https://t.me/Blondeplace">
+            <img src="/header/wa-icon.svg" alt="WhatsApp icon" />
+          </a>
+        </div>
+        <div>
+          <button class="Button_button__C0__L Button_light__Q3_1u Button_text__CeUC5 BurgerMenu_burgerMenu__selector__40hqg">
+            <img src="/header/menu-open.svg" alt="Menu icon" />
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Telegram Button -->
+    <div class="Header_header__mobileTg__8DpGl">
+      <a class="Button_button__C0__L Button_light__Q3_1u Button_icon__zM_AX Header_header__mobileButton__GdDO9" href="https://t.me/Blondeplace">
+        <img src="/header/telegram-icon.svg" alt="Telegram Icon" />
+      </a>
+    </div>
+
+    <div class="Layout_layout__container__QeKWZ">
+      <main class="main">
+        <slot />
+      </main>
+
+      <!-- Burger Menu -->
+      <div class="BurgerMenu_burgerMenu__ZWXCi">
+        <ul class="BurgerMenu_burgerMenu__list__YbyPX">
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#about">о нас</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#services">наши услуги</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#discount">получите скидку</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#why">почему BLONDE PLACE</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#coworking">коворкинг</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#masters">наши мастера</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="https://t.me/Blondeplace">телеграм</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#contacts">контакты</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#comments">отзывы</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#brands">бренды</a></li>
+          <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#news">новостная лента</a></li>
+        </ul>
       </div>
     </div>
-  </header>
 
-  <main>
-    <slot />
-  </main>
-
-  <!-- Footer with navigation (since header has no menu) -->
-  <footer class="main-footer">
-    <div class="footer-container">
-      <div class="footer-sections">
-        <!-- Logo section -->
-        <div class="footer-section">
-          <div class="footer-logo">
-            <div class="footer-logo-text">BLONDE PLACE</div>
-            <div class="footer-tagline">салон красоты комфорт класса</div>
+    <!-- EXACT FOOTER COPY FROM ORIGINAL -->
+    <footer class="Footer_footer__0jj6Q">
+      <div class="Layout_layout__container__QeKWZ">
+        <div class="Footer_footer__wrapper__sMhWs">
+          <div class="Footer_footer__main__hvoA7">
+            <h3 class="Footer_footer__heading__nFHY9">Главная</h3>
+            <div class="Footer_footer__linksContainer__eQ_Ra">
+              <div class="Footer_footer__link__pEe8_"><a href="#about">о нас</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">наши услуги</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#discount">получите скидку</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#why">почему BLONDE PLACE</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#coworking">коворкинг</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#masters">наши мастера</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="https://t.me/Blondeplace">телеграм</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#contacts">контакты</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#comments">отзывы</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#brands">бренды</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#news">новостная лента</a></div>
+            </div>
+            <div class="Footer_footer__IP__V4hYc">ИП РАФАЕНКО ОА <br/> ОГРН 313715413300153</div>
           </div>
-        </div>
 
-        <!-- Navigation -->
-        <div class="footer-section">
-          <h3>Главная</h3>
-          <ul>
-            <li><a href="/">о нас</a></li>
-            <li><a href="/services">наши услуги</a></li>
-            <li><a href="/blog">получите скидку</a></li>
-            <li><a href="/beauty-coworking">коворкинг</a></li>
-            <li><a href="https://blondeplace.ru/#masters" target="_blank">наши мастера</a></li>
-            <li><a href="/contacts">контакты</a></li>
-            <li><a href="/blog">новостная лента</a></li>
-          </ul>
-        </div>
-
-        <!-- Services -->
-        <div class="footer-section">
-          <h3>Услуги</h3>
-          <ul>
-            <li><a href="/services">мелирование с растяжкой цвета</a></li>
-            <li><a href="/services">мелирование</a></li>
-            <li><a href="/services">сложное окрашивание+стрижка</a></li>
-            <li><a href="/services">контуринг</a></li>
-            <li><a href="/services">окрашивание корней</a></li>
-            <li><a href="/services">тотал блонд с нуля</a></li>
-            <li><a href="/services">шатуш</a></li>
-            <li><a href="/services">AirTouch ниже плеч</a></li>
-            <li><a href="/services">тонирование</a></li>
-            <li><a href="/services">тотал блонд (окрашенная база)</a></li>
-          </ul>
-        </div>
-
-        <!-- Consultation -->
-        <div class="footer-section">
-          <h3>Консультация</h3>
-          <ul>
-            <li><a href="tel:+79819608722">Ваш телефон</a></li>
-          </ul>
-          <div class="phone-input-wrapper">
-            <input type="tel" placeholder="+7 (999) 999-99-99" class="phone-input">
-            <button class="phone-submit">▶</button>
+          <div class="Footer_footer__service__5trIS">
+            <h3 class="Footer_footer__heading__nFHY9">Услуги</h3>
+            <div class="Footer_footer__serviceContainer__RbpyU">
+              <div class="Footer_footer__link__pEe8_"><a href="#services">мелирование с растяжкой цвета</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">мелирование</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">сложное окрашивание+стрижка</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">контуринг</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">окрашивание корней</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">тотал блонд с нуля</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">шатуш</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">AirTouch ниже плеч</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">тонирование</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">тотал блонд (окрашенная база)</a></div>
+              <div class="Footer_footer__link__pEe8_"><a href="#services">AirTouch ниже плеч</a></div>
+            </div>
           </div>
-        </div>
 
-        <!-- Contacts -->
-        <div class="footer-section">
-          <h3>Контакты</h3>
-          <div class="contact-info">
-            <p><strong>+7 (981) 960-87-22</strong></p>
-            <p>г. Санкт-Петербург, Дегтярная, дом 9</p>
-            <p class="metro-info">
-              м. Площадь Восстания, 12 мин<br>
-              м. Александра Невского, 19 мин<br>  
-              м. Маяковского, 12 мин
-            </p>
+          <div class="Footer_footer__form__MxY5M">
+            <h3 class="Footer_footer__heading__nFHY9">Консультация</h3>
+            <form class="Footer_footer__innerForm__gQImc" action="#">
+              <div class="Footer_footer__controlContainer__lwNH_">
+                <input type="text" placeholder="Ваш телефон" name="telephone-footer" value="" />
+              </div>
+              <button class="Footer_footer__button__VLDCz" type="submit">
+                <img src="/footer/icon.svg" alt="send" />
+              </button>
+            </form>
           </div>
         </div>
       </div>
+    </footer>
+  </div>
 
-      <div class="footer-bottom">
-        <div class="footer-legal">
-          <p>ИП РАФАЕНКО ОА<br>ОГРН 313715413300153</p>
-        </div>
-        <div class="footer-copyright">
-          <p>© 2025 BLONDE PLACE. Все права защищены.</p>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <style>
-    /* EXACT COPY OF blondeplace.ru STYLING */
-    :root {
-      --primary-color: #d4a574;
-      --secondary-color: #e6c4a8;
-      --background-color: #faf9f7;
-      --text-color: #2a2a2a;
-      --light-text: #666;
-      --border-color: #e8e5e0;
-      --card-bg: #ffffff;
-      --gold-gradient: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
-    }
-
+  <style is:global>
+    /* EXACT CSS FROM ORIGINAL SITE */
     * {
       margin: 0;
       padding: 0;
@@ -157,352 +139,280 @@ const { title, description } = Astro.props;
     }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--background-color);
-      color: var(--text-color);
+      font-family: 'Exo', system-ui, sans-serif;
+      margin: 0;
+      color: #000;
+      background: #fff;
       line-height: 1.6;
-      font-size: 16px;
     }
 
-    /* HEADER - EXACT COPY */
-    .main-header {
-      background: var(--background-color);
-      padding: 20px 0;
-      border-bottom: 1px solid var(--border-color);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    .__className_893524 {
+      font-family: 'Exo', system-ui, sans-serif;
     }
 
-    .header-container {
+    /* Layout Container */
+    .Layout_layout__OUE_I {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .Layout_layout__container__QeKWZ {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
+      flex: 1;
+    }
+
+    /* Header Styles - EXACT COPY */
+    .Header_header__elx5B {
+      padding: 20px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
-    .logo {
-      display: flex;
-      align-items: center;
-    }
-
-    .logo-text {
-      font-family: 'Montserrat', sans-serif;
+    .Header_header__log__AnD1i {
+      font-family: 'Exo', sans-serif;
       font-size: 24px;
-      font-weight: 600;
-      color: var(--primary-color);
-      letter-spacing: 1px;
+      font-weight: 700;
+      color: #B8956A;
+      margin: 0;
     }
 
-    .header-buttons {
+    .Header_header__buttons__qM_hW {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
-    .header-btn {
-      width: 44px;
-      height: 44px;
+    .Header_header__links__SqUHS {
+      display: flex;
+      gap: 10px;
+    }
+
+    .Header_header__mobileTg__8DpGl {
+      display: none;
+    }
+
+    /* Button Styles - EXACT COPY */
+    .Button_button__C0__L {
       border: none;
-      background: var(--gold-gradient);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(212, 165, 116, 0.3);
-    }
-
-    .header-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
-    }
-
-    .header-menu-btn {
-      width: 44px;
-      height: 44px;
-      border: none;
-      background: var(--gold-gradient);
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(212, 165, 116, 0.3);
-    }
-
-    .header-menu-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
-    }
-
-    .header-menu-btn span {
-      width: 20px;
-      height: 2px;
-      background: white;
-      border-radius: 1px;
-    }
-
-    /* TYPOGRAPHY */
-    h1, h2, h3, h4, h5, h6 {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 600;
-      color: var(--text-color);
-    }
-
-    h1 {
-      font-size: 3.5rem;
-      line-height: 1.2;
-    }
-
-    h2 {
-      font-size: 2.5rem;
-      line-height: 1.3;
-    }
-
-    h3 {
-      font-size: 1.8rem;
-      line-height: 1.4;
-    }
-
-    p {
-      font-size: 1rem;
-      line-height: 1.7;
-      color: var(--light-text);
-    }
-
-    a {
-      color: var(--primary-color);
       text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    a:hover {
-      color: var(--secondary-color);
-    }
-
-    /* BUTTONS */
-    .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 14px 28px;
-      border: none;
+    }
+
+    .Button_light__Q3_1u {
+      background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
+      color: #2a2a2a;
+      border-radius: 50%;
+    }
+
+    .Button_icon__zM_AX {
+      width: 44px;
+      height: 44px;
+      padding: 10px;
+    }
+
+    .Button_text__CeUC5 {
+      padding: 10px 20px;
       border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: 1rem;
       font-weight: 500;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      white-space: nowrap;
     }
 
-    .btn-primary {
-      background: var(--gold-gradient);
-      color: white;
-      box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+    .Button_text-black__LdsvQ {
+      color: #2a2a2a;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(212, 165, 116, 0.4);
-      color: white;
+    .Button_light-dark__JVyvW {
+      background: #333;
+      color: #fff;
     }
 
-    .btn-secondary {
+    .Button_transparent__6L3R2 {
       background: transparent;
-      color: var(--primary-color);
-      border: 2px solid var(--primary-color);
+      border: 1px solid #ddd;
     }
 
-    .btn-secondary:hover {
-      background: var(--primary-color);
-      color: white;
+    .Button_black-transparent__jvtuc {
+      background: transparent;
+      border: 1px solid #333;
+      color: #333;
     }
 
-    /* CARDS */
-    .card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
+    .Button_text-full-black__EddWC {
+      background: #000;
+      color: #fff;
     }
 
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    /* Header specific buttons */
+    .Header_header__buttonTg__jPP8I,
+    .Header_header__button___lZf0 {
+      box-shadow: 0 2px 8px rgba(245, 213, 184, 0.3);
     }
 
-    /* FOOTER */
-    .main-footer {
-      background: var(--card-bg);
-      padding: 60px 0 30px;
-      border-top: 1px solid var(--border-color);
-      margin-top: 80px;
+    .Header_header__buttonTg__jPP8I:hover,
+    .Header_header__button___lZf0:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 213, 184, 0.4);
     }
 
-    .footer-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
+    .BurgerMenu_burgerMenu__selector__40hqg {
+      background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
+      border-radius: 8px;
+      padding: 12px;
     }
 
-    .footer-sections {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 40px;
-      margin-bottom: 40px;
+    .Header_header__mobileButton__GdDO9 {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
     }
 
-    .footer-section h3 {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
-      color: var(--text-color);
+    /* Burger Menu */
+    .BurgerMenu_burgerMenu__ZWXCi {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background: #fff;
+      transition: right 0.3s ease;
+      z-index: 1001;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.1);
     }
 
-    .footer-section ul {
+    .BurgerMenu_burgerMenu__list__YbyPX {
       list-style: none;
+      padding: 80px 20px 20px;
     }
 
-    .footer-section ul li {
-      margin-bottom: 12px;
+    .BurgerMenu_burgerMenu__list__YbyPX li {
+      margin-bottom: 20px;
     }
 
-    .footer-section ul li a {
-      color: var(--light-text);
-      font-size: 0.95rem;
+    .BurgerMenu_burgerMenu__link__YP4CM {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      transition: color 0.3s ease;
     }
 
-    .footer-logo-text {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 600;
-      color: var(--primary-color);
-      margin-bottom: 8px;
+    .BurgerMenu_burgerMenu__link__YP4CM:hover {
+      color: #B8956A;
     }
 
-    .footer-tagline {
-      color: var(--light-text);
-      font-size: 0.9rem;
+    /* Footer Styles - EXACT COPY */
+    .Footer_footer__0jj6Q {
+      background: #f8f8f8;
+      padding: 40px 0 20px;
+      margin-top: auto;
     }
 
-    .contact-info p {
-      margin-bottom: 8px;
-      color: var(--light-text);
+    .Footer_footer__wrapper__sMhWs {
+      display: grid;
+      grid-template-columns: 1fr 1fr 300px;
+      gap: 40px;
+      margin-bottom: 20px;
     }
 
-    .contact-info strong {
-      color: var(--text-color);
+    .Footer_footer__heading__nFHY9 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #333;
     }
 
-    .metro-info {
-      font-size: 0.85rem;
+    .Footer_footer__linksContainer__eQ_Ra,
+    .Footer_footer__serviceContainer__RbpyU {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .Footer_footer__link__pEe8_ a {
+      color: #666;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s ease;
+    }
+
+    .Footer_footer__link__pEe8_ a:hover {
+      color: #B8956A;
+    }
+
+    .Footer_footer__IP__V4hYc {
+      margin-top: 20px;
+      color: #999;
+      font-size: 12px;
       line-height: 1.4;
     }
 
-    .phone-input-wrapper {
+    .Footer_footer__innerForm__gQImc {
       display: flex;
-      margin-top: 12px;
+      gap: 10px;
     }
 
-    .phone-input {
+    .Footer_footer__controlContainer__lwNH_ {
       flex: 1;
-      padding: 8px 12px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px 0 0 6px;
-      font-size: 0.9rem;
     }
 
-    .phone-submit {
-      padding: 8px 12px;
-      background: var(--primary-color);
-      color: white;
+    .Footer_footer__controlContainer__lwNH_ input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .Footer_footer__button__VLDCz {
+      background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
       border: none;
-      border-radius: 0 6px 6px 0;
+      border-radius: 8px;
+      padding: 12px;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
 
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 30px;
-      border-top: 1px solid var(--border-color);
-      flex-wrap: wrap;
-      gap: 20px;
+    .Footer_footer__button__VLDCz:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(245, 213, 184, 0.4);
     }
 
-    .footer-legal p,
-    .footer-copyright p {
-      font-size: 0.85rem;
-      color: var(--light-text);
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 20px 0;
     }
 
-    /* RESPONSIVE */
+    /* Responsive */
     @media (max-width: 768px) {
-      .header-container {
-        padding: 0 15px;
+      .Header_header__links__SqUHS {
+        display: none;
       }
 
-      .logo-text {
-        font-size: 20px;
+      .Header_header__mobileTg__8DpGl {
+        display: block;
       }
 
-      .header-buttons {
-        gap: 8px;
-      }
-
-      .header-btn,
-      .header-menu-btn {
-        width: 40px;
-        height: 40px;
-      }
-
-      .footer-sections {
+      .Footer_footer__wrapper__sMhWs {
         grid-template-columns: 1fr;
         gap: 30px;
       }
 
-      .footer-bottom {
-        flex-direction: column;
-        text-align: center;
+      .Layout_layout__container__QeKWZ {
+        padding: 0 15px;
       }
-
-      h1 {
-        font-size: 2.5rem;
-      }
-
-      h2 {
-        font-size: 2rem;
-      }
-    }
-
-    /* SCROLLBAR */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--background-color);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--primary-color);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--secondary-color);
     }
   </style>
 </body>
