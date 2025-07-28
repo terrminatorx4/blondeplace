@@ -137,7 +137,7 @@ async function generateWithRetry(prompt, maxRetries = 4) {
 
 async function notifyIndexNow(url) {
     console.log(`📢 [Beauty Поток #${threadId}] Отправляю уведомление для ${url} в IndexNow...`);
-    const API_KEY = "d1b055ab1eb146d892169bbb2c96550e";
+    const API_KEY = "df39150ca56f896546628ae3c923dd4a";
     const HOST = "blondeplace.netlify.app";
     
     const payload = JSON.stringify({ host: HOST, key: API_KEY, urlList: [url] });
