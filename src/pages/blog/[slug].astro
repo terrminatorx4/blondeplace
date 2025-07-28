@@ -1,0 +1,135 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  console.log('🐛 [DEBUG] getStaticPaths called');
+  
+  try {
+    const posts = await getCollection('posts');
+    console.log('🐛 [DEBUG] Posts found:', posts.length);
+    
+    if (posts.length === 0) {
+      console.log('🚨 [ERROR] NO POSTS FOUND!');
+      return [];
+    }
+    
+    console.log('🐛 [DEBUG] First post:', posts[0]?.slug, posts[0]?.data?.title);
+    
+    const paths = posts.map((post) => {
+      console.log('🐛 [DEBUG] Creating path for:', post.slug);
+      return {
+        params: { slug: post.slug },
+        props: post,
+      };
+    });
+    
+    console.log('🐛 [DEBUG] Total paths created:', paths.length);
+    return paths;
+    
+  } catch (error) {
+    console.error('🚨 [ERROR] getStaticPaths failed:', error);
+    return [];
+  }
+}
+
+const post = Astro.props;
+const { Content } = await post.render();
+---
+
+<Layout 
+  title={post.data.title} 
+  description={post.data.description}
+>
+  <article class="container">
+    <header class="article-header">
+      <h1 class="article-title">{post.data.title}</h1>
+      <p class="article-description">{post.data.description}</p>
+      <div class="article-meta">
+        <time datetime={post.data.pubDate.toISOString()}>
+          {new Date(post.data.pubDate).toLocaleDateString('ru-RU')}
+        </time>
+        <span>by {post.data.author}</span>
+      </div>
+    </header>
+
+    {post.data.heroImage && (
+      <div class="article-image">
+        <img src={post.data.heroImage} alt={post.data.title} />
+      </div>
+    )}
+
+    <div class="article-content">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.article-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.article-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d1b69;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.article-description {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.article-meta {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.article-image {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.article-image img {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+.article-content {
+  line-height: 1.8;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.article-content h2,
+.article-content h3 {
+  color: #2d1b69;
+  margin: 2rem 0 1rem 0;
+}
+
+.article-content p {
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .article-title {
+    font-size: 2rem;
+  }
+}
+</style>
