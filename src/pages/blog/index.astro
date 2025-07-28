@@ -1,98 +1,315 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+// Получаем последние статьи
+const allPosts = await getCollection('posts');
+const recentPosts = allPosts
+  .sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf())
+  .slice(0, 6);
+
+const pageTitle = "Beauty Блог | BLONDE PLACE - Советы экспертов";
+const pageDescription = "Профессиональные советы по уходу за волосами, окрашиванию, маникюру и beauty-процедурам от экспертов салона BLONDE PLACE";
 ---
 
-<Layout title="Блог - BlondePlace" description="Статьи о красоте, стиле и уходе за собой">
-    <div class="blog-header">
-        <h1>💄 Наш Beauty-блог</h1>
-        <p>Актуальные советы, тренды и секреты красоты от экспертов</p>
-    </div>
-    
-    <div class="coming-soon">
-        <div class="coming-soon-content">
-            <h2>✨ Скоро здесь появятся увлекательные статьи!</h2>
-            <p>Мы готовим для вас качественный контент о:</p>
-            <ul>
-                <li>🎨 Модных техниках макияжа</li>
-                <li>💅 Трендах в nail-арте</li>
-                <li>🌿 Натуральном уходе за кожей</li>
-                <li>💇‍♀️ Современных техниках окрашивания</li>
-                <li>✨ Процедурах красоты</li>
-            </ul>
-            <p class="note">Контент будет автоматически генерироваться через нашу Content Factory систему!</p>
+<Layout title={pageTitle} description={pageDescription}>
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title">
+            💄 Наш Beauty-блог
+          </h1>
+          <p class="hero-description">
+            Актуальные советы, тренды и секреты красоты от экспертов салона BLONDE PLACE
+          </p>
+          <div class="hero-cta">
+            <a href="https://blondeplace.ru" class="cta-primary" target="_blank">
+              🏪 Записаться в салон
+            </a>
+          </div>
         </div>
-    </div>
-</Layout>
+      </div>
+    </section>
 
-<style>
-    .blog-header {
-        text-align: center;
-        margin-bottom: 3rem;
-        padding: 2rem 0;
+    <!-- Recent Posts Section -->
+    {recentPosts.length > 0 ? (
+      <section class="recent-posts-section">
+        <div class="section-header">
+          <h2 class="section-title">Последние статьи</h2>
+        </div>
+        <div class="posts-grid">
+          {recentPosts.map((post) => (
+            <article class="post-card">
+              <div class="post-image">
+                {post.data.heroImage ? (
+                  <img src={post.data.heroImage} alt={post.data.title} loading="lazy" />
+                ) : (
+                  <div class="post-placeholder">
+                    <span class="post-category">{post.data.category}</span>
+                  </div>
+                )}
+              </div>
+              <div class="post-content">
+                <div class="post-meta">
+                  <span class="post-date">
+                    {new Date(post.data.pubDate).toLocaleDateString('ru-RU', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </span>
+                  <span class="post-category-tag">{post.data.category}</span>
+                </div>
+                <h3 class="post-title">
+                  <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
+                </h3>
+                <p class="post-excerpt">{post.data.description}</p>
+                <a href={`/blog/${post.slug}/`} class="read-more">
+                  Читать далее →
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    ) : (
+      <section class="empty-blog-section">
+        <div class="empty-content">
+          <h2>✨ Скоро здесь появятся увлекательные статьи!</h2>
+          <p>Мы готовим для вас качественный контент о:</p>
+          <ul class="content-list">
+            <li>🎨 Модных техниках макияжа</li>
+            <li>💅 Трендах в nail-арте</li>
+            <li>🌿 Натуральном уходе за кожей</li>
+            <li>💇‍♀️ Современных техниках окрашивания</li>
+            <li>✨ Процедурах красоты</li>
+          </ul>
+          <p><strong>Контент будет автоматически генерироваться через нашу Content Factory систему!</strong></p>
+        </div>
+      </section>
+    )}
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="cta-content">
+        <h2>Готовы преобразиться?</h2>
+        <p>Записывайтесь на консультацию к нашим мастерам и получите персональные рекомендации по уходу</p>
+        <a href="https://blondeplace.ru" class="cta-button-large" target="_blank">
+          Записаться в салон BLONDE PLACE
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
     }
-    
-    .blog-header h1 {
-        color: #c44569;
-        margin-bottom: 1rem;
-        font-size: 2.5rem;
+
+    .hero-section {
+      padding: 4rem 0;
+      background: linear-gradient(135deg, #B8956A, #f5d5b8);
+      border-radius: 20px;
+      margin-bottom: 4rem;
+      text-align: center;
     }
-    
-    .blog-header p {
-        color: #666;
-        font-size: 1.2rem;
+
+    .hero-title {
+      font-size: 3rem;
+      color: white;
+      margin-bottom: 1rem;
     }
-    
-    .coming-soon {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 400px;
+
+    .hero-description {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 2rem;
     }
-    
-    .coming-soon-content {
-        background: linear-gradient(135deg, #ffecd2, #fcb69f);
-        padding: 3rem;
-        border-radius: 25px;
-        text-align: center;
-        max-width: 600px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+
+    .cta-primary {
+      background: white;
+      color: #333;
+      padding: 1rem 2rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-block;
+      transition: transform 0.3s ease;
     }
-    
-    .coming-soon-content h2 {
-        color: #333;
-        margin-bottom: 1.5rem;
-        font-size: 1.8rem;
+
+    .cta-primary:hover {
+      transform: translateY(-2px);
     }
-    
-    .coming-soon-content ul {
-        text-align: left;
-        margin: 2rem 0;
-        display: inline-block;
+
+    .empty-blog-section {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: #faf9f7;
+      border-radius: 15px;
+      margin-bottom: 4rem;
     }
-    
-    .coming-soon-content li {
-        margin-bottom: 0.8rem;
-        color: #444;
-        font-size: 1.1rem;
+
+    .empty-content h2 {
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 1.5rem;
     }
-    
-    .note {
-        margin-top: 2rem;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 15px;
-        font-style: italic;
-        color: #555;
+
+    .empty-content p {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 1.5rem;
     }
-    
+
+    .content-list {
+      list-style: none;
+      text-align: left;
+      max-width: 400px;
+      margin: 0 auto 2rem;
+    }
+
+    .content-list li {
+      padding: 0.5rem 0;
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .post-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .post-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .post-image {
+      height: 200px;
+      overflow: hidden;
+      background: #f5d5b8;
+    }
+
+    .post-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .post-placeholder {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #B8956A, #f5d5b8);
+      font-size: 1.2rem;
+      color: white;
+      font-weight: 600;
+    }
+
+    .post-content {
+      padding: 1.5rem;
+    }
+
+    .post-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .post-category-tag {
+      background: #B8956A;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+
+    .post-title a {
+      font-size: 1.3rem;
+      color: #333;
+      text-decoration: none;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .post-title a:hover {
+      color: #B8956A;
+    }
+
+    .post-excerpt {
+      color: #666;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .read-more {
+      color: #B8956A;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .cta-section {
+      background: linear-gradient(135deg, #B8956A, #f5d5b8);
+      padding: 4rem 2rem;
+      border-radius: 20px;
+      text-align: center;
+    }
+
+    .cta-content h2 {
+      font-size: 2.5rem;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .cta-content p {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 2rem;
+    }
+
+    .cta-button-large {
+      display: inline-block;
+      background: white;
+      color: #333;
+      padding: 1.2rem 3rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+
+    .cta-button-large:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
     @media (max-width: 768px) {
-        .coming-soon-content {
-            padding: 2rem;
-            margin: 0 1rem;
-        }
-        
-        .blog-header h1 {
-            font-size: 2rem;
-        }
+      .hero-title {
+        font-size: 2rem;
+      }
+
+      .cta-content h2 {
+        font-size: 2rem;
+      }
     }
-</style>
+  </style>
+</Layout>
