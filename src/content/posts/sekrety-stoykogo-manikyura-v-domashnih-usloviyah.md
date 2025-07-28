@@ -1,12 +1,14 @@
 ---
-title: "Секреты идеального маникюра дома от BlondePlace"
-description: "Хотите стойкий маникюр, не выходя из дома?  BlondePlace делится секретами! Узнайте, как правильно подготовить ногти, нанести гель-лак и обеспечить длительную носку без сколов и отслоек.  Наши советы помогут вам создать салонный маникюр в домашних условиях, экономя время и деньги.  Простые шаги к безупречному результату ждут вас!"
+title: "Секреты идеального маникюра дома от..."
+description: "Хотите стойкий маникюр, не выходя из дома?  BlondePlace делится секретами! Узнайте, как правильно подготовить ногти, нанести гель-лак и обеспечить длительную..."
 keywords: "стойкий маникюр, гель-лак дома, домашний маникюр, уход за ногтями,  маникюр гель-лак,  долговечный маникюр,  советы по маникюру"
 pubDate: "2025-07-28T16:50:51.289Z"
 author: "Эксперт BlondePlace"
 heroImage: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2070&auto=format&fit=crop"
 schema: {"@context":"https://schema.org","@type":"HowTo","name":"Секреты идеального маникюра дома от BlondePlace","description":"Хотите стойкий маникюр, не выходя из дома?  BlondePlace делится секретами! Узнайте, как правильно подготовить ногти, нанести гель-лак и обеспечить длительную носку без сколов и отслоек.  Наши советы помогут вам создать салонный маникюр в домашних условиях, экономя время и деньги.  Простые шаги к безупречному результату ждут вас!","image":{"@type":"ImageObject","url":"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2070&auto=format&fit=crop"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"5.0","reviewCount":544,"bestRating":"5","worstRating":"1"},"publisher":{"@type":"Organization","name":"Блог BlondePlace","logo":{"@type":"ImageObject","url":"https://blondeplace.netlify.app/favicon.ico"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://blondeplace.netlify.app/blog/sekrety-stoykogo-manikyura-v-domashnih-usloviyah/"}}
+category: "beauty-tips"
 ---
+
 # Секреты стойкого маникюра в домашних условиях: Долговременный результат без салона
 
 ## Мечтаете о безупречном маникюре надолго? Больше не нужно тратить время и деньги на салон!
