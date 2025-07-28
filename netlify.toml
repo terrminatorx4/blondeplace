@@ -1,7 +1,7 @@
-# BlondePlace Netlify Config (Astro Fix)
+# BlondePlace Netlify Config (Root Astro)
 [build]
-  publish = "blondeplace-blog/dist"
-  command = "npm run build-blog && node postbuild.js"
+  publish = "dist"
+  command = "npm install && npx astro build && node postbuild.js"
   
 [build.environment]
   NODE_VERSION = "18"
