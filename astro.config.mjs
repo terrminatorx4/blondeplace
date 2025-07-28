@@ -6,13 +6,13 @@ export default defineConfig({
   output: 'static',
   adapter: netlify(),
   
-  // 🔥 BUILT-IN MINIFICATION (instead of plugin)
+  // 🔥 PRODUCTION OPTIMIZATIONS
   build: {
     format: 'directory',
     inlineStylesheets: 'auto',
   },
   
-  // ⚡ VITE OPTIMIZATION FOR PRODUCTION
+  // ⚡ VITE OPTIMIZATION 
   vite: {
     build: {
       minify: 'esbuild',
@@ -23,8 +23,14 @@ export default defineConfig({
         },
       },
     },
+    ssr: {
+      noExternal: ['@astrojs/netlify']
+    }
   },
   
-  // 🎯 COMPRESSION & OPTIMIZATION
+  // 📱 PWA OPTIMIZATION
   compressHTML: true,
+  
+  // 🎯 SEO SITEMAP
+  site: 'https://blondeplace.netlify.app',
 });
