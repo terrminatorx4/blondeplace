@@ -16,9 +16,7 @@
     "gray-matter": "^4.0.3",
     "execa": "^8.0.1",
     "astro": "^4.15.12",
-    "@astrojs/netlify": "^5.5.3"
-  },
-  "devDependencies": {
+    "@astrojs/netlify": "^5.5.3",
     "@astrojs/sitemap": "^3.2.1"
   }
 }
