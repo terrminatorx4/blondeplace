@@ -1,33 +1,39 @@
 ---
-const { title = 'BLONDE PLACE - Салон красоты в Санкт-Петербурге', description = 'Профессиональные услуги красоты: окрашивание волос, стрижки, маникюр, уход за кожей. Beauty коворкинг в центре СПб.' } = Astro.props;
+const { title = 'BLONDE PLACE - Салон красоты в Санкт-Петербурге', description = 'Профессиональные услуги красоты в центре СПб: окрашивание волос, стрижки, маникюр, уход за кожей. Beauty коворкинг.' } = Astro.props;
 ---
 
 <!DOCTYPE html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href={Astro.url} />
     
+    <!-- Google & Yandex Verification (LIKE BUTLER) -->
+    <meta name="google-site-verification" content="QmTdEF5xHLHXsL1FEcotg-xZTPfD14z9BxH6D64b0ds" />
+    <meta name="yandex-verification" content="92b03968d7c06925" />
+    
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     
-    <!-- OpenGraph по умолчанию -->
+    <!-- OpenGraph (BUTLER-EXACT) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content="https://blondeplace.netlify.app/og-image.jpg" />
-    <meta property="og:url" content={Astro.url} />
-    <meta property="og:type" content="website" />
     <meta property="og:site_name" content="BLONDE PLACE" />
     
-    <!-- Twitter Card по умолчанию -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content="https://blondeplace.netlify.app/og-image.jpg" />
+    <!-- Twitter Card (BUTLER-EXACT) -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content="https://blondeplace.netlify.app/og-image.jpg" />
     
     <slot name="head" />
   </head>
