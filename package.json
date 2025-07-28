@@ -1,23 +1,24 @@
 {
-  "name": "blondeplace-beauty-generator",
+  "name": "blondeplace",
   "version": "1.0.0",
-  "description": "BlondePlace Beauty Content Generator",
+  "description": "BlondePlace Beauty Website",
   "type": "module",
-  "main": "factory.js",
   "scripts": {
     "factory": "node factory.js",
-    "build": "npm run build && node postbuild.js",
     "dev": "astro dev",
     "start": "astro dev",
+    "build": "astro build",
     "preview": "astro preview"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "node-fetch": "^3.3.2",
     "gray-matter": "^4.0.3",
-    "execa": "^8.0.1"
+    "execa": "^8.0.1",
+    "astro": "^5.12.4",
+    "@astrojs/netlify": "^5.5.3"
   },
-  "keywords": ["beauty", "content-generation", "blondeplace", "astro"],
-  "author": "BlondePlace Beauty Team",
-  "license": "MIT"
+  "devDependencies": {
+    "@astrojs/sitemap": "^3.2.1"
+  }
 }
