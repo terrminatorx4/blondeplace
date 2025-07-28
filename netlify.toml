@@ -1,7 +1,7 @@
-# BlondePlace Netlify Config (Emergency Fix)
+# BlondePlace Netlify Config (Astro Fix)
 [build]
   publish = "blondeplace-blog/dist"
-  command = "npm run build-astro && node postbuild.js"
+  command = "npm run build-blog && node postbuild.js"
   
 [build.environment]
   NODE_VERSION = "18"
@@ -9,7 +9,7 @@
   ASTRO_TELEMETRY_DISABLED = "1"
   NODE_ENV = "production"
   
-# Simple processing
+# Processing
 [build.processing]
   skip_processing = false
   
