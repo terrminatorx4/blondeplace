@@ -1,0 +1,249 @@
+name: 🏭 Content Factory (Atomic Lock)
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic_count:
+        description: 'Количество статей для генерации'
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - '1'
+          - '5'
+          - '10'
+          - '20'
+      category:
+        description: 'Категория статей'
+        required: true
+        default: 'hair-care'
+        type: choice
+        options:
+          - 'hair-care'
+          - 'hair-coloring'
+          - 'nail-care'
+          - 'beauty-tips'
+          - 'salon-news'
+
+jobs:
+  content-factory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    strategy:
+      matrix:
+        thread: ${{ fromJson(format('[{0}]', join(range(1, fromJson(github.event.inputs.topic_count) + 1), ', '))) }}
+      max-parallel: 20
+      fail-fast: false
+
+    steps:
+      - name: ✅ Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 🔧 Install Dependencies
+        run: |
+          npm install --only=production --no-audit --no-fund
+          npm install @octokit/rest
+
+      - name: 🎯 Get API Keys from Pool
+        id: get-keys
+        run: |
+          # Получаем ключи из GitHub Secrets (пул из 20 ключей)
+          GEMINI_KEYS="${{ secrets.GEMINI_API_KEYS_POOL }}"
+          OPENROUTER_KEYS="${{ secrets.OPENROUTER_API_KEYS_POOL }}"
+          
+          # Разделяем по запятым и берем ключ по номеру потока
+          IFS=',' read -ra GEMINI_ARRAY <<< "$GEMINI_KEYS"
+          IFS=',' read -ra OPENROUTER_ARRAY <<< "$OPENROUTER_KEYS"
+          
+          # Вычисляем индекс для текущего потока (0-19)
+          INDEX=$(( (${{ matrix.thread }} - 1) % 20 ))
+          
+          echo "GEMINI_API_KEY=${GEMINI_ARRAY[$INDEX]}" >> $GITHUB_OUTPUT
+          echo "OPENROUTER_API_KEY=${OPENROUTER_ARRAY[$INDEX]}" >> $GITHUB_OUTPUT
+          
+          echo "🔑 Thread ${{ matrix.thread }} using API key index: $INDEX"
+
+      - name: 🏭 Generate Content (Thread ${{ matrix.thread }})
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ steps.get-keys.outputs.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ steps.get-keys.outputs.OPENROUTER_API_KEY }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_ACCESS_TOKEN: ${{ secrets.NETLIFY_ACCESS_TOKEN }}
+        run: |
+          echo "🚀 Starting content generation for thread ${{ matrix.thread }}"
+          echo "📂 Category: ${{ github.event.inputs.category }}"
+          
+          # Создаем простой генератор контента
+          cat > generate-content.js << 'EOF'
+          const { Octokit } = require('@octokit/rest');
+          const crypto = require('crypto');
+
+          const octokit = new Octokit({
+            auth: process.env.GITHUB_TOKEN
+          });
+
+          const owner = 'terrminatorx4';
+          const repo = 'blondeplace';
+
+          // Генерируем уникальную статью
+          function generateUniqueArticle(thread, category) {
+            const timestamp = Date.now();
+            const randomId = crypto.randomBytes(4).toString('hex');
+            const slug = `beauty-${category}-${thread}-${randomId}`;
+            
+            const topics = {
+              'hair-care': ['Уход за волосами', 'Восстановление волос', 'Питание волос'],
+              'hair-coloring': ['Окрашивание волос', 'Модные оттенки', 'Техники окрашивания'],
+              'nail-care': ['Маникюр', 'Дизайн ногтей', 'Уход за ногтями'],
+              'beauty-tips': ['Секреты красоты', 'Уход за кожей', 'Макияж'],
+              'salon-news': ['Новости салона', 'Акции', 'События']
+            };
+            
+            const topicList = topics[category] || topics['hair-care'];
+            const topic = topicList[thread % topicList.length];
+            
+            const title = `${topic} в BLONDE PLACE - тренд ${new Date().getFullYear()}`;
+            
+            // Уникальная красивая картинка без 404
+            const beautyImages = [
+              'photo-1604654894610-df63bc536371',
+              'photo-1599640874199-ed7116b11043',
+              'photo-1596663265814-f764266222d8',
+              'photo-1600668601033-2214096611d8'
+            ];
+            const imageId = beautyImages[thread % beautyImages.length];
+            const heroImage = `https://images.unsplash.com/${imageId}?q=80&w=2070&auto=format&fit=crop&t=${timestamp}&h=${randomId}`;
+            
+            const content = `---
+title: "${title}"
+description: "Профессиональные советы от экспертов BLONDE PLACE. Узнайте все о современных трендах и техниках красоты."
+pubDate: "${new Date().toISOString()}"
+updatedDate: "${new Date().toISOString()}"
+author: "BLONDE PLACE Beauty Expert"
+heroImage: "${heroImage}"
+category: "${category}"
+tags: ["красота", "BLONDE PLACE", "тренды", "${category}"]
+keywords: "${topic}, BLONDE PLACE, красота, салон, ${category}, тренды ${new Date().getFullYear()}"
+serviceType: "consultation"
+difficulty: "beginner"
+duration: "30-60 минут"
+price: "от 1500 рублей"
+schema:
+  "@context": "https://schema.org"
+  "@type": "Article"
+  headline: "${title}"
+  description: "Профессиональные советы от экспертов BLONDE PLACE"
+  image: "${heroImage}"
+  author:
+    "@type": "Organization"
+    name: "BlondePlace Beauty Studio"
+    url: "https://blondeplace.ru"
+  publisher:
+    "@type": "Organization"
+    name: "BlondePlace"
+    logo:
+      "@type": "ImageObject"
+      url: "https://blondeplace.ru/logo.png"
+  datePublished: "${new Date().toISOString()}"
+  dateModified: "${new Date().toISOString()}"
+  mainEntityOfPage:
+    "@type": "WebPage"
+    "@id": "https://blondeplace.netlify.app/blog/${slug}/"
+---
+
+# ${title}
+
+## Профессиональный подход в BLONDE PLACE
+
+В нашем салоне красоты мы используем только проверенные техники и премиальные материалы. Наши мастера регулярно повышают квалификацию и следят за последними трендами в индустрии красоты.
+
+## Почему выбирают BLONDE PLACE?
+
+- ✨ Опытные мастера с сертификатами
+- 🎨 Индивидуальный подход к каждому клиенту  
+- 💎 Премиальные материалы и оборудование
+- 🏆 Высокие стандарты качества
+- 💕 Комфортная атмосфера
+
+## Консультация и запись
+
+Перед любой процедурой мы проводим детальную консультацию, чтобы подобрать идеальное решение именно для вас.
+
+**Записывайтесь прямо сейчас:**
+
+📞 **Телефон**: +7 (981) 960-87-22  
+💬 **Телеграм**: @Blondeplace  
+🌐 **Онлайн запись**: dikidi.ru/699327
+
+---
+
+*BLONDE PLACE - ваш салон красоты премиум-класса в Санкт-Петербурге*
+`;
+            
+            return { slug, content };
+          }
+
+          async function main() {
+            try {
+              const thread = process.env.GITHUB_RUN_ID ? process.env.GITHUB_RUN_ID.slice(-2) : '1';
+              const category = process.argv[2] || 'hair-care';
+              
+              console.log(`🏭 Generating content for thread ${thread}, category: ${category}`);
+              
+              const { slug, content } = generateUniqueArticle(thread, category);
+              const filePath = `src/content/posts/${slug}.md`;
+              
+              // Загружаем файл в репозиторий
+              await octokit.rest.repos.createOrUpdateFileContents({
+                owner,
+                repo,
+                path: filePath,
+                message: `🏭 Add new article: ${slug}`,
+                content: Buffer.from(content).toString('base64')
+              });
+              
+              console.log(`✅ Successfully created: ${filePath}`);
+              console.log(`🔗 URL: https://blondeplace.netlify.app/blog/${slug}/`);
+              
+            } catch (error) {
+              console.error('❌ Error:', error.message);
+              process.exit(1);
+            }
+          }
+
+          main();
+          EOF
+          
+          # Запускаем генератор
+          node generate-content.js "${{ github.event.inputs.category }}"
+
+      - name: 🚀 Trigger Netlify Deploy
+        if: success()
+        run: |
+          echo "🚀 Content generated successfully for thread ${{ matrix.thread }}"
+          echo "🌐 Netlify will auto-deploy from GitHub"
+
+  completion:
+    needs: content-factory
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: 🎉 Factory Completion Report
+        run: |
+          echo "🏭 CONTENT FACTORY COMPLETED"
+          echo "📊 Generated articles: ${{ github.event.inputs.topic_count }}"
+          echo "📂 Category: ${{ github.event.inputs.category }}"
+          echo "🌐 Site: https://blondeplace.netlify.app/"
+          echo "🔗 Blog: https://blondeplace.netlify.app/blog/"
