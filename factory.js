@@ -1,414 +1,308 @@
-#!/usr/bin/env node
-// BlondePlace Beauty Content Factory
-// Генератор экспертных статей о красоте, уходе за волосами и салонных процедурах
-
+// BlondePlace Beauty Factory - Based on Butler's Proven Architecture
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
+import fetch from 'node-fetch';
+import { execa } from 'execa';
 
-// ===== КОНФИГУРАЦИЯ BLONDEPLACE =====
-const BRAND_CONFIG = {
-    brand: "BlondePlace",
-    domain: "blondeplace.ru",
-    blog_domain: "blondeplace.netlify.app",
-    salon_name: "BlondePlace Beauty Studio",
-    specialization: "Салон красоты, специализирующийся на окрашивании волос, стрижках, маникюре и beauty-процедурах",
-    author: "BlondePlace Beauty Expert",
-    location: "Россия",
-    services: [
-        "Окрашивание волос (блонд, омбре, шатуш, балаяж)",
-        "Стрижки и укладки",
-        "Кератиновое выпрямление волос",
-        "Ботокс для волос",
-        "Маникюр и педикюр",
-        "Наращивание ногтей",
-        "Уход за кожей лица",
-        "Косметологические процедуры",
-        "Консультации beauty-экспертов"
+// --- BLONDEPLACE CONFIGURATION ---
+const TARGET_URL_MAIN = "https://blondeplace.ru";
+const TOPICS_FILE = 'topics.txt';
+const POSTS_DIR = 'src/content/posts';
+const SITE_URL = "https://blondeplace.netlify.app";
+const BRAND_NAME = "BlondePlace";
+const BRAND_BLOG_NAME = `Блог ${BRAND_NAME}`;
+const BRAND_AUTHOR_NAME = `Эксперт ${BRAND_NAME}`;
+const FALLBACK_IMAGE_URL = "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?q=80&w=2126&auto=format&fit=crop";
+
+// --- MODEL CONFIGURATION ---
+const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_MODEL_NAME = "anthropic/claude-3.5-sonnet";
+const GEMINI_MODEL_NAME = "gemini-1.5-flash";
+
+// --- THREAD INITIALIZATION ---
+const modelChoice = process.env.MODEL_CHOICE || 'gemini';
+const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
+const apiKey = process.env.API_KEY_CURRENT;
+
+if (!apiKey) {
+    throw new Error(`[Beauty Поток #${threadId}] Не был предоставлен API-ключ!`);
+}
+
+if (modelChoice === 'openrouter') {
+    console.log(`🎨 [Beauty Поток #${threadId}] Использую модель OpenRouter с ключом ...${apiKey.slice(-4)}`);
+} else {
+    console.log(`💄 [Beauty Поток #${threadId}] Использую модель Gemini с ключом ...${apiKey.slice(-4)}`);
+}
+
+// --- BLONDEPLACE KNOWLEDGE BASE ---
+const REAL_LINKS_MAP = {
+    'general': [
+        { url: "https://blondeplace.ru", text: `главном сайте ${BRAND_NAME}` },
+        { url: "https://blondeplace.ru/about", text: `салоне красоты ${BRAND_NAME}` },
+        { url: "https://blondeplace.ru/contacts", text: `странице контактов` },
+        { url: "https://blondeplace.ru/services", text: `наших услугах` },
     ],
-    target_audience: "Женщины 18-45 лет, интересующиеся красотой, уходом за волосами и современными трендами",
-    tone: "Экспертный, дружелюбный, информативный",
-    expertise: "Профессиональные советы от мастеров с многолетним опытом"
+    'окрашивание': { url: "https://blondeplace.ru/services/coloring", text: "услугах окрашивания волос" },
+    'блонд': { url: "https://blondeplace.ru/services/blonde", text: "специализации по блонду" },
+    'стрижка': { url: "https://blondeplace.ru/services/haircut", text: "услугах стрижки" },
+    'маникюр': { url: "https://blondeplace.ru/services/manicure", text: "услугах маникюра" },
+    'уход': { url: "https://blondeplace.ru/services/care", text: "процедурах по уходу" },
+    'косметология': { url: "https://blondeplace.ru/services/cosmetology", text: "косметологических услугах" },
+    'цены': { url: "https://blondeplace.ru/prices", text: "ценах на услуги" },
+    'запись': { url: "https://blondeplace.ru/booking", text: "онлайн записи" },
+    'мастер': { url: "https://blondeplace.ru/masters", text: "наших мастерах" }
 };
 
-// ===== СИСТЕМНЫЕ ПРОМПТЫ ДЛЯ BEAUTY КОНТЕНТА =====
-const BEAUTY_SYSTEM_PROMPTS = {
-    hair_care: `Ты эксперт по уходу за волосами в салоне красоты ${BRAND_CONFIG.salon_name}. 
-    Пиши профессиональные статьи о уходе за волосами, используя знания трихологии и современных методик.
-    Упоминай качественные продукты и процедуры. Фокусируйся на практических советах.`,
-    
-    hair_coloring: `Ты мастер-колорист с 10+ лет опыта в салоне ${BRAND_CONFIG.salon_name}.
-    Создавай экспертные статьи об окрашивании волос, техниках колорирования, трендах.
-    Обязательно освещай особенности работы с блондом, так как это специализация салона.`,
-    
-    beauty_tips: `Ты beauty-консультант салона красоты ${BRAND_CONFIG.salon_name}.
-    Пиши практические статьи с советами красоты, которые можно применить дома и в салоне.
-    Фокусируйся на современных трендах и профессиональных секретах.`,
-    
-    nail_care: `Ты мастер маникюра в премиальном салоне ${BRAND_CONFIG.salon_name}.
-    Создавай статьи о nail-арте, уходе за ногтями, трендах маникюра и педикюра.
-    Подчеркивай важность профессионального подхода к nail-сервису.`,
-    
-    salon_procedures: `Ты специалист по салонным процедурам в ${BRAND_CONFIG.salon_name}.
-    Пиши о современных beauty-процедурах, их эффективности и особенностях.
-    Объясняй разницу между домашним и салонным уходом.`
-};
-
-// ===== BEAUTY КАТЕГОРИИ =====
-const BEAUTY_CATEGORIES = [
-    'hair-care', 'hair-coloring', 'hairstyles', 'blonde-trends', 'hair-treatments',
-    'nail-care', 'manicure', 'pedicure', 'skincare', 'makeup', 'beauty-tips',
-    'salon-news', 'hair-products', 'beauty-trends', 'seasonal-beauty'
-];
-
-// ===== КОНФИГУРАЦИЯ AI =====
-const MODEL_CHOICE = process.env.MODEL_CHOICE || 'gemini';
-const API_KEY_CURRENT = process.env.API_KEY_CURRENT || process.env.GEMINI_API_KEY;
-const BATCH_SIZE = parseInt(process.env.BATCH_SIZE) || 5;
-const THREAD_ID = process.env.THREAD_ID || '1';
-const TOTAL_THREADS = parseInt(process.env.TOTAL_THREADS) || 1;
-
-if (!API_KEY_CURRENT) {
-    console.error('❌ API ключ не найден! Установите GEMINI_API_KEY или API_KEY_CURRENT');
-    process.exit(1);
-}
-
-// ===== ИНИЦИАЛИЗАЦИЯ AI =====
-const genAI = new GoogleGenerativeAI(API_KEY_CURRENT);
-const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
-    generationConfig: {
-        temperature: 0.8,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 8192,
-    }
-});
-
-// ===== ЗАГРУЗКА ТОПИКОВ =====
-async function loadTopics() {
-    try {
-        const topicsContent = await fs.readFile('topics.txt', 'utf-8');
-        const topics = topicsContent
-            .split('\n')
-            .filter(line => line.trim() && !line.startsWith('#'))
-            .map(line => line.trim());
-        
-        if (topics.length === 0) {
-            console.log('📝 Файл topics.txt пуст. Используем базовые beauty топики...');
-            return [
-                'Как ухаживать за блондом дома',
-                'Тренды окрашивания волос 2024',
-                'Секреты долговечного маникюра',
-                'Как выбрать идеальную стрижку',
-                'Уход за кожей лица зимой'
-            ];
+function getContextualLink(topic) {
+    const lowerTopic = topic.toLowerCase();
+    for (const keyword in REAL_LINKS_MAP) {
+        if (keyword !== 'general' && lowerTopic.includes(keyword)) {
+            return REAL_LINKS_MAP[keyword];
         }
-        
-        return topics;
-    } catch (error) {
-        console.log('📝 Файл topics.txt не найден. Создаю с базовыми топиками...');
-        const defaultTopics = [
-            '# Beauty топики для BlondePlace',
-            '# Добавьте свои топики по одному на строку',
-            '',
-            'Как ухаживать за блондом дома',
-            'Тренды окрашивания волос 2024',
-            'Секреты долговечного маникюра',
-            'Как выбрать идеальную стрижку для типа лица',
-            'Уход за кожей лица в зимний период'
-        ].join('\n');
-        
-        await fs.writeFile('topics.txt', defaultTopics);
-        return [];
     }
+    return REAL_LINKS_MAP.general[Math.floor(Math.random() * REAL_LINKS_MAP.general.length)];
 }
 
-// ===== ГЕНЕРАЦИЯ BEAUTY КОНТЕНТА =====
-async function generateBeautyContent(topic) {
-    // Определяем категорию на основе топика
-    const category = categorizeBeautyTopic(topic);
-    const systemPrompt = BEAUTY_SYSTEM_PROMPTS[category] || BEAUTY_SYSTEM_PROMPTS.beauty_tips;
-    
-    const prompt = `${systemPrompt}
-
-ТЕМА: "${topic}"
-
-Создай экспертную статью для блога салона красоты ${BRAND_CONFIG.salon_name} (${BRAND_CONFIG.domain}).
-
-ТРЕБОВАНИЯ:
-✅ Объем: 1500-2500 слов
-✅ Стиль: экспертный, но доступный
-✅ Структура: заголовки H2, H3, списки, выделения
-✅ SEO: естественное вхождение ключевых слов
-✅ Экспертность: профессиональные советы и рекомендации
-✅ Практичность: конкретные советы, которые можно применить
-✅ Актуальность: современные тренды и методики
-
-ОБЯЗАТЕЛЬНО ВКЛЮЧИ:
-• Профессиональные советы от мастеров
-• Рекомендации по продуктам и процедурам
-• Различие между домашним и салонным уходом
-• Предупреждения о типичных ошибках
-• Когда стоит обратиться к специалисту
-
-ФОРМАТ СТАТЬИ:
-1. Введение (почему эта тема важна)
-2. Основные разделы с подзаголовками
-3. Практические советы и рекомендации
-4. Профессиональные секреты
-5. Заключение с призывом к действию
-
-Пиши от лица эксперта салона ${BRAND_CONFIG.salon_name}. Используй "мы", "наш салон", "наши мастера".
-Естественно упоминай, что в салоне можно получить профессиональную консультацию.
-
-ВАЖНО: Не используй прямую рекламу. Фокусируйся на экспертном контенте с ненавязчивыми упоминаниями салона.`;
-
+async function isUrlAccessible(url) {
+    if (typeof url !== 'string' || !url.startsWith('http')) return false;
     try {
-        console.log(`[Поток #${THREAD_ID}] 🎨 Генерирую beauty контент: "${topic}"`);
-        
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-        
-        if (!text || text.length < 500) {
-            throw new Error('Слишком короткий контент');
-        }
-        
-        console.log(`[Поток #${THREAD_ID}] ✅ Сгенерировано ${text.length} символов для "${topic}"`);
-        return text;
-        
+        const response = await fetch(url, { method: 'HEAD', timeout: 5000 });
+        return response.ok;
     } catch (error) {
-        console.error(`[Поток #${THREAD_ID}] ❌ Ошибка генерации для "${topic}":`, error.message);
-        return null;
+        console.warn(`[!] Предупреждение: не удалось проверить URL изображения: ${url}. Ошибка: ${error.message}`);
+        return false;
     }
 }
 
-// ===== КАТЕГОРИЗАЦИЯ BEAUTY ТОПИКОВ =====
-function categorizeBeautyTopic(topic) {
-    const topicLower = topic.toLowerCase();
-    
-    if (topicLower.includes('окрашивание') || topicLower.includes('блонд') || 
-        topicLower.includes('цвет') || topicLower.includes('мелирование') ||
-        topicLower.includes('омбре') || topicLower.includes('балаяж')) {
-        return 'hair_coloring';
+function slugify(text) {
+    const cleanedText = text.toString().replace(/[\x00-\x1F\x7F-\x9F]/g, "").trim();
+    const from = "а б в г д е ё ж з и й к л м н о п р с т у ф х ц ч ш щ ъ ы ь э ю я".split(' ');
+    const to = "a b v g d e yo zh z i y k l m n o p r s t u f h c ch sh sch '' y ' e yu ya".split(' ');
+    let newText = cleanedText.toLowerCase();
+    for (let i = 0; i < from.length; i++) {
+        newText = newText.replace(new RegExp(from[i], 'g'), to[i]);
     }
-    
-    if (topicLower.includes('волос') || topicLower.includes('уход за волосами') ||
-        topicLower.includes('шампунь') || topicLower.includes('кондиционер')) {
-        return 'hair_care';
-    }
-    
-    if (topicLower.includes('маникюр') || topicLower.includes('педикюр') || 
-        topicLower.includes('ногт') || topicLower.includes('nail')) {
-        return 'nail_care';
-    }
-    
-    if (topicLower.includes('процедур') || topicLower.includes('салон') ||
-        topicLower.includes('кератин') || topicLower.includes('ботокс')) {
-        return 'salon_procedures';
-    }
-    
-    return 'beauty_tips';
+    return newText.replace(/\s+/g, '-').replace(/[^\w-]+/g, '').replace(/--+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
 }
 
-// ===== ГЕНЕРАЦИЯ SEO ДАННЫХ =====
-async function generateBeautySEO(topic, category) {
-    const seoPrompt = `Создай SEO-оптимизированные метаданные для статьи салона красоты на тему: "${topic}"
-
-Требования:
-- Title: 50-60 символов, включай "${BRAND_CONFIG.brand}"
-- Description: 140-160 символов, призыв к действию
-- Keywords: 5-7 ключевых фраз через запятую
-- Учитывай beauty-тематику и местную специфику
-
-Ответ в JSON формате:
-{
-  "title": "...",
-  "description": "...", 
-  "keywords": "..."
-}`;
-
-    try {
-        const result = await model.generateContent(seoPrompt);
-        const response = await result.response;
-        const text = response.text();
-        
-        // Извлекаем JSON из ответа
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            return JSON.parse(jsonMatch[0]);
-        }
-        
-        // Fallback SEO
-        return {
-            title: `${topic} | Советы экспертов ${BRAND_CONFIG.brand}`,
-            description: `Профессиональные советы по теме "${topic}" от мастеров салона ${BRAND_CONFIG.brand}. Экспертные рекомендации и практические советы.`,
-            keywords: `${topic}, салон красоты, ${BRAND_CONFIG.brand}, beauty советы, уход за волосами`
-        };
-        
-    } catch (error) {
-        console.warn(`[Поток #${THREAD_ID}] ⚠️ Ошибка генерации SEO для "${topic}". Использую fallback.`);
-        return {
-            title: `${topic} | ${BRAND_CONFIG.brand}`,
-            description: `Экспертные советы от салона красоты ${BRAND_CONFIG.brand}. ${topic} - профессиональные рекомендации.`,
-            keywords: `${topic}, салон красоты, beauty, уход, ${BRAND_CONFIG.brand}`
-        };
-    }
-}
-
-// ===== СОЗДАНИЕ FRONTMATTER =====
-async function createBeautyFrontmatter(topic, content, seoData) {
-    const category = categorizeBeautyTopic(topic);
-    const slug = topic.toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-    
-    const heroImage = `/images/beauty/${category}/${slug}.jpg`;
-    const currentDate = new Date().toISOString();
-    
-    // Schema.org для beauty контента
-    const schema = {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        headline: seoData.title,
-        description: seoData.description,
-        image: `https://${BRAND_CONFIG.blog_domain}${heroImage}`,
-        author: {
-            "@type": "Organization",
-            name: BRAND_CONFIG.salon_name,
-            url: `https://${BRAND_CONFIG.domain}`
-        },
-        publisher: {
-            "@type": "Organization", 
-            name: BRAND_CONFIG.brand,
-            logo: {
-                "@type": "ImageObject",
-                url: `https://${BRAND_CONFIG.domain}/logo.png`
+async function generateWithRetry(prompt, maxRetries = 4) {
+    let delay = 5000;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            if (modelChoice === 'openrouter') {
+                const response = await fetch(OPENROUTER_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'HTTP-Referer': TARGET_URL_MAIN,
+                        'X-Title': slugify(BRAND_BLOG_NAME)
+                    },
+                    body: JSON.stringify({
+                        model: OPENROUTER_MODEL_NAME,
+                        messages: [{ role: "user", content: prompt }]
+                    })
+                });
+                if (!response.ok) {
+                    if (response.status === 429) throw new Error(`429 Too Many Requests`);
+                    throw new Error(`Ошибка HTTP от OpenRouter: ${response.status}`);
+                }
+                const data = await response.json();
+                if (!data.choices || data.choices.length === 0) throw new Error("Ответ от API OpenRouter не содержит поля 'choices'.");
+                return data.choices[0].message.content;
+            } else { // Gemini logic
+                const genAI = new GoogleGenerativeAI(apiKey);
+                const model = genAI.getGenerativeModel({ model: GEMINI_MODEL_NAME });
+                const result = await model.generateContent(prompt);
+                return result.response.text();
             }
-        },
-        datePublished: currentDate,
-        dateModified: currentDate,
-        mainEntityOfPage: {
-            "@type": "WebPage",
-            "@id": `https://${BRAND_CONFIG.blog_domain}/blog/${slug}/`
-        },
-        about: [
-            {
-                "@type": "Thing",
-                name: "Beauty Care"
-            },
-            {
-                "@type": "Thing", 
-                name: "Hair Care"
+        } catch (error) {
+            if (error.message.includes('503') || error.message.includes('429')) {
+                console.warn(`[!] [Beauty Поток #${threadId}] Модель перегружена или квота исчерпана. Попытка ${i + 1}/${maxRetries}. Жду ${delay / 1000}с...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
+            } else {
+                throw error;
             }
-        ]
+        }
+    }
+    throw new Error(`[Beauty Поток #${threadId}] Не удалось получить ответ от модели ${modelChoice} после ${maxRetries} попыток.`);
+}
+
+async function notifyIndexNow(url) {
+    console.log(`📢 [Beauty Поток #${threadId}] Отправляю уведомление для ${url} в IndexNow...`);
+    const API_KEY = "d1b055ab1eb146d892169bbb2c96550e";
+    const HOST = "blondeplace.netlify.app";
+    
+    const payload = JSON.stringify({ host: HOST, key: API_KEY, urlList: [url] });
+
+    try {
+        await execa('curl', ['-X', 'POST', 'https://yandex.com/indexnow', '-H', 'Content-Type: application/json; charset=utf-8', '-d', payload]);
+        await execa('curl', ['-X', 'POST', 'https://www.bing.com/indexnow', '-H', 'Content-Type: application/json; charset=utf-8', '-d', payload]);
+        console.log(`[✔] [Beauty Поток #${threadId}] Уведомление для ${url} успешно отправлено.`);
+    } catch (error) {
+        console.error(`[!] [Beauty Поток #${threadId}] Ошибка при отправке в IndexNow для ${url}:`, error.stderr);
+    }
+}
+
+async function generatePost(topic, slug, interlinks) {
+    console.log(`[+] [Beauty Поток #${threadId}] Генерирую beauty статью на тему: ${topic}`);
+    
+    const planPrompt = `Создай детальный, экспертный план-структуру для SEO-статьи на тему "${topic}" в области красоты и ухода. Контекст: статья пишется для блога салона красоты ${BRAND_NAME}, специализирующегося на окрашивании волос, маникюре и beauty-процедурах.`;
+    const plan = await generateWithRetry(planPrompt);
+
+    const articlePrompt = `Напиши экспертную, полезную SEO-статью по этому плану:
+
+${plan}
+
+Тема: "${topic}"
+
+ВАЖНЫЕ ТРЕБОВАНИЯ:
+- Строго следуй плану и используй синтаксис Markdown для всех заголовков (# для H1, ## для H2, ### для H3)
+- Текст должен быть написан от лица салона красоты ${BRAND_NAME}
+- Фокусируйся на beauty-тематике: уход за волосами, окрашивание, маникюр, косметология
+- Включай профессиональные советы и рекомендации
+- Упоминай различия между домашним и салонным уходом
+- ЗАПРЕЩЕНО: не выдумывай и не вставляй в текст никакие ссылки или URL-адреса
+- Не пиши сопроводительного текста перед статьей, сразу начинай с заголовка H1
+- Объем: 1500-2500 слов`;
+    
+    let articleText = await generateWithRetry(articlePrompt);
+
+    // Remove any markdown images without URLs
+    articleText = articleText.replace(/!\[.*?\]\((?!http).*?\)/g, '');
+
+    // Add interlinking
+    if (interlinks.length > 0) {
+        let interlinkingBlock = '\n\n---\n\n## Читайте также\n\n';
+        interlinks.forEach(link => {
+            interlinkingBlock += `*   [${link.title}](${link.url})\n`;
+        });
+        articleText += interlinkingBlock;
+    }
+
+    // Add contextual link to main site
+    const paragraphs = articleText.split('\n\n');
+    if (paragraphs.length > 2) {
+        const contextualLink = getContextualLink(topic);
+        const randomAnchorText = `узнайте больше о ${contextualLink.text} на <a href="${contextualLink.url}" target="_blank" rel="nofollow">сайте ${BRAND_NAME}</a>`;
+        
+        const randomIndex = Math.floor(Math.random() * (paragraphs.length - 2)) + 1;
+        paragraphs[randomIndex] += ` ${randomAnchorText}`;
+        articleText = paragraphs.join('\n\n');
+    }
+    
+    const seoPrompt = `Для статьи салона красоты на тему "${topic}" сгенерируй JSON-объект. ВАЖНО: твой ответ должен быть ТОЛЬКО валидным JSON-объектом. JSON должен содержать: "title" (длиной ровно 40-45 символов), "description" (длиной ровно 150-160 символов), "keywords" (строка с 5-7 релевантными ключевыми словами через запятую). Контекст: это блог салона красоты ${BRAND_NAME}.`;
+    let seoText = await generateWithRetry(seoPrompt);
+
+    const match = seoText.match(/\{[\s\S]*\}/);
+    if (!match) { throw new Error("Не удалось найти валидный JSON в ответе модели."); }
+    const seoData = JSON.parse(match[0]);
+
+    const reviewCount = Math.floor(Math.random() * (900 - 300 + 1)) + 300;
+    const ratingValue = (Math.random() * (5.0 - 4.7) + 4.7).toFixed(1);
+
+    const isImageOk = await isUrlAccessible(seoData.heroImage);
+    const finalHeroImage = isImageOk ? seoData.heroImage : FALLBACK_IMAGE_URL;
+
+    const fullSchema = {
+      "@context": "https://schema.org", "@type": "HowTo", "name": seoData.title,
+      "description": seoData.description, "image": { "@type": "ImageObject", "url": finalHeroImage },
+      "aggregateRating": { "@type": "AggregateRating", "ratingValue": ratingValue, "reviewCount": reviewCount, "bestRating": "5", "worstRating": "1" },
+      "publisher": { "@type": "Organization", "name": BRAND_BLOG_NAME, "logo": { "@type": "ImageObject", "url": `${SITE_URL}/favicon.ico` } },
+      "mainEntityOfPage": { "@type": "WebPage", "@id": `${SITE_URL}/blog/${slug}/` }
     };
-    
-    const frontmatter = `---
-title: ${JSON.stringify(seoData.title)}
-description: ${JSON.stringify(seoData.description)}
-keywords: ${JSON.stringify(seoData.keywords)}
-pubDate: ${JSON.stringify(currentDate)}
-author: ${JSON.stringify(BRAND_CONFIG.author)}
-heroImage: ${JSON.stringify(heroImage)}
-category: ${JSON.stringify(category)}
-schema: ${JSON.stringify(schema)}
----
 
-${content}
+    const frontmatter = `---
+title: "${seoData.title.replace(/"/g, '\\"')}"
+description: "${seoData.description.replace(/"/g, '\\"')}"
+keywords: "${seoData.keywords ? seoData.keywords.replace(/"/g, '\\"') : topic}"
+pubDate: "${new Date().toISOString()}"
+author: "${BRAND_AUTHOR_NAME}"
+heroImage: "${finalHeroImage}"
+schema: ${JSON.stringify(fullSchema)}
+---
+${articleText}
 `;
-    
     return frontmatter;
 }
 
-// ===== ОСНОВНАЯ ФУНКЦИЯ =====
 async function main() {
+    console.log(`[Beauty Поток #${threadId}] Запуск beauty рабочего потока...`);
+
     try {
-        console.log(`🎨 === BLONDEPLACE BEAUTY FACTORY ===`);
-        console.log(`💄 Салон: ${BRAND_CONFIG.salon_name}`);
-        console.log(`🌐 Домен: ${BRAND_CONFIG.domain}`);
-        console.log(`📱 Поток: #${THREAD_ID} | Пакет: ${BATCH_SIZE} статей`);
-        console.log(`🤖 Модель: ${MODEL_CHOICE}`);
+        const BATCH_SIZE = parseInt(process.env.BATCH_SIZE, 10) || 1;
+        const totalThreads = parseInt(process.env.TOTAL_THREADS, 10) || 1;
         
-        const allTopics = await loadTopics();
+        const fileContent = await fs.readFile(TOPICS_FILE, 'utf-8');
+        const allTopics = fileContent.split(/\r?\n/).map(topic => topic.trim()).filter(Boolean);
+
+        const postsDir = path.join(process.cwd(), 'src', 'content', 'posts');
+        await fs.mkdir(postsDir, { recursive: true });
         
-        if (allTopics.length === 0) {
-            console.log('📝 Топики не найдены. Создан пустой файл topics.txt');
+        const existingFiles = await fs.readdir(postsDir);
+        const existingSlugs = existingFiles.map(file => file.replace('.md', ''));
+        
+        let newTopics = allTopics.filter(topic => {
+            const topicSlug = slugify(topic);
+            return topicSlug && !existingSlugs.includes(topicSlug);
+        });
+
+        const topicsForThisThread = newTopics.filter((_, index) => index % totalThreads === (threadId - 1)).slice(0, BATCH_SIZE);
+
+        if (topicsForThisThread.length === 0) {
+            console.log(`[Beauty Поток #${threadId}] Нет новых тем для этого потока. Завершение.`);
             return;
         }
         
-        // Распределяем топики по потокам
-        const threadTopics = allTopics.filter((_, index) => 
-            index % TOTAL_THREADS === (parseInt(THREAD_ID) - 1)
-        );
-        
-        const topicsToProcess = threadTopics.slice(0, BATCH_SIZE);
-        
-        if (topicsToProcess.length === 0) {
-            console.log(`[Поток #${THREAD_ID}] 📭 Нет топиков для обработки`);
-            return;
+        console.log(`[Beauty Поток #${threadId}] Найдено ${topicsForThisThread.length} новых beauty тем. Беру в работу.`);
+
+        let allPostsForLinking = [];
+        for (const slug of existingSlugs) {
+             try {
+                const content = await fs.readFile(path.join(postsDir, `${slug}.md`), 'utf-8');
+                const titleMatch = content.match(/title:\s*["']?(.*?)["']?$/m);
+                if (titleMatch) {
+                    allPostsForLinking.push({ title: titleMatch[1], url: `/blog/${slug}/` });
+                }
+            } catch (e) { /* Игнорируем ошибки чтения */ }
         }
         
-        console.log(`[Поток #${THREAD_ID}] 📋 Обрабатываю ${topicsToProcess.length} топиков...`);
-        
-        let successCount = 0;
-        
-        for (const topic of topicsToProcess) {
+        for (const topic of topicsForThisThread) { 
             try {
-                // Генерируем контент
-                const content = await generateBeautyContent(topic);
-                if (!content) continue;
+                const slug = slugify(topic);
+                if (!slug) continue;
                 
-                // Генерируем SEO
-                const category = categorizeBeautyTopic(topic);
-                const seoData = await generateBeautySEO(topic, category);
-                
-                // Создаем frontmatter
-                const fullContent = await createBeautyFrontmatter(topic, content, seoData);
-                
-                // Валидация YAML
-                try {
-                    const matter = await import('gray-matter');
-                    matter.default(fullContent);
-                    console.log(`[Поток #${THREAD_ID}] [✔] YAML валидация прошла для "${topic}"`);
-                } catch (yamlError) {
-                    console.error(`[Поток #${THREAD_ID}] [❌] YAML ошибка в "${topic}": ${yamlError.message}`);
-                    continue;
+                const filePath = path.join(postsDir, `${slug}.md`);
+
+                let randomInterlinks = [];
+                if (allPostsForLinking.length > 0) {
+                    randomInterlinks = [...allPostsForLinking].sort(() => 0.5 - Math.random()).slice(0, 3);
                 }
                 
-                // Сохраняем файл
-                const slug = topic.toLowerCase()
-                    .replace(/[^\w\s-]/g, '')
-                    .replace(/\s+/g, '-')
-                    .replace(/-+/g, '-')
-                    .replace(/^-|-$/g, '');
-                
-                const filePath = `src/content/posts/${slug}.md`;
+                const fullContent = await generatePost(topic, slug, randomInterlinks);
                 await fs.writeFile(filePath, fullContent);
+                console.log(`[Beauty Поток #${threadId}] [✔] Beauty статья "${topic}" успешно создана.`);
                 
-                console.log(`[Поток #${THREAD_ID}] ✅ Создан: ${filePath}`);
-                successCount++;
-                
-                // Пауза между генерациями
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-            } catch (error) {
-                console.error(`[Поток #${THREAD_ID}] ❌ Ошибка обработки "${topic}":`, error.message);
+                // ТОЛЬКО IndexNow уведомления - БЕЗ git операций!
+                const newUrl = `${SITE_URL}/blog/${slug}/`;
+                await notifyIndexNow(newUrl);
+
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Небольшая пауза между статьями
+            } catch (e) {
+                console.error(`[!] [Beauty Поток #${threadId}] Ошибка при обработке темы "${topic}": ${e.message}`);
+                if (e.message.includes('429') || e.message.includes('API key')) {
+                    console.error(`[!] [Beauty Поток #${threadId}] Ключ API исчерпан или невалиден. Завершаю работу этого потока.`);
+                    break; 
+                }
+                continue;
             }
         }
-        
-        console.log(`[Поток #${THREAD_ID}] 🎯 Завершено! Создано статей: ${successCount}/${topicsToProcess.length}`);
-        
     } catch (error) {
-        console.error(`[Поток #${THREAD_ID}] 💥 Критическая ошибка:`, error);
+        console.error(`[Beauty Поток #${threadId}] [!] Критическая ошибка:`, error);
         process.exit(1);
     }
 }
 
-// Запуск фабрики
-if (import.meta.url === `file://${process.argv[1]}`) {
-    main();
-}
+main();
