@@ -1,5 +1,5 @@
-// BLONDE PLACE PWA Service Worker v2
-const CACHE_NAME = 'blondeplace-v2';
+// BLONDE PLACE Perfect PWA Service Worker
+const CACHE_NAME = 'blondeplace-perfect-v1';
 const urlsToCache = [
   '/',
   '/blog/',
@@ -9,31 +9,34 @@ const urlsToCache = [
   '/apple-touch-icon.png'
 ];
 
+// Perfect install event
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('PWA: Кэширую ресурсы');
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting();
 });
 
+// Perfect fetch event
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Возвращаем кэш или загружаем из сети
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
+        return response || fetch(event.request).catch(() => {
+          // Fallback for offline
+          if (event.request.destination === 'document') {
+            return caches.match('/');
+          }
+        });
       }
     )
   );
 });
 
-// Cleanup old caches
+// Perfect activate event
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -46,4 +49,5 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  self.clients.claim();
 });
