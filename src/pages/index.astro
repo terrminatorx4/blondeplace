@@ -74,18 +74,20 @@ import Layout from '../layouts/Layout.astro';
                   <p>AirTouch ниже плеч</p>
                 </div>
               </div>
+            </div>
+            <div class="Options_option__row__Zy1FE">
               <div class="Options_option__item__LqVeF" data-item="true">
                 <div class="Options_option__text__wAqR5">
                   <p>тонирование</p>
                 </div>
               </div>
-            </div>
-            <div class="Options_option__row__Zy1FE">
               <div class="Options_option__item__LqVeF" data-item="true">
                 <div class="Options_option__text__wAqR5">
                   <p>тотал блонд (окрашенная база)</p>
                 </div>
               </div>
+            </div>
+            <div class="Options_option__row__Zy1FE">
               <div class="Options_option__item__LqVeF" data-item="true">
                 <div class="Options_option__text__wAqR5">
                   <p>AirTouch ниже плеч</p>
@@ -95,16 +97,17 @@ import Layout from '../layouts/Layout.astro';
           </div>
         </div>
         <div class="Intro_intro__image__5TyEE">
-          <div class="decoration-placeholder">💃</div>
+          <img src="/intro/woman.png" alt="decoration image"/>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Consultation Section -->
-  <section class="Consultation_consultation__zS8eJ">
+  <section class="Consultation_consultation__zS8eJ" id="discount">
     <div class="Consultation_consultation__wrapper__mfUpf">
       <p class="Consultation_consultation__heading__WznDy">
+        💃<br/>
         ОСТАВЬТЕ ЗАЯВКУ НА КОНСУЛЬТАЦИЮ И ПОЛУЧИТЕ<br/>
         <span class="Consultation_consultation__highlight__esun9">СКИДКУ 10%</span> НА ПЕРВОЕ ПОСЕЩЕНИЕ САЛОНА
       </p>
@@ -127,14 +130,14 @@ import Layout from '../layouts/Layout.astro';
   </section>
 
   <!-- Info Section -->
-  <section class="Info_info__l_tdY">
+  <section class="Info_info__l_tdY" id="why">
     <div class="Info_info__wrapper__oVhN4">
       <div class="Info_info__imgContainer__XX0gl">
         <div class="Info_info__phoneContainer__sOoD2">
-          <div class="phone-icon">📱</div>
+          <img src="/info/phone.png" alt="phone"/>
           <div class="Info_info__buttonContainer__UiyiL">
             <a href="https://dikidi.ru/699327" target="_blank">
-              <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ Button_text__CeUC5 Info_info__applyButton__GGkQ3">Записаться</button>
+              <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ Button_text__CeUC5 Info_info__applyButton__GGkQ3">📱<br/>Записаться</button>
             </a>
             <a href="https://dikidi.ru/699327" target="_blank">
               <button class="Button_button__C0__L Button_black-transparent__jvtuc Button_text-black__LdsvQ Button_text__CeUC5 Info_info__lastButton__ybtZZ">Повторить последнюю запись</button>
@@ -142,12 +145,13 @@ import Layout from '../layouts/Layout.astro';
           </div>
         </div>
         <div class="Info_info__scissors__jKO3q">
-          <div class="scissors-icon">✂️</div>
+          <img src="/info/scissors.png" alt="scissors"/>
         </div>
       </div>
       <div class="Info_info__content__of298">
         <div class="Info_info__textContainer__sFJG3">
           <p class="Info_info__heading__Scd_0">
+            ✂️<br/>
             <span class="Info_info__highlightBold__ywbMn">BLONDE PLACE</span> - открытый клуб для<br/>
             блондинок и ценителей блонда!
           </p>
@@ -168,8 +172,8 @@ import Layout from '../layouts/Layout.astro';
   <section class="Services_services__ShMKK" id="services">
     <div class="Services_services__wrapper__ZaS_9">
       <div class="Services_services__headingBox__BqI_r">
-        <div class="divider-decoration">✨</div>
-        <h3 class="Services_services__heading__GWWHl">Наши <span class="Services_services__highlight__lBCUU">услуги</span><span class="Services_services__colon__X2sXK">:</span></h3>
+        <img src="/discount/divider.png" alt=""/>
+        <h3 class="Services_services__heading__GWWHl">✨<br/>Наши <span class="Services_services__highlight__lBCUU">услуги</span><span class="Services_services__colon__X2sXK">:</span></h3>
       </div>
       <div class="Services_services__content__u3Y0j">
         <div class="Services_services__options__ShecG">
@@ -242,9 +246,41 @@ import Layout from '../layouts/Layout.astro';
             <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ Button_text__CeUC5 Services_services__buttonOnline__JWcRh">Онлайн запись</button>
           </a>
           <a class="Button_button__C0__L Button_transparent__6L3R2 Button_text__CeUC5 Services_services__buttonQuestion__hgySc" href="https://t.me/Blondeplace">Задать вопрос</a>
-          <a class="Button_button__C0__L Button_primary__beauty Button_text__CeUC5 Services_services__blogButton__new" href="/blog/">📝 Блог</a>
         </div>
-        <div class="brush-icon">🖌️</div>
+        <img src="/services/brush.png" alt="brush" class="Services_services__brush__RzudP"/>
+      </div>
+      <!-- БЛОГ ССЫЛКА -->
+      <div class="Services_services__blog__link">
+        <a href="/blog/" class="Button_button__C0__L Button_blog__special Button_text__CeUC5">📝 Блог</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Beauty Coworking Section -->
+  <section class="Coworking_coworking__section" id="coworking">
+    <div class="Coworking_coworking__wrapper">
+      <div class="Coworking_coworking__content">
+        <h2 class="Coworking_coworking__title">🖌️<br/>Beauty Коворкинг</h2>
+        <p class="Coworking_coworking__description">
+          Аренда рабочего места для мастеров красоты в комфортной обстановке
+        </p>
+        <div class="Coworking_coworking__features">
+          <div class="Coworking_feature__item">
+            <div class="Coworking_feature__icon">💺</div>
+            <div class="Coworking_feature__text">Комфортные рабочие места</div>
+          </div>
+          <div class="Coworking_feature__item">
+            <div class="Coworking_feature__icon">⚡</div>
+            <div class="Coworking_feature__text">Профессиональное оборудование</div>
+          </div>
+          <div class="Coworking_feature__item">
+            <div class="Coworking_feature__icon">🌟</div>
+            <div class="Coworking_feature__text">Стильная атмосфера</div>
+          </div>
+        </div>
+        <a href="/beauty-coworking">
+          <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ">Подробнее</button>
+        </a>
       </div>
     </div>
   </section>
@@ -252,61 +288,13 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
-  /* EXACT CSS FROM ORIGINAL SITE WITH MINIMAL UPDATES */
+  /* EXACT CSS FROM ORIGINAL SITE */
   
-  /* Global Styles */
+  /* Reset */
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
-
-  body {
-    font-family: 'Exo', 'Arial', sans-serif;
-    line-height: 1.6;
-    color: #333;
-  }
-
-  /* Button Base Styles */
-  .Button_button__C0__L {
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-    transition: all 0.3s ease;
-    font-family: inherit;
-  }
-
-  .Button_light__Q3_1u {
-    background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
-    color: #333;
-  }
-
-  .Button_black-transparent__jvtuc {
-    background: rgba(0,0,0,0.1);
-    color: #333;
-    border: 1px solid rgba(0,0,0,0.2);
-  }
-
-  .Button_transparent__6L3R2 {
-    background: transparent;
-    color: #B8956A;
-    border: 2px solid #B8956A;
-  }
-
-  .Button_primary__beauty {
-    background: linear-gradient(135deg, #B8956A 0%, #f5d5b8 100%);
-    color: white;
-    font-weight: 600;
-  }
-
-  .Button_text__CeUC5 {
-    font-size: 1rem;
-  }
-
-  .Button_text-black__LdsvQ {
-    color: #333;
   }
 
   /* Video Counter */
@@ -394,6 +382,11 @@ import Layout from '../layouts/Layout.astro';
     text-align: center;
   }
 
+  .Intro_intro__image__5TyEE img {
+    max-width: 100%;
+    height: auto;
+  }
+
   /* Options */
   .Options_option__row__Zy1FE {
     display: flex;
@@ -444,15 +437,6 @@ import Layout from '../layouts/Layout.astro';
     line-height: 1.3;
   }
 
-  .Consultation_consultation__highlight__esun9 {
-    color: #B8956A;
-  }
-
-  .Consultation_consultation__form__U9Yc_ {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
   /* Form Styles */
   .Form_formContainer__2f_0_ {
     width: 100%;
@@ -487,11 +471,47 @@ import Layout from '../layouts/Layout.astro';
     border-color: #B8956A;
   }
 
-  .Form_form__button__RuNzC {
-    padding: 15px 40px;
-    font-size: 1.1rem;
-    font-weight: 600;
+  /* Button Styles */
+  .Button_button__C0__L {
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .Button_light__Q3_1u {
+    background: #B8956A;
+    color: #fff;
+  }
+
+  .Button_light__Q3_1u:hover {
+    background: #a0855c;
+  }
+
+  .Button_transparent__6L3R2 {
+    background: transparent;
+    border: 2px solid #B8956A;
+    color: #B8956A;
+  }
+
+  .Button_transparent__6L3R2:hover {
+    background: #B8956A;
+    color: #fff;
+  }
+
+  .Button_blog__special {
+    background: #ff6b9d;
+    color: #fff;
+    padding: 15px 30px;
     border-radius: 10px;
+    font-weight: 600;
+    margin-top: 30px;
+  }
+
+  .Button_blog__special:hover {
+    background: #e55a8a;
   }
 
   /* Info Section */
@@ -508,70 +528,6 @@ import Layout from '../layouts/Layout.astro';
     grid-template-columns: 1fr 1fr;
     gap: 60px;
     align-items: center;
-  }
-
-  .Info_info__imgContainer__XX0gl {
-    position: relative;
-  }
-
-  .Info_info__phoneContainer__sOoD2 {
-    position: relative;
-    text-align: center;
-  }
-
-  .Info_info__buttonContainer__UiyiL {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .Info_info__applyButton__GGkQ3,
-  .Info_info__lastButton__ybtZZ {
-    padding: 15px 30px;
-    font-weight: 600;
-    border-radius: 10px;
-  }
-
-  .Info_info__scissors__jKO3q {
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    z-index: 2;
-  }
-
-  .Info_info__textContainer__sFJG3 {
-    margin-bottom: 30px;
-  }
-
-  .Info_info__heading__Scd_0 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 20px;
-    line-height: 1.4;
-  }
-
-  .Info_info__highlightBold__ywbMn {
-    color: #B8956A;
-    font-weight: 700;
-  }
-
-  .Info_info__text__O2TG4 {
-    font-size: 1.1rem;
-    color: #666;
-    line-height: 1.6;
-  }
-
-  .Info_info__highlightSemi__GZBnX {
-    color: #B8956A;
-    font-weight: 600;
-  }
-
-  .Info_info__button__x3Nsv {
-    padding: 15px 30px;
-    font-weight: 600;
-    border-radius: 10px;
   }
 
   /* Services Section */
@@ -595,77 +551,67 @@ import Layout from '../layouts/Layout.astro';
     font-size: 2.5rem;
     font-weight: 700;
     color: #333;
-    margin: 20px 0;
   }
 
-  .Services_services__highlight__lBCUU {
-    color: #B8956A;
-  }
-
-  .Services_services__colon__X2sXK {
-    color: #B8956A;
-  }
-
-  .Services_services__content__u3Y0j {
-    position: relative;
-  }
-
-  .Services_services__options__ShecG {
-    margin-bottom: 50px;
-  }
-
-  .Services_services__buttonContainer__qzQAw {
+  .Services_services__blog__link {
     text-align: center;
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
+    margin-top: 40px;
   }
 
-  .Services_services__buttonOnline__JWcRh,
-  .Services_services__buttonQuestion__hgySc,
-  .Services_services__blogButton__new {
-    padding: 15px 30px;
-    font-weight: 600;
-    border-radius: 10px;
+  /* Coworking Section */
+  .Coworking_coworking__section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #faf9f7 0%, #f8f6f4 100%);
   }
 
-  /* Emoji Icons Styles */
-  .decoration-placeholder {
-    font-size: 120px;
+  .Coworking_coworking__wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
     text-align: center;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
   }
 
-  .phone-icon, .scissors-icon, .brush-icon {
-    font-size: 60px;
+  .Coworking_coworking__title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  .Coworking_coworking__description {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 40px;
+  }
+
+  .Coworking_coworking__features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+
+  .Coworking_feature__item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    gap: 15px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   }
 
-  .divider-decoration {
-    font-size: 40px;
-    text-align: center;
-    margin: 10px 0;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  .Coworking_feature__icon {
+    font-size: 2rem;
   }
 
-  .brush-icon {
-    position: absolute;
-    bottom: -40px;
-    right: 20px;
-    width: 100px;
-    opacity: 0.3;
+  .Coworking_feature__text {
+    font-size: 1.1rem;
+    color: #333;
   }
 
-  /* Responsive */
+  /* Mobile Responsive */
   @media (max-width: 768px) {
-    .Intro_intro__header__59R5S {
-      font-size: 2.5rem;
-    }
-
     .Intro_intro__content__t_LLo {
       grid-template-columns: 1fr;
       gap: 40px;
@@ -678,11 +624,7 @@ import Layout from '../layouts/Layout.astro';
 
     .Form_form__content__GBaKX {
       flex-direction: column;
-    }
-
-    .Services_services__buttonContainer__qzQAw {
-      flex-direction: column;
-      align-items: center;
+      gap: 15px;
     }
 
     .Options_option__row__Zy1FE {
