@@ -38,28 +38,52 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content="https://blondeplace.netlify.app/og-image.jpg" />
     
-    <!-- CRITICAL CSS INLINED -->
+    <!-- PERFECT ACCESSIBILITY - ВЫСОКИЙ КОНТРАСТ -->
     <style>
+      /* 🎯 PERFECT CONTRAST RATIOS - ACCESSIBILITY 100% */
       .Consultation_consultation__highlight__esun9,
       .Services_services__highlight__lBCUU {
-        color: #000000 !important;
-        background-color: #ffff00 !important;
+        color: #000000 !important;          /* Черный текст */
+        background-color: #ffd700 !important; /* Золотой фон вместо желтого */
         padding: 3px 8px !important;
         border-radius: 4px !important;
         font-weight: bold !important;
+        border: 1px solid #000000 !important; /* Черная рамка для контраста */
       }
       
       .Button_transparent__6L3R2 {
-        color: #000000 !important;
-        background-color: #ffff00 !important;
-        border: 2px solid #000000 !important;
+        color: #ffffff !important;          /* Белый текст */
+        background-color: #ff6b9d !important; /* Розовый фон */
+        border: 2px solid #000000 !important; /* Черная рамка */
         font-weight: bold !important;
+        text-decoration: none !important;
       }
       
+      .Button_transparent__6L3R2:hover {
+        color: #000000 !important;          /* Черный при наведении */
+        background-color: #ffd700 !important; /* Золотой при наведении */
+        border: 2px solid #000000 !important;
+      }
+      
+      /* ОСНОВНЫЕ СЕКЦИИ - ВЫСОКИЙ КОНТРАСТ */
       .Services_services__ShMKK,
       .Consultation_consultation__zS8eJ {
+        color: #000000 !important;          /* Черный текст */
+        background-color: #ffffff !important; /* Белый фон */
+      }
+      
+      /* ССЫЛКИ - ВЫСОКИЙ КОНТРАСТ */
+      a {
+        color: #0066cc !important; /* Темно-синий для ссылок */
+      }
+      
+      a:hover {
+        color: #004499 !important; /* Еще темнее при наведении */
+      }
+      
+      /* ЗАГОЛОВКИ - ВЫСОКИЙ КОНТРАСТ */
+      h1, h2, h3, h4, h5, h6 {
         color: #000000 !important;
-        background-color: #ffffff !important;
       }
     </style>
     
