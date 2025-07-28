@@ -39,19 +39,24 @@ if (modelChoice === 'openrouter') {
 const REAL_LINKS_MAP = {
     'general': [
         { url: "https://blondeplace.ru", text: `главном сайте ${BRAND_NAME}` },
-        { url: "https://blondeplace.ru/about", text: `салоне красоты ${BRAND_NAME}` },
-        { url: "https://blondeplace.ru/contacts", text: `странице контактов` },
-        { url: "https://blondeplace.ru/services", text: `наших услугах` },
+        { url: "https://blondeplace.ru/#about", text: `о салоне красоты ${BRAND_NAME}` },
+        { url: "https://blondeplace.ru/#services", text: `наших услугах` },
+        { url: "https://blondeplace.ru/#masters", text: `наших мастерах` },
+        { url: "https://blondeplace.ru/#coworking", text: `beauty коворкинге` },
+        { url: "https://t.me/Blondeplace", text: `Telegram канале` },
     ],
-    'окрашивание': { url: "https://blondeplace.ru/services/coloring", text: "услугах окрашивания волос" },
-    'блонд': { url: "https://blondeplace.ru/services/blonde", text: "специализации по блонду" },
-    'стрижка': { url: "https://blondeplace.ru/services/haircut", text: "услугах стрижки" },
-    'маникюр': { url: "https://blondeplace.ru/services/manicure", text: "услугах маникюра" },
-    'уход': { url: "https://blondeplace.ru/services/care", text: "процедурах по уходу" },
-    'косметология': { url: "https://blondeplace.ru/services/cosmetology", text: "косметологических услугах" },
-    'цены': { url: "https://blondeplace.ru/prices", text: "ценах на услуги" },
-    'запись': { url: "https://blondeplace.ru/booking", text: "онлайн записи" },
-    'мастер': { url: "https://blondeplace.ru/masters", text: "наших мастерах" }
+    'услуг': { url: "https://blondeplace.ru/#services", text: "наших услугах" },
+    'окрашивание': { url: "https://blondeplace.ru/#services", text: "услугах окрашивания волос" },
+    'блонд': { url: "https://blondeplace.ru/#why", text: "почему BLONDE PLACE" },
+    'стрижка': { url: "https://blondeplace.ru/#services", text: "услугах стрижки" },
+    'маникюр': { url: "https://blondeplace.ru/#services", text: "услугах маникюра" },
+    'уход': { url: "https://blondeplace.ru/#services", text: "процедурах по уходу" },
+    'скидк': { url: "https://blondeplace.ru/#discount", text: "получении скидки" },
+    'мастер': { url: "https://blondeplace.ru/#masters", text: "наших мастерах" },
+    'бренд': { url: "https://blondeplace.ru/#brands", text: "брендах которые мы используем" },
+    'новост': { url: "https://blondeplace.ru/#news", text: "новостной ленте" },
+    'отзыв': { url: "https://blondeplace.ru/#comments", text: "отзывах клиентов" },
+    'коворкинг': { url: "https://blondeplace.ru/#coworking", text: "beauty коворкинге" }
 };
 
 function getContextualLink(topic) {
