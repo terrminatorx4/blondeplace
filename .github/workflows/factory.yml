@@ -3,8 +3,26 @@ name: 🚀 BlondePlace Beauty Factory (Atomic Lock)
 on:
   workflow_dispatch:
     inputs:
-      topic_count:
-        description: 'Количество статей для генерации'
+      model_choice:
+        description: 'Выбор AI модели'
+        required: true
+        default: 'gemini'
+        type: choice
+        options:
+          - 'gemini'
+          - 'openrouter'
+      articles_per_thread:
+        description: 'Количество статей на 1 поток'
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '3'
+          - '5'
+      thread_count:
+        description: 'Количество потоков (параллельно)'
         required: true
         default: '1'
         type: choice
@@ -13,17 +31,6 @@ on:
           - '5'
           - '10'
           - '20'
-      category:
-        description: 'Категория статей'
-        required: true
-        default: 'hair-care'
-        type: choice
-        options:
-          - 'hair-care'
-          - 'hair-coloring'
-          - 'nail-care'
-          - 'beauty-tips'
-          - 'salon-news'
 
 jobs:
   generate_and_publish:
@@ -32,7 +39,7 @@ jobs:
     
     strategy:
       matrix:
-        thread: ${{ fromJson(format('[{0}]', join(range(1, fromJson(github.event.inputs.topic_count) + 1), ', '))) }}
+        thread: ${{ fromJson(format('[{0}]', join(range(1, fromJson(github.event.inputs.thread_count) + 1), ', '))) }}
       max-parallel: 20
       fail-fast: false
 
@@ -88,9 +95,9 @@ jobs:
             OPENROUTER_KEY=$(head -n1 openrouter_keys.txt | tr -d '[:space:]')
           fi
           
-          # Выводим в переменные окружения
-          echo "GEMINI_API_KEY=$GEMINI_KEY" >> $GITHUB_ENV
-          echo "OPENROUTER_API_KEY=$OPENROUTER_KEY" >> $GITHUB_ENV
+          # ИСПРАВЛЯЕМ НАЗВАНИЯ ПЕРЕМЕННЫХ ДЛЯ FACTORY.JS
+          echo "GEMINI_API_KEY_CURRENT=$GEMINI_KEY" >> $GITHUB_ENV
+          echo "OPENROUTER_API_KEY_CURRENT=$OPENROUTER_KEY" >> $GITHUB_ENV
           
           echo "✅ Thread $THREAD_NUM using key index: $INDEX"
           
@@ -99,15 +106,17 @@ jobs:
 
       - name: 🏭 Generate Content (Thread ${{ matrix.thread }})
         env:
-          MODEL_CHOICE: "gemini"
-          BATCH_SIZE: "1"
+          MODEL_CHOICE: ${{ github.event.inputs.model_choice }}
+          BATCH_SIZE_PER_THREAD: ${{ github.event.inputs.articles_per_thread }}
           THREAD_ID: ${{ matrix.thread }}
-          CATEGORY: ${{ github.event.inputs.category }}
         run: |
           git config --global user.name 'BlondePlace Beauty Bot'
           git config --global user.email 'beauty-bot@blondeplace.ru'
           
           echo "--- 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Начинаю генерацию beauty контента ---"
+          echo "🤖 Модель: ${{ github.event.inputs.model_choice }}"
+          echo "📊 Статей на поток: ${{ github.event.inputs.articles_per_thread }}"
+          echo "🧵 Всего потоков: ${{ github.event.inputs.thread_count }}"
           
           # Запускаем factory.js через npm script
           npm run factory
@@ -120,7 +129,7 @@ jobs:
           echo "🔥 Thread ${{ matrix.thread }}: Найден новый beauty контент. Публикую..."
           
           git add src/content/posts/*.md
-          git commit -m "🎨 Beauty content from thread ${{ matrix.thread }} (${{ github.event.inputs.category }})"
+          git commit -m "🎨 Beauty content from thread ${{ matrix.thread }} (${{ github.event.inputs.model_choice }})"
           git pull --rebase
           git push
 
@@ -128,7 +137,8 @@ jobs:
         if: success()
         run: |
           echo "✅ BEAUTY THREAD ${{ matrix.thread }} COMPLETED"
-          echo "📂 Category: ${{ github.event.inputs.category }}"
+          echo "🤖 Model: ${{ github.event.inputs.model_choice }}"
+          echo "📊 Articles per thread: ${{ github.event.inputs.articles_per_thread }}"
           echo "🎨 Beauty content generated successfully"
 
   completion:
@@ -141,8 +151,9 @@ jobs:
         run: |
           echo "🚀 BLONDE PLACE BEAUTY FACTORY COMPLETED"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "📊 Generated articles: ${{ github.event.inputs.topic_count }}"
-          echo "📂 Category: ${{ github.event.inputs.category }}"
+          echo "🤖 Model used: ${{ github.event.inputs.model_choice }}"
+          echo "📊 Articles per thread: ${{ github.event.inputs.articles_per_thread }}"
+          echo "🧵 Total threads: ${{ github.event.inputs.thread_count }}"
           echo "🌐 Site: https://blondeplace.netlify.app/"
           echo "🔗 Blog: https://blondeplace.netlify.app/blog/"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
