@@ -15,7 +15,7 @@
     "node-fetch": "^3.3.2",
     "gray-matter": "^4.0.3",
     "execa": "^8.0.1",
-    "astro": "^5.12.4",
+    "astro": "^4.15.12",
     "@astrojs/netlify": "^5.5.3"
   },
   "devDependencies": {
