@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Blonde Place - Салон красоты комфорт класса">
+<Layout title="BLONDE PLACE - Салон красоты комфорт класса">
   <!-- EXACT COPY OF ORIGINAL HOMEPAGE STRUCTURE -->
   
   <!-- Video Counter -->
@@ -95,7 +95,7 @@ import Layout from '../layouts/Layout.astro';
           </div>
         </div>
         <div class="Intro_intro__image__5TyEE">
-          <img src="/intro/woman.png" alt="decoration image"/>
+          <div class="decoration-placeholder">💃</div>
         </div>
       </div>
     </div>
@@ -131,7 +131,7 @@ import Layout from '../layouts/Layout.astro';
     <div class="Info_info__wrapper__oVhN4">
       <div class="Info_info__imgContainer__XX0gl">
         <div class="Info_info__phoneContainer__sOoD2">
-          <img src="/info/phone.png" alt="phone"/>
+          <div class="phone-icon">📱</div>
           <div class="Info_info__buttonContainer__UiyiL">
             <a href="https://dikidi.ru/699327" target="_blank">
               <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ Button_text__CeUC5 Info_info__applyButton__GGkQ3">Записаться</button>
@@ -142,7 +142,7 @@ import Layout from '../layouts/Layout.astro';
           </div>
         </div>
         <div class="Info_info__scissors__jKO3q">
-          <img src="/info/scissors.png" alt="scissors"/>
+          <div class="scissors-icon">✂️</div>
         </div>
       </div>
       <div class="Info_info__content__of298">
@@ -168,7 +168,7 @@ import Layout from '../layouts/Layout.astro';
   <section class="Services_services__ShMKK" id="services">
     <div class="Services_services__wrapper__ZaS_9">
       <div class="Services_services__headingBox__BqI_r">
-        <img src="/discount/divider.png" alt=""/>
+        <div class="divider-decoration">✨</div>
         <h3 class="Services_services__heading__GWWHl">Наши <span class="Services_services__highlight__lBCUU">услуги</span><span class="Services_services__colon__X2sXK">:</span></h3>
       </div>
       <div class="Services_services__content__u3Y0j">
@@ -242,19 +242,73 @@ import Layout from '../layouts/Layout.astro';
             <button class="Button_button__C0__L Button_light__Q3_1u Button_text-black__LdsvQ Button_text__CeUC5 Services_services__buttonOnline__JWcRh">Онлайн запись</button>
           </a>
           <a class="Button_button__C0__L Button_transparent__6L3R2 Button_text__CeUC5 Services_services__buttonQuestion__hgySc" href="https://t.me/Blondeplace">Задать вопрос</a>
+          <a class="Button_button__C0__L Button_primary__beauty Button_text__CeUC5 Services_services__blogButton__new" href="/blog/">📝 Блог</a>
         </div>
-        <img src="/services/brush.png" alt="brush" class="Services_services__brush__RzudP"/>
+        <div class="brush-icon">🖌️</div>
       </div>
     </div>
   </section>
 
-  <!-- Rest of sections will continue in next step... -->
-
 </Layout>
 
 <style>
-  /* EXACT CSS FROM ORIGINAL SITE */
+  /* EXACT CSS FROM ORIGINAL SITE WITH MINIMAL UPDATES */
   
+  /* Global Styles */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Exo', 'Arial', sans-serif;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  /* Button Base Styles */
+  .Button_button__C0__L {
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .Button_light__Q3_1u {
+    background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
+    color: #333;
+  }
+
+  .Button_black-transparent__jvtuc {
+    background: rgba(0,0,0,0.1);
+    color: #333;
+    border: 1px solid rgba(0,0,0,0.2);
+  }
+
+  .Button_transparent__6L3R2 {
+    background: transparent;
+    color: #B8956A;
+    border: 2px solid #B8956A;
+  }
+
+  .Button_primary__beauty {
+    background: linear-gradient(135deg, #B8956A 0%, #f5d5b8 100%);
+    color: white;
+    font-weight: 600;
+  }
+
+  .Button_text__CeUC5 {
+    font-size: 1rem;
+  }
+
+  .Button_text-black__LdsvQ {
+    color: #333;
+  }
+
   /* Video Counter */
   .CounterVideo_video__nJkxH {
     position: fixed;
@@ -338,11 +392,6 @@ import Layout from '../layouts/Layout.astro';
 
   .Intro_intro__image__5TyEE {
     text-align: center;
-  }
-
-  .Intro_intro__image__5TyEE img {
-    max-width: 100%;
-    height: auto;
   }
 
   /* Options */
@@ -574,13 +623,36 @@ import Layout from '../layouts/Layout.astro';
   }
 
   .Services_services__buttonOnline__JWcRh,
-  .Services_services__buttonQuestion__hgySc {
+  .Services_services__buttonQuestion__hgySc,
+  .Services_services__blogButton__new {
     padding: 15px 30px;
     font-weight: 600;
     border-radius: 10px;
   }
 
-  .Services_services__brush__RzudP {
+  /* Emoji Icons Styles */
+  .decoration-placeholder {
+    font-size: 120px;
+    text-align: center;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+  }
+
+  .phone-icon, .scissors-icon, .brush-icon {
+    font-size: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+
+  .divider-decoration {
+    font-size: 40px;
+    text-align: center;
+    margin: 10px 0;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+
+  .brush-icon {
     position: absolute;
     bottom: -40px;
     right: 20px;
@@ -616,27 +688,5 @@ import Layout from '../layouts/Layout.astro';
     .Options_option__row__Zy1FE {
       justify-content: center;
     }
-  }
-
-  /* Emoji Icons Styles */
-  .decoration-placeholder {
-    font-size: 120px;
-    text-align: center;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
-  }
-
-  .phone-icon, .scissors-icon, .brush-icon {
-    font-size: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-  }
-
-  .divider-decoration {
-    font-size: 40px;
-    text-align: center;
-    margin: 10px 0;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
   }
 </style>
