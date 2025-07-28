@@ -6,24 +6,37 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href={Astro.url} />
     
+    <!-- PWA THEME COLOR (LIGHTHOUSE FIX) -->
+    <meta name="theme-color" content="#ff6b9d" />
+    <meta name="msapplication-TileColor" content="#ff6b9d" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="BLONDE PLACE" />
+    
     <!-- FAVICON (YANDEX REQUIREMENTS) -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    
+    <!-- PWA MANIFEST -->
     <link rel="manifest" href="/site.webmanifest" />
     
-    <!-- Google & Yandex Verification (LIKE BUTLER) -->
+    <!-- PWA ICONS -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+    
+    <!-- Google & Yandex Verification -->
     <meta name="google-site-verification" content="QmTdEF5xHLHXsL1FEcotg-xZTPfD14z9BxH6D64b0ds" />
     <meta name="yandex-verification" content="92b03968d7c06925" />
     
-    <!-- OpenGraph (BUTLER-EXACT) -->
+    <!-- OpenGraph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:title" content={title} />
@@ -31,7 +44,7 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
     <meta property="og:image" content="https://blondeplace.netlify.app/og-image.jpg" />
     <meta property="og:site_name" content="BLONDE PLACE" />
     
-    <!-- Twitter Card (BUTLER-EXACT) -->
+    <!-- Twitter Card -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={Astro.url} />
     <meta property="twitter:title" content={title} />
@@ -42,5 +55,20 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
   </head>
   <body>
     <slot />
+    
+    <!-- PWA SERVICE WORKER REGISTRATION -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
