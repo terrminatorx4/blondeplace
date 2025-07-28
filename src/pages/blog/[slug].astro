@@ -18,25 +18,30 @@ const pageUrl = `https://blondeplace.netlify.app/blog/${post.slug}/`;
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
-  <!-- Дополнительные SEO мета-теги -->
+  <!-- KEYWORDS МЕТА-ТЕГ (КАК В BUTLER!) -->
   <meta slot="head" name="keywords" content={post.data.keywords} />
   <meta slot="head" name="author" content={post.data.author} />
   <meta slot="head" name="robots" content="index, follow" />
   <link slot="head" rel="canonical" href={pageUrl} />
   
-  <!-- OpenGraph мета-теги -->
+  <!-- Google & Yandex Verification -->
+  <meta slot="head" name="google-site-verification" content="QmTdEF5xHLHXsL1FEcotg-xZTPfD14z9BxH6D64b0ds" />
+  <meta slot="head" name="yandex-verification" content="92b03968d7c06925" />
+  
+  <!-- OpenGraph (OVERRIDE DEFAULTS) -->
+  <meta slot="head" property="og:type" content="website" />
+  <meta slot="head" property="og:url" content={pageUrl} />
   <meta slot="head" property="og:title" content={post.data.title} />
   <meta slot="head" property="og:description" content={post.data.description} />
   <meta slot="head" property="og:image" content={ogImage} />
-  <meta slot="head" property="og:url" content={pageUrl} />
-  <meta slot="head" property="og:type" content="article" />
   <meta slot="head" property="og:site_name" content="BLONDE PLACE" />
   
-  <!-- Twitter Card -->
-  <meta slot="head" name="twitter:card" content="summary_large_image" />
-  <meta slot="head" name="twitter:title" content={post.data.title} />
-  <meta slot="head" name="twitter:description" content={post.data.description} />
-  <meta slot="head" name="twitter:image" content={ogImage} />
+  <!-- Twitter Card (OVERRIDE DEFAULTS) -->
+  <meta slot="head" property="twitter:card" content="summary_large_image" />
+  <meta slot="head" property="twitter:url" content={pageUrl} />
+  <meta slot="head" property="twitter:title" content={post.data.title} />
+  <meta slot="head" property="twitter:description" content={post.data.description} />
+  <meta slot="head" property="twitter:image" content={ogImage} />
   
   <!-- Structured Data -->
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(post.data.schema)} />
