@@ -6,22 +6,37 @@ export default defineConfig({
   output: 'static',
   adapter: netlify(),
   
-  // 🔥 PRODUCTION OPTIMIZATIONS
+  // 🚀 МАКСИМАЛЬНАЯ ПРОИЗВОДИТЕЛЬНОСТЬ
   build: {
     format: 'directory',
     inlineStylesheets: 'auto',
+    splitting: true,
+    assets: '_astro'
   },
   
-  // ⚡ VITE OPTIMIZATION 
+  // ⚡ VITE TURBO OPTIMIZATION 
   vite: {
     build: {
-      minify: 'esbuild',
-      cssMinify: true,
+      minify: 'terser',
+      cssMinify: 'lightningcss',
       rollupOptions: {
         output: {
-          manualChunks: undefined,
+          manualChunks: (id) => {
+            // Разделяем vendor код для кеширования
+            if (id.includes('node_modules')) {
+              return 'vendor';
+            }
+          },
+          assetFileNames: 'assets/[name].[hash][extname]',
+          chunkFileNames: 'chunks/[name].[hash].js'
         },
       },
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true
+        }
+      }
     },
     ssr: {
       noExternal: ['@astrojs/netlify']
@@ -33,4 +48,9 @@ export default defineConfig({
   
   // 🎯 SEO SITEMAP
   site: 'https://blondeplace.netlify.app',
+  
+  // ⚡ EXPERIMENTAL PERFORMANCE
+  experimental: {
+    assets: true
+  }
 });
