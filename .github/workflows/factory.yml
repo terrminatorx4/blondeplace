@@ -27,7 +27,7 @@ env:
 
 jobs:
   beauty-content-generation:
-    name: 🎨 Генерация Beauty Контента (BEAUTY ПОТОК #${{ matrix.thread }})
+    name: 🎨 BEAUTY ПОТОК #${{ matrix.thread }}
     runs-on: ubuntu-latest
     
     strategy:
@@ -70,7 +70,7 @@ jobs:
           MODEL_CHOICE: ${{ github.event.inputs.model_choice || 'gemini' }}
           API_KEY_CURRENT: ${{ steps.set_key.outputs.key }}
           BATCH_SIZE: ${{ github.event.inputs.batch_size_per_thread || 5 }}
-          TOTAL_THREADS: ${{ github.event.inputs.threads || 3 }}
+          TOTAL_THREADS: ${{ github.event.inputs.threads || 10 }}
           THREAD_ID: ${{ matrix.thread }}
         run: |
           git config --global user.name 'BlondePlace Beauty Bot'
@@ -90,82 +90,26 @@ jobs:
           
           MAX_RETRIES=5
           RETRY_DELAY=5
-          for ((i=1; i<=MAX_RETRIES; i++)); do
-            # Сначала добавляем файлы в staging
-            git add src/content/posts/*.md
+          
+          for attempt in $(seq 1 $MAX_RETRIES); do
+            echo "📝 BEAUTY ПОТОК #${{ matrix.thread }}: Попытка публикации #$attempt из $MAX_RETRIES..."
             
-            # Stash изменения для чистого pull
-            git stash push -m "Temporary stash for pull - Beauty Thread ${{ matrix.thread }}"
+            git add .
+            git commit -m "🎨 Beauty статьи: поток #${{ matrix.thread }} (${{ github.event.inputs.batch_size_per_thread || 5 }} шт.) [${{ github.event.inputs.model_choice || 'gemini' }}]"
             
-            # Делаем pull
-            git pull origin main
-            
-            # Возвращаем изменения
-            git stash pop || echo "Stash already applied"
-            
-            # Добавляем файлы снова (на случай конфликтов)
-            git add src/content/posts/*.md
-            
-            # Коммитим
-            git commit -m "💄 Авто-публикация beauty статей: поток №${{ matrix.thread }} | BlondePlace" || echo "Nothing to commit"
-            
-            if git push; then
-              echo "✅ Публикация beauty контента прошла успешно с попытки №$i."
+            if git push origin main; then
+              echo "✅ 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Статьи успешно опубликованы в GitHub!"
               break
             else
-              if [ "$i" -eq "$MAX_RETRIES" ]; then
-                echo "::error::Не удалось опубликовать beauty статьи после $MAX_RETRIES попыток."
-                exit 1
-              fi
-              echo "[!] Конфликт! Попытка №$i не удалась. Жду ${RETRY_DELAY}с и пробую снова..."
-              git reset --hard HEAD~1
+              echo "⚠️ BEAUTY ПОТОК #${{ matrix.thread }}: Конфликт при публикации. Обновляю и повторяю попытку..."
+              git pull --rebase origin main || git pull --no-rebase origin main
               sleep $RETRY_DELAY
+            fi
+            
+            if [ $attempt -eq $MAX_RETRIES ]; then
+              echo "❌ BEAUTY ПОТОК #${{ matrix.thread }}: Не удалось опубликовать после $MAX_RETRIES попыток"
+              exit 1
             fi
           done
           
-          commit_after=$(git rev-parse HEAD)
-          commit_before=$(git rev-parse HEAD~1)
-          
-          NEW_FILES=$(git diff --name-only $commit_before $commit_after -- 'src/content/posts/*.md' 2>/dev/null || echo "")
-          
-          if [[ -n "$NEW_FILES" ]]; then
-            echo "📢 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Подготовка уведомления для IndexNow..."
-            API_KEY="d1b055ab1eb146d892169bbb2c96550e"
-            HOST="blondeplace-blog.netlify.app"
-
-            URL_JSON_ARRAY=$(for file in $NEW_FILES; do slug=$(basename "$file" .md); echo "https://blondeplace-blog.netlify.app/blog/${slug}/"; done | jq -R . | jq -s .)
-
-            JSON_PAYLOAD=$(jq -n \
-                            --arg host "$HOST" \
-                            --arg key "$API_KEY" \
-                            --argjson urls "$URL_JSON_ARRAY" \
-                            '{host: $host, key: $key, urlList: $urls}')
-            
-            echo "--- Диагностика пакета для IndexNow (Beauty Поток №${{ matrix.thread }}) ---"
-            echo "$JSON_PAYLOAD"
-            echo "--- Конец диагностики ---"
-            
-            curl -X POST "https://yandex.com/indexnow" -H "Content-Type: application/json; charset=utf-8" -d "$JSON_PAYLOAD"
-            curl -X POST "https://www.bing.com/indexnow" -H "Content-Type: application/json; charset=utf-8" -d "$JSON_PAYLOAD"
-          fi
-          
-          echo -e "\n✅ 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Миссия успешно завершена."
-
-  notify-completion:
-    name: 📢 Уведомление о завершении
-    runs-on: ubuntu-latest
-    needs: beauty-content-generation
-    if: always()
-    
-    steps:
-      - name: 📊 Summary
-        run: |
-          echo "🎨 === BLONDEPLACE BEAUTY FACTORY ЗАВЕРШЕНА ==="
-          echo "💄 Модель: ${{ github.event.inputs.model_choice || 'gemini' }}"
-          echo "📝 Статей на поток: ${{ github.event.inputs.batch_size_per_thread || 5 }}"
-          echo "🧵 Потоков: ${{ github.event.inputs.threads || 3 }}"
-          echo "🎯 Общий статус: ${{ needs.beauty-content-generation.result }}"
-          echo ""
-          echo "🏪 Проект: BlondePlace Beauty Blog"
-          echo "🌐 Сайт: https://blondeplace-blog.netlify.app"
-          echo "💅 Салон: https://blondeplace.ru"
+          echo "🎉 BEAUTY ПОТОК #${{ matrix.thread }}: Beauty контент успешно создан и опубликован!"
