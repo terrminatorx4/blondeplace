@@ -1,6 +1,6 @@
 ---
-import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
@@ -9,132 +9,215 @@ export async function getStaticPaths() {
     props: post,
   }));
 }
+type Props = CollectionEntry<'posts'>;
 
 const post = Astro.props;
 const { Content } = await post.render();
 
-const ogImage = post.data.heroImage || 'https://blondeplace.netlify.app/og-image.jpg';
-const pageUrl = `https://blondeplace.netlify.app/blog/${post.slug}/`;
+const pageTitle = post.data.title;
+const pageDescription = post.data.description;
 ---
 
-<Layout title={post.data.title} description={post.data.description}>
-  <!-- KEYWORDS МЕТА-ТЕГ (КАК В BUTLER!) -->
-  <meta slot="head" name="keywords" content={post.data.keywords} />
-  <meta slot="head" name="author" content={post.data.author} />
-  <meta slot="head" name="robots" content="index, follow" />
-  <link slot="head" rel="canonical" href={pageUrl} />
-  
-  <!-- Google & Yandex Verification -->
-  <meta slot="head" name="google-site-verification" content="QmTdEF5xHLHXsL1FEcotg-xZTPfD14z9BxH6D64b0ds" />
-  <meta slot="head" name="yandex-verification" content="92b03968d7c06925" />
-  
-  <!-- OpenGraph (OVERRIDE DEFAULTS) -->
-  <meta slot="head" property="og:type" content="website" />
-  <meta slot="head" property="og:url" content={pageUrl} />
-  <meta slot="head" property="og:title" content={post.data.title} />
-  <meta slot="head" property="og:description" content={post.data.description} />
-  <meta slot="head" property="og:image" content={ogImage} />
-  <meta slot="head" property="og:site_name" content="BLONDE PLACE" />
-  
-  <!-- Twitter Card (OVERRIDE DEFAULTS) -->
-  <meta slot="head" property="twitter:card" content="summary_large_image" />
-  <meta slot="head" property="twitter:url" content={pageUrl} />
-  <meta slot="head" property="twitter:title" content={post.data.title} />
-  <meta slot="head" property="twitter:description" content={post.data.description} />
-  <meta slot="head" property="twitter:image" content={ogImage} />
-  
-  <!-- Structured Data -->
-  <script slot="head" type="application/ld+json" set:html={JSON.stringify(post.data.schema)} />
-
-  <article class="container">
-    <header class="article-header">
-      <h1 class="article-title">{post.data.title}</h1>
-      <p class="article-description">{post.data.description}</p>
-      <div class="article-meta">
-        <time datetime={post.data.pubDate.toISOString()}>
-          {new Date(post.data.pubDate).toLocaleDateString('ru-RU')}
-        </time>
-        <span>by {post.data.author}</span>
-      </div>
-    </header>
-
-    {post.data.heroImage && (
-      <div class="article-image">
-        <img src={post.data.heroImage} alt={post.data.title} />
-      </div>
-    )}
-
-    <div class="article-content">
-      <Content />
+<Layout title={pageTitle} description={pageDescription}>
+  <main class="blog-post">
+    <div class="container">
+      <!-- Hero Image Section -->
+      {post.data.heroImage && (
+        <div class="hero-image">
+          <img 
+            src={post.data.heroImage} 
+            alt={post.data.title}
+            width="1200"
+            height="630"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      )}
+      
+      <!-- Post Header -->
+      <header class="post-header">
+        <h1 class="post-title">{post.data.title}</h1>
+        <div class="post-meta">
+          <time datetime={post.data.pubDate.toISOString()}>
+            {post.data.pubDate.toLocaleDateString('ru-RU')}
+          </time>
+          <span class="author">by {post.data.author}</span>
+        </div>
+        <p class="post-description">{post.data.description}</p>
+      </header>
+      
+      <!-- Post Content -->
+      <article class="post-content">
+        <Content />
+      </article>
+      
+      <!-- CTA Section -->
+      <section class="post-cta">
+        <div class="cta-content">
+          <h2>Запишитесь в BLONDE PLACE уже сегодня!</h2>
+          <div class="cta-buttons">
+            <a href="tel:+79819608722" class="cta-btn primary">📞 Позвонить</a>
+            <a href="https://t.me/Blondeplace" class="cta-btn secondary">💬 Телеграм</a>
+            <a href="https://dikidi.ru/699327" class="cta-btn primary">🌐 Онлайн запись</a>
+          </div>
+        </div>
+      </section>
     </div>
-  </article>
+  </main>
 </Layout>
 
 <style>
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-.article-header {
-  margin-bottom: 3rem;
-  text-align: center;
-}
-
-.article-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #2d1b69;
-  margin-bottom: 1rem;
-  line-height: 1.2;
-}
-
-.article-description {
-  font-size: 1.2rem;
-  color: #666;
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
-}
-
-.article-meta {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  font-size: 0.9rem;
-  color: #888;
-}
-
-.article-image {
-  margin-bottom: 3rem;
-  text-align: center;
-}
-
-.article-image img {
-  max-width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-}
-
-.article-content {
-  line-height: 1.8;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-.article-content h2,
-.article-content h3 {
-  color: #2d1b69;
-  margin: 2rem 0 1rem 0;
-}
-
-.article-content p {
-  margin-bottom: 1.5rem;
-}
-
-@media (max-width: 768px) {
-  .article-title {
-    font-size: 2rem;
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
   }
-}
+  
+  .hero-image {
+    margin-bottom: 2rem;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  
+  .hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  .post-header {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+  
+  .post-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d1810;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  
+  .post-meta {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .post-description {
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .post-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .post-content h2 {
+    font-size: 1.8rem;
+    color: #2d1810;
+    margin: 2.5rem 0 1rem;
+    font-weight: 600;
+  }
+  
+  .post-content h3 {
+    font-size: 1.4rem;
+    color: #2d1810;
+    margin: 2rem 0 1rem;
+    font-weight: 600;
+  }
+  
+  .post-content p {
+    margin-bottom: 1.5rem;
+  }
+  
+  .post-content ul, .post-content ol {
+    margin: 1.5rem 0;
+    padding-left: 2rem;
+  }
+  
+  .post-content li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .post-cta {
+    background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-top: 3rem;
+    color: white;
+  }
+  
+  .post-cta h2 {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+  }
+  
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .cta-btn {
+    padding: 12px 24px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+  
+  .cta-btn.primary {
+    background: white;
+    color: #ff6b9d;
+  }
+  
+  .cta-btn.primary:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+  }
+  
+  .cta-btn.secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+  }
+  
+  .cta-btn.secondary:hover {
+    background: white;
+    color: #ff6b9d;
+  }
+  
+  @media (max-width: 768px) {
+    .post-title {
+      font-size: 2rem;
+    }
+    
+    .container {
+      padding: 1rem;
+    }
+    
+    .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .cta-btn {
+      width: 200px;
+    }
+  }
 </style>
