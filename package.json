@@ -6,10 +6,10 @@
   "main": "factory.js",
   "scripts": {
     "factory": "node factory.js",
-    "build-blog": "cd blondeplace-blog && npm install && npm run build",
-    "build": "npm run build-blog && node postbuild.js",
-    "dev": "cd blondeplace-blog && npm run dev",
-    "preview": "cd blondeplace-blog && npm run preview"
+    "build": "npm run build && node postbuild.js",
+    "dev": "astro dev",
+    "start": "astro dev",
+    "preview": "astro preview"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
