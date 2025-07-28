@@ -1,21 +1,43 @@
 {
-  "name": "BLONDE PLACE - Салон красоты",
+  "name": "BLONDE PLACE - Салон красоты в СПб",
   "short_name": "BLONDE PLACE",
-  "description": "Профессиональные услуги красоты в Санкт-Петербурге",
+  "description": "Профессиональные услуги красоты: окрашивание волос, маникюр, уход за кожей. Beauty коворкинг в центре Санкт-Петербурга.",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#ff6b9d",
   "background_color": "#ffffff",
-  "theme_color": "#d4af37",
+  "categories": [
+    "beauty",
+    "lifestyle",
+    "health"
+  ],
+  "scope": "/",
+  "lang": "ru",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
