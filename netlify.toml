@@ -6,3 +6,47 @@
   NODE_VERSION = "18"
   ASTRO_TELEMETRY_DISABLED = "1"
   NODE_ENV = "production"
+
+# 🔥 SEO OPTIMIZATION PLUGINS
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
+  
+  [plugins.inputs]
+    # Optimized for beauty blog
+    changeFreq = "daily"
+    priority = 0.8
+    prettyURLs = true
+    trailingSlash = false
+    
+    # Exclude admin/system pages
+    exclude = [
+      "/admin/**",
+      "/api/**", 
+      "**/*.json",
+      "**/*.xml"
+    ]
+
+[[plugins]]
+  package = "netlify-plugin-minify-html"
+  
+  [plugins.inputs]
+    # Optimized settings for performance
+    removeComments = true
+    collapseWhitespace = true
+    removeRedundantAttributes = true
+    minifyCSS = true
+    minifyJS = true
+
+# 🎯 LIGHTHOUSE QUALITY CONTROL
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+  
+  [plugins.inputs]
+    # Fail deploy if SEO is poor
+    fail_deploy_on_score_thresholds = "true"
+    
+  [plugins.inputs.thresholds]
+    performance = 0.85
+    seo = 0.95
+    accessibility = 0.90
+    best-practices = 0.85
