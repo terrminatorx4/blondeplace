@@ -1,647 +1,509 @@
 ---
 export interface Props {
-	title: string;
-	description?: string;
+  title: string;
+  description?: string;
 }
 
-const { title, description = "BlondePlace Beauty Studio - профессиональный салон красоты в Санкт-Петербурге" } = Astro.props;
+const { title, description } = Astro.props;
 ---
 
 <!DOCTYPE html>
 <html lang="ru">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		
-		<!-- Google Fonts -->
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-	</head>
-	<body>
-		<!-- Header -->
-		<header class="header">
-			<div class="container">
-				<div class="header-content">
-					<div class="logo">
-						<a href="/">
-							<span class="logo-text">BLONDE PLACE</span>
-							<span class="logo-tagline">салон красоты комфорт класса</span>
-						</a>
-					</div>
-					
-					<nav class="nav-menu">
-						<a href="/" class="nav-link">Главная</a>
-						<a href="/blog/" class="nav-link">Блог</a>
-						<a href="/services/" class="nav-link">Услуги</a>
-						<a href="/beauty-coworking/" class="nav-link">Beauty Coworking</a>
-						<a href="https://blondeplace.ru/#masters" target="_blank" class="nav-link">Наши мастера</a>
-						<a href="/about/" class="nav-link">О нас</a>
-						<a href="/contacts/" class="nav-link">Контакты</a>
-					</nav>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content={description || "BLONDE PLACE - салон красоты комфорт класса в Санкт-Петербурге. Профессиональное окрашивание волос, мелирование, сложное окрашивание."} />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>{title}</title>
+  
+  <!-- Google Fonts - exactly like blondeplace.ru -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- EXACT COPY OF blondeplace.ru HEADER -->
+  <header class="main-header">
+    <div class="header-container">
+      <!-- Logo - exactly like original -->
+      <div class="logo">
+        <div class="logo-text">BLONDEPLACE</div>
+      </div>
+      
+      <!-- Right buttons - exactly like original -->
+      <div class="header-buttons">
+        <button class="header-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/>
+            <path d="M12 6c-3.309 0-6 2.691-6 6s2.691 6 6 6 6-2.691 6-6-2.691-6-6-6zm0 10c-2.206 0-4-1.794-4-4s1.794-4 4-4 4 1.794 4 4-1.794 4-4 4z"/>
+          </svg>
+        </button>
+        <button class="header-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </button>
+        <button class="header-menu-btn">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
 
-					<div class="header-actions">
-						<a href="tel:+79819608722" class="phone-btn">
-							📞 +7 (981) 960-87-22
-						</a>
-						<button class="booking-btn">Записаться</button>
-					</div>
+  <main>
+    <slot />
+  </main>
 
-					<div class="mobile-menu-toggle">
-						<span></span>
-						<span></span>
-						<span></span>
-					</div>
-				</div>
-			</div>
-		</header>
+  <!-- Footer with navigation (since header has no menu) -->
+  <footer class="main-footer">
+    <div class="footer-container">
+      <div class="footer-sections">
+        <!-- Logo section -->
+        <div class="footer-section">
+          <div class="footer-logo">
+            <div class="footer-logo-text">BLONDE PLACE</div>
+            <div class="footer-tagline">салон красоты комфорт класса</div>
+          </div>
+        </div>
 
-		<!-- Main Content -->
-		<main class="main-content">
-			<slot />
-		</main>
+        <!-- Navigation -->
+        <div class="footer-section">
+          <h3>Главная</h3>
+          <ul>
+            <li><a href="/">о нас</a></li>
+            <li><a href="/services">наши услуги</a></li>
+            <li><a href="/blog">получите скидку</a></li>
+            <li><a href="/beauty-coworking">коворкинг</a></li>
+            <li><a href="https://blondeplace.ru/#masters" target="_blank">наши мастера</a></li>
+            <li><a href="/contacts">контакты</a></li>
+            <li><a href="/blog">новостная лента</a></li>
+          </ul>
+        </div>
 
-		<!-- Footer -->
-		<footer class="footer">
-			<div class="container">
-				<div class="footer-content">
-					<div class="footer-section">
-						<div class="footer-logo">
-							<span class="logo-text">BLONDE PLACE</span>
-							<span class="logo-tagline">салон красоты комфорт класса</span>
-						</div>
-						<p class="footer-description">
-							BLONDE PLACE - ЭТО ОАЗИС УЕДИНЕНИЯ И КОМФОРТА, ГДЕ КАЖДЫЙ КЛИЕНТ ОКРУЖЕН ВНИМАНИЕМ НАИВЫСШЕГО УРОВНЯ.
-						</p>
-					</div>
+        <!-- Services -->
+        <div class="footer-section">
+          <h3>Услуги</h3>
+          <ul>
+            <li><a href="/services">мелирование с растяжкой цвета</a></li>
+            <li><a href="/services">мелирование</a></li>
+            <li><a href="/services">сложное окрашивание+стрижка</a></li>
+            <li><a href="/services">контуринг</a></li>
+            <li><a href="/services">окрашивание корней</a></li>
+            <li><a href="/services">тотал блонд с нуля</a></li>
+            <li><a href="/services">шатуш</a></li>
+            <li><a href="/services">AirTouch ниже плеч</a></li>
+            <li><a href="/services">тонирование</a></li>
+            <li><a href="/services">тотал блонд (окрашенная база)</a></li>
+          </ul>
+        </div>
 
-					<div class="footer-section">
-						<h4>Услуги</h4>
-						<ul>
-							<li><a href="/services/">мелирование с растяжкой цвета</a></li>
-							<li><a href="/services/">сложное окрашивание+стрижка</a></li>
-							<li><a href="/services/">контуринг</a></li>
-							<li><a href="/services/">тотал блонд с нуля</a></li>
-							<li><a href="/services/">AirTouch ниже плеч</a></li>
-							<li><a href="/services/">шатуш</a></li>
-						</ul>
-					</div>
+        <!-- Consultation -->
+        <div class="footer-section">
+          <h3>Консультация</h3>
+          <ul>
+            <li><a href="tel:+79819608722">Ваш телефон</a></li>
+          </ul>
+          <div class="phone-input-wrapper">
+            <input type="tel" placeholder="+7 (999) 999-99-99" class="phone-input">
+            <button class="phone-submit">▶</button>
+          </div>
+        </div>
 
-					<div class="footer-section">
-						<h4>Консультация</h4>
-						<ul>
-							<li><a href="/contacts/">Онлайн запись</a></li>
-							<li><a href="/contacts/">Задать вопрос</a></li>
-							<li><a href="/beauty-coworking/">Beauty коворкинг</a></li>
-							<li><a href="https://blondeplace.ru/#masters" target="_blank">Наши мастера</a></li>
-						</ul>
-					</div>
+        <!-- Contacts -->
+        <div class="footer-section">
+          <h3>Контакты</h3>
+          <div class="contact-info">
+            <p><strong>+7 (981) 960-87-22</strong></p>
+            <p>г. Санкт-Петербург, Дегтярная, дом 9</p>
+            <p class="metro-info">
+              м. Площадь Восстания, 12 мин<br>
+              м. Александра Невского, 19 мин<br>  
+              м. Маяковского, 12 мин
+            </p>
+          </div>
+        </div>
+      </div>
 
-					<div class="footer-section">
-						<h4>Контакты</h4>
-						<div class="footer-contact">
-							<p><strong>📞 Телефон:</strong><br>
-							<a href="tel:+79819608722">+7 (981) 960-87-22</a></p>
-							
-							<p><strong>📍 Адрес:</strong><br>
-							г. Санкт-Петербург,<br>
-							Дегтярная, дом 9</p>
-							
-							<p><strong>🚇 Метро:</strong><br>
-							м. Площадь Восстания (12 мин)<br>
-							м. Александра Невского (19 мин)<br>
-							м. Маяковского (12 мин)</p>
-						</div>
-					</div>
-				</div>
+      <div class="footer-bottom">
+        <div class="footer-legal">
+          <p>ИП РАФАЕНКО ОА<br>ОГРН 313715413300153</p>
+        </div>
+        <div class="footer-copyright">
+          <p>© 2025 BLONDE PLACE. Все права защищены.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
 
-				<div class="footer-bottom">
-					<div class="footer-bottom-content">
-						<p>ИП РАФАЕНКО ОА ОГРН 313715413300153</p>
-						<p>&copy; 2025 BLONDE PLACE. Все права защищены.</p>
-					</div>
-				</div>
-			</div>
-		</footer>
-	</body>
+  <style>
+    /* EXACT COPY OF blondeplace.ru STYLING */
+    :root {
+      --primary-color: #d4a574;
+      --secondary-color: #e6c4a8;
+      --background-color: #faf9f7;
+      --text-color: #2a2a2a;
+      --light-text: #666;
+      --border-color: #e8e5e0;
+      --card-bg: #ffffff;
+      --gold-gradient: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    /* HEADER - EXACT COPY */
+    .main-header {
+      background: var(--background-color);
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--primary-color);
+      letter-spacing: 1px;
+    }
+
+    .header-buttons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-btn {
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: var(--gold-gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(212, 165, 116, 0.3);
+    }
+
+    .header-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
+    }
+
+    .header-menu-btn {
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: var(--gold-gradient);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(212, 165, 116, 0.3);
+    }
+
+    .header-menu-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
+    }
+
+    .header-menu-btn span {
+      width: 20px;
+      height: 2px;
+      background: white;
+      border-radius: 1px;
+    }
+
+    /* TYPOGRAPHY */
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      line-height: 1.3;
+    }
+
+    h3 {
+      font-size: 1.8rem;
+      line-height: 1.4;
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--light-text);
+    }
+
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: var(--secondary-color);
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--gold-gradient);
+      color: white;
+      box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(212, 165, 116, 0.4);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+
+    /* FOOTER */
+    .main-footer {
+      background: var(--card-bg);
+      padding: 60px 0 30px;
+      border-top: 1px solid var(--border-color);
+      margin-top: 80px;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .footer-sections {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-section h3 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      color: var(--text-color);
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section ul li {
+      margin-bottom: 12px;
+    }
+
+    .footer-section ul li a {
+      color: var(--light-text);
+      font-size: 0.95rem;
+    }
+
+    .footer-logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 8px;
+    }
+
+    .footer-tagline {
+      color: var(--light-text);
+      font-size: 0.9rem;
+    }
+
+    .contact-info p {
+      margin-bottom: 8px;
+      color: var(--light-text);
+    }
+
+    .contact-info strong {
+      color: var(--text-color);
+    }
+
+    .metro-info {
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .phone-input-wrapper {
+      display: flex;
+      margin-top: 12px;
+    }
+
+    .phone-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px 0 0 6px;
+      font-size: 0.9rem;
+    }
+
+    .phone-submit {
+      padding: 8px 12px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 0 6px 6px 0;
+      cursor: pointer;
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 30px;
+      border-top: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-legal p,
+    .footer-copyright p {
+      font-size: 0.85rem;
+      color: var(--light-text);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .header-container {
+        padding: 0 15px;
+      }
+
+      .logo-text {
+        font-size: 20px;
+      }
+
+      .header-buttons {
+        gap: 8px;
+      }
+
+      .header-btn,
+      .header-menu-btn {
+        width: 40px;
+        height: 40px;
+      }
+
+      .footer-sections {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      h2 {
+        font-size: 2rem;
+      }
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--background-color);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary-color);
+    }
+  </style>
+</body>
 </html>
-
-<style is:global>
-	/* CSS Reset & Base Styles */
-	* {
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-	}
-
-	html {
-		font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
-		scroll-behavior: smooth;
-	}
-
-	body {
-		line-height: 1.6;
-		color: #2a2a2a;
-		background: #faf9f7;
-		min-height: 100vh;
-		display: flex;
-		flex-direction: column;
-	}
-
-	/* Typography в стиле blondeplace.ru */
-	h1, h2, h3, h4, h5, h6 {
-		font-family: 'Montserrat', sans-serif;
-		font-weight: 600;
-		line-height: 1.3;
-		color: #2a2a2a;
-	}
-
-	h1 {
-		font-size: clamp(2rem, 4vw, 3.5rem);
-		margin-bottom: 1.5rem;
-		font-weight: 700;
-	}
-
-	h2 {
-		font-size: clamp(1.5rem, 3vw, 2.5rem);
-		margin-bottom: 1.25rem;
-	}
-
-	h3 {
-		font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-		margin-bottom: 1rem;
-	}
-
-	p {
-		font-size: 1rem;
-		line-height: 1.6;
-		margin-bottom: 1rem;
-		color: #555;
-	}
-
-	a {
-		color: #d4a574;
-		text-decoration: none;
-		transition: all 0.3s ease;
-	}
-
-	a:hover {
-		color: #b8956a;
-		text-decoration: underline;
-	}
-
-	.container {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 0 1.5rem;
-	}
-
-	/* Header в стиле blondeplace.ru */
-	.header {
-		background: rgba(250, 249, 247, 0.95);
-		backdrop-filter: blur(20px);
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: 1000;
-		border-bottom: 1px solid rgba(212, 165, 116, 0.1);
-		box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-	}
-
-	.header-content {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 1rem 0;
-	}
-
-	.logo {
-		z-index: 1001;
-	}
-
-	.logo a {
-		display: flex;
-		flex-direction: column;
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.logo-text {
-		font-family: 'Montserrat', sans-serif;
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: #2a2a2a;
-		letter-spacing: 0.5px;
-		text-transform: uppercase;
-	}
-
-	.logo-tagline {
-		font-family: 'Inter', sans-serif;
-		font-size: 0.7rem;
-		font-weight: 400;
-		color: #d4a574;
-		text-transform: lowercase;
-		margin-top: -2px;
-	}
-
-	.nav-menu {
-		display: flex;
-		align-items: center;
-		gap: 2rem;
-	}
-
-	.nav-link {
-		font-family: 'Montserrat', sans-serif;
-		font-size: 0.9rem;
-		font-weight: 500;
-		color: #2a2a2a;
-		text-decoration: none;
-		padding: 0.5rem 0;
-		position: relative;
-		transition: all 0.3s ease;
-	}
-
-	.nav-link:hover {
-		color: #d4a574;
-		text-decoration: none;
-	}
-
-	.header-actions {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	}
-
-	.phone-btn {
-		font-family: 'Montserrat', sans-serif;
-		font-size: 0.9rem;
-		color: #2a2a2a;
-		text-decoration: none;
-		font-weight: 500;
-	}
-
-	.phone-btn:hover {
-		color: #d4a574;
-		text-decoration: none;
-	}
-
-	.booking-btn {
-		background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
-		color: #2a2a2a;
-		padding: 0.6rem 1.5rem;
-		border: none;
-		border-radius: 25px;
-		font-family: 'Montserrat', sans-serif;
-		font-weight: 600;
-		font-size: 0.9rem;
-		cursor: pointer;
-		transition: all 0.3s ease;
-		box-shadow: 0 2px 10px rgba(245, 213, 184, 0.3);
-	}
-
-	.booking-btn:hover {
-		background: linear-gradient(135deg, #e6c4a8 0%, #d4a574 100%);
-		transform: translateY(-1px);
-		box-shadow: 0 4px 15px rgba(245, 213, 184, 0.4);
-	}
-
-	.mobile-menu-toggle {
-		display: none;
-		flex-direction: column;
-		gap: 4px;
-		cursor: pointer;
-		z-index: 1001;
-	}
-
-	.mobile-menu-toggle span {
-		width: 25px;
-		height: 2px;
-		background: #2a2a2a;
-		border-radius: 2px;
-		transition: all 0.3s ease;
-	}
-
-	/* Main Content */
-	.main-content {
-		flex: 1;
-		margin-top: 80px;
-		padding: 2rem 0;
-	}
-
-	/* Footer в стиле blondeplace.ru */
-	.footer {
-		background: #f8f6f4;
-		color: #2a2a2a;
-		border-top: 1px solid rgba(212, 165, 116, 0.1);
-		margin-top: auto;
-	}
-
-	.footer-content {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: 3rem;
-		padding: 4rem 0 2rem;
-	}
-
-	.footer-section h4 {
-		font-family: 'Montserrat', sans-serif;
-		font-size: 1.1rem;
-		color: #2a2a2a;
-		margin-bottom: 1.5rem;
-		font-weight: 600;
-	}
-
-	.footer-logo {
-		margin-bottom: 1.5rem;
-	}
-
-	.footer-logo .logo-text {
-		color: #2a2a2a;
-		font-size: 1.3rem;
-	}
-
-	.footer-logo .logo-tagline {
-		color: #d4a574;
-	}
-
-	.footer-description {
-		color: #666;
-		font-size: 0.9rem;
-		line-height: 1.5;
-		margin-bottom: 2rem;
-	}
-
-	.footer-section ul {
-		list-style: none;
-	}
-
-	.footer-section ul li {
-		margin-bottom: 0.75rem;
-	}
-
-	.footer-section ul li a {
-		color: #666;
-		font-size: 0.9rem;
-		transition: color 0.3s ease;
-	}
-
-	.footer-section ul li a:hover {
-		color: #d4a574;
-		text-decoration: none;
-	}
-
-	.footer-contact p {
-		margin-bottom: 1rem;
-		color: #666;
-		font-size: 0.9rem;
-	}
-
-	.footer-contact strong {
-		color: #2a2a2a;
-		font-weight: 600;
-	}
-
-	.footer-contact a {
-		color: #2a2a2a;
-		font-weight: 500;
-	}
-
-	.footer-bottom {
-		border-top: 1px solid rgba(212, 165, 116, 0.1);
-		padding: 2rem 0;
-		margin-top: 2rem;
-	}
-
-	.footer-bottom-content {
-		text-align: center;
-		color: #888;
-		font-size: 0.8rem;
-	}
-
-	.footer-bottom-content p {
-		margin-bottom: 0.5rem;
-		color: inherit;
-	}
-
-	/* Responsive Design */
-	@media (max-width: 768px) {
-		.nav-menu {
-			display: none;
-		}
-
-		.header-actions {
-			display: none;
-		}
-
-		.mobile-menu-toggle {
-			display: flex;
-		}
-
-		.header-content {
-			padding: 0.75rem 0;
-		}
-
-		.logo-text {
-			font-size: 1.2rem;
-		}
-
-		.main-content {
-			margin-top: 70px;
-			padding: 1rem 0;
-		}
-
-		.footer-content {
-			grid-template-columns: 1fr;
-			gap: 2rem;
-			padding: 3rem 0 1.5rem;
-		}
-
-		.container {
-			padding: 0 1rem;
-		}
-	}
-
-	/* Common Components в стиле blondeplace.ru */
-	.btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.8rem 2rem;
-		border-radius: 25px;
-		font-family: 'Montserrat', sans-serif;
-		font-weight: 600;
-		font-size: 0.9rem;
-		text-decoration: none;
-		transition: all 0.3s ease;
-		border: 2px solid transparent;
-		cursor: pointer;
-		gap: 0.5rem;
-	}
-
-	.btn-primary {
-		background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
-		color: #2a2a2a;
-		box-shadow: 0 3px 12px rgba(245, 213, 184, 0.3);
-	}
-
-	.btn-primary:hover {
-		background: linear-gradient(135deg, #e6c4a8 0%, #d4a574 100%);
-		transform: translateY(-2px);
-		box-shadow: 0 5px 18px rgba(245, 213, 184, 0.4);
-		color: #2a2a2a;
-		text-decoration: none;
-	}
-
-	.btn-secondary {
-		background: transparent;
-		color: #2a2a2a;
-		border-color: #e6c4a8;
-	}
-
-	.btn-secondary:hover {
-		background: #e6c4a8;
-		color: #2a2a2a;
-		text-decoration: none;
-	}
-
-	/* Page Sections */
-	.section {
-		padding: 3rem 0;
-	}
-
-	.section-hero {
-		padding: 4rem 0;
-		background: linear-gradient(135deg, rgba(250, 249, 247, 0.9) 0%, rgba(248, 246, 244, 0.9) 100%);
-	}
-
-	.section-title {
-		text-align: center;
-		margin-bottom: 2.5rem;
-		font-weight: 600;
-	}
-
-	.section-subtitle {
-		text-align: center;
-		font-size: 1.1rem;
-		color: #666;
-		margin-bottom: 2.5rem;
-		max-width: 600px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	/* Cards в стиле blondeplace.ru */
-	.card {
-		background: rgba(255, 255, 255, 0.8);
-		backdrop-filter: blur(10px);
-		border-radius: 15px;
-		padding: 2rem;
-		box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-		border: 1px solid rgba(245, 213, 184, 0.2);
-		transition: all 0.3s ease;
-	}
-
-	.card:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-	}
-
-	/* Grid Layouts */
-	.grid {
-		display: grid;
-		gap: 2rem;
-	}
-
-	.grid-2 {
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-	}
-
-	.grid-3 {
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-	}
-
-	.grid-4 {
-		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-	}
-
-	/* Text Alignment */
-	.text-center {
-		text-align: center;
-	}
-
-	.text-left {
-		text-align: left;
-	}
-
-	.text-right {
-		text-align: right;
-	}
-
-	/* Spacing */
-	.mb-1 { margin-bottom: 0.5rem; }
-	.mb-2 { margin-bottom: 1rem; }
-	.mb-3 { margin-bottom: 1.5rem; }
-	.mb-4 { margin-bottom: 2rem; }
-	.mb-5 { margin-bottom: 3rem; }
-
-	.mt-1 { margin-top: 0.5rem; }
-	.mt-2 { margin-top: 1rem; }
-	.mt-3 { margin-top: 1.5rem; }
-	.mt-4 { margin-top: 2rem; }
-	.mt-5 { margin-top: 3rem; }
-
-	/* Animations */
-	@keyframes fadeInUp {
-		from {
-			opacity: 0;
-			transform: translateY(20px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	.fade-in-up {
-		animation: fadeInUp 0.5s ease-out;
-	}
-
-	/* Loading states */
-	.loading {
-		opacity: 0.7;
-		pointer-events: none;
-	}
-
-	/* Focus states for accessibility */
-	.btn:focus,
-	.nav-link:focus,
-	input:focus,
-	textarea:focus,
-	select:focus {
-		outline: 2px solid #d4a574;
-		outline-offset: 2px;
-	}
-
-	/* Custom scrollbar в стиле blondeplace.ru */
-	::-webkit-scrollbar {
-		width: 6px;
-	}
-
-	::-webkit-scrollbar-track {
-		background: #f8f6f4;
-	}
-
-	::-webkit-scrollbar-thumb {
-		background: #e6c4a8;
-		border-radius: 3px;
-	}
-
-	::-webkit-scrollbar-thumb:hover {
-		background: #d4a574;
-	}
-</style>
