@@ -8,7 +8,7 @@ import { execa } from 'execa';
 // --- BLONDEPLACE CONFIGURATION ---
 const TARGET_URL_MAIN = "https://blondeplace.ru";
 const TOPICS_FILE = 'topics.txt';
-const POSTS_DIR = 'blondeplace-blog/src/content/posts';
+const POSTS_DIR = 'src/content/posts';
 const SITE_URL = "https://blondeplace.netlify.app";
 const BRAND_NAME = "BlondePlace";
 const BRAND_BLOG_NAME = `Блог ${BRAND_NAME}`;
@@ -243,7 +243,7 @@ async function main() {
         const fileContent = await fs.readFile(TOPICS_FILE, 'utf-8');
         const allTopics = fileContent.split(/\r?\n/).map(topic => topic.trim()).filter(Boolean);
 
-        const postsDir = path.join(process.cwd(), 'blondeplace-blog', 'src', 'content', 'posts');
+        const postsDir = path.join(process.cwd(), 'src', 'content', 'posts');
         await fs.mkdir(postsDir, { recursive: true });
         
         const existingFiles = await fs.readdir(postsDir);
