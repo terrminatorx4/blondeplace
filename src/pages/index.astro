@@ -8,8 +8,8 @@ const recentPosts = allPosts
   .sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf())
   .slice(0, 6);
 
-const pageTitle = "BlondePlace Beauty Studio | Профессиональный салон красоты в Санкт-Петербурге";
-const pageDescription = "BlondePlace Beauty Studio - ведущий салон красоты в Санкт-Петербурге. Специализируемся на профессиональном окрашивании волос и создании идеального блонда.";
+const pageTitle = "BLONDE PLACE - салон красоты комфорт класса в Санкт-Петербурге";
+const pageDescription = "BLONDE PLACE - ЭТО ОАЗИС УЕДИНЕНИЯ И КОМФОРТА, ГДЕ КАЖДЫЙ КЛИЕНТ ОКРУЖЕН ВНИМАНИЕМ НАИВЫСШЕГО УРОВНЯ. Открытый клуб для блондинок и ценителей блонда.";
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
@@ -18,183 +18,201 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
     <section class="hero-section section-hero">
       <div class="hero-content">
         <div class="hero-text">
-          <h1 class="hero-title fade-in-up">
-            Идеальный блонд<br>
-            <span class="highlight">начинается здесь</span>
+          <h1 class="hero-title">
+            BLONDE PLACE<br>
+            <span class="highlight">салон красоты комфорт класса</span>
           </h1>
           <p class="hero-description">
-            Профессиональный салон красоты в Санкт-Петербурге. 
-            Мы специализируемся на создании идеального блонда и сложном окрашивании волос, 
-            используя только премиальные продукты и современные техники.
+            BLONDE PLACE - ЭТО ОАЗИС УЕДИНЕНИЯ И КОМФОРТА, ГДЕ КАЖДЫЙ  
+            КЛИЕНТ ОКРУЖЕН ВНИМАНИЕМ НАИВЫСШЕГО УРОВНЯ.
           </p>
-          <div class="hero-stats">
-            <div class="stat-item">
-              <div class="stat-number">5+</div>
-              <div class="stat-label">лет опыта</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number">1000+</div>
-              <div class="stat-label">довольных клиентов</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number">10+</div>
-              <div class="stat-label">услуг</div>
-            </div>
-          </div>
+          <p class="hero-subtitle">
+            BLONDE PLACE - открытый клуб для блондинок и ценителей блонда!<br>
+            Философия BLONDE PLACE - качественный, дорогой и ухоженный блонд
+          </p>
           <div class="hero-cta">
-            <a href="tel:+79819608722" class="btn btn-primary">
-              📞 Записаться сейчас
-            </a>
-            <a href="/services/" class="btn btn-secondary">
-              Услуги салона
+            <button class="btn btn-primary">
+              ОСТАВЬТЕ ЗАЯВКУ НА КОНСУЛЬТАЦИЮ И ПОЛУЧИТЕ СКИДКУ 10%
+            </button>
+            <a href="tel:+79819608722" class="btn btn-secondary">
+              📞 Записаться
             </a>
           </div>
         </div>
         <div class="hero-visual">
-          <div class="hero-badge">
-            <div class="badge-icon">💫</div>
-            <div class="badge-text">
-              <strong>Премиум салон</strong>
-              <span>Эксперты по блонду</span>
-            </div>
-          </div>
           <div class="hero-decoration">
-            <div class="deco-circle deco-1"></div>
-            <div class="deco-circle deco-2"></div>
-            <div class="deco-circle deco-3"></div>
+            <!-- Минималистичные декоративные элементы -->
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Services Preview Section -->
-    <section class="services-preview section">
-      <h2 class="section-title">Наши основные услуги</h2>
-      <p class="section-subtitle">
-        Мы специализируемся на профессиональном окрашивании волос и создании идеального блонда
-      </p>
+    <!-- Services Section -->
+    <section class="services-section section">
+      <h2 class="section-title">Наши услуги:</h2>
       <div class="services-grid grid grid-3">
         <div class="service-card card">
-          <div class="service-icon">🎨</div>
-          <h3>Мелирование с растяжкой цвета</h3>
-          <p>Создание плавного перехода цвета с эффектом естественного выгорания</p>
-          <div class="service-price">от 4 500 ₽</div>
+          <h3>мелирование с растяжкой цвета</h3>
         </div>
         <div class="service-card card">
-          <div class="service-icon">✨</div>
-          <h3>Сложное окрашивание</h3>
-          <p>Многоцветное окрашивание с профессиональной стрижкой</p>
-          <div class="service-price">от 8 500 ₽</div>
+          <h3>мелирование</h3>
         </div>
         <div class="service-card card">
-          <div class="service-icon">💎</div>
-          <h3>Тотал блонд</h3>
-          <p>Полное осветление до платинового блонда с нуля</p>
-          <div class="service-price">от 12 000 ₽</div>
+          <h3>сложное окрашивание+стрижка</h3>
         </div>
         <div class="service-card card">
-          <div class="service-icon">🌟</div>
-          <h3>AirTouch</h3>
-          <p>Бережная техника осветления для длинных волос</p>
-          <div class="service-price">от 9 500 ₽</div>
+          <h3>контуринг</h3>
         </div>
         <div class="service-card card">
-          <div class="service-icon">🎯</div>
-          <h3>Контуринг</h3>
-          <p>Техника окрашивания для создания объема и коррекции формы лица</p>
-          <div class="service-price">от 6 000 ₽</div>
+          <h3>окрашивание корней</h3>
         </div>
         <div class="service-card card">
-          <div class="service-icon">🔥</div>
-          <h3>Шатуш</h3>
-          <p>Эффект выгоревших на солнце волос с плавными переходами</p>
-          <div class="service-price">от 5 500 ₽</div>
+          <h3>тотал блонд с нуля</h3>
+        </div>
+        <div class="service-card card">
+          <h3>шатуш</h3>
+        </div>
+        <div class="service-card card">
+          <h3>AirTouch ниже плеч</h3>
+        </div>
+        <div class="service-card card">
+          <h3>тонирование</h3>
+        </div>
+        <div class="service-card card">
+          <h3>тотал блонд (окрашенная база)</h3>
         </div>
       </div>
       <div class="services-cta text-center mt-4">
         <a href="/services/" class="btn btn-primary">Все услуги</a>
+        <a href="/contacts/" class="btn btn-secondary">Онлайн запись</a>
       </div>
     </section>
 
     <!-- Why Choose Us Section -->
-    <section class="why-us-section section">
-      <h2 class="section-title">Почему выбирают BlondePlace?</h2>
-      <div class="features-grid grid grid-4">
+    <section class="why-section section">
+      <h2 class="section-title">Почему именно "BLONDE PLACE?"</h2>
+      <div class="features-grid grid grid-3">
         <div class="feature-card card">
-          <div class="feature-icon">👩‍🎨</div>
-          <h3>Экспертные мастера</h3>
-          <p>Профессиональные колористы с многолетним опытом и постоянным повышением квалификации</p>
+          <h3>БРЕНДОВАЯ КОСМЕТИКА</h3>
+          <p>В BLONDE PLACE выполняем работу на профессиональной косметике Estel. Гарантируем Вам уединение, комфорт и внимание самого наивысшего уровня</p>
         </div>
         <div class="feature-card card">
-          <div class="feature-icon">💎</div>
-          <h3>Премиум продукты</h3>
-          <p>Используем только лучшие продукты для окрашивания и ухода за волосами</p>
+          <h3>УДОБНОЕ РАСПОЛОЖЕНИЕ</h3>
+          <p>Салон красоты BLONDE PLACE располагается в самом центре Санкт-Петербурга</p>
         </div>
         <div class="feature-card card">
-          <div class="feature-icon">🎯</div>
-          <h3>Индивидуальный подход</h3>
-          <p>Каждый клиент получает персональную консультацию и уникальное решение</p>
+          <h3>КОНЦЕПТУАЛЬНЫЙ ПОДХОД</h3>
+          <p>1. Не окрашиваем волосы тёмных оттенков<br>
+          2. Если вам нужно первоначальное лечение волос, а затем окрашивание, не рекомендуем записываться сразу на окрашивание волос<br>
+          3. 18+<br>
+          4. Мы ценим доброжелательный настрой и приятную атмосферу, и также хотим взаимности<br>
+          5. Запись осуществляется без предоплаты</p>
         </div>
-        <div class="feature-card card">
-          <div class="feature-icon">🏆</div>
-          <h3>Гарантия качества</h3>
-          <p>Мы гарантируем отличный результат и предоставляем рекомендации по уходу</p>
+      </div>
+    </section>
+
+    <!-- Beauty Coworking Section -->
+    <section class="coworking-section section">
+      <div class="coworking-content grid grid-2">
+        <div class="coworking-info">
+          <h2>Beauty coworking</h2>
+          <p>
+            Бьюти-коворкинг Blonde Place в Санкт-Петербурге представляет собой современное решение для специалистов beauty-индустрии. Формат coworking позволяет как новичкам, так и опытным мастерам создать комфортное рабочее пространство без больших затрат.
+          </p>
+          <p>
+            Новички могут быстро начать зарабатывать, используя уже предоставленное оборудование и накапливая опыт и портфолио. Опытные мастера могут работать более независимо, избегая неудобств домашнего офиса и высоких комиссий салонов, что дает возможность устанавливать собственные цены.
+          </p>
+          <a href="/beauty-coworking/" class="btn btn-primary">Выбрать место</a>
+        </div>
+        <div class="coworking-rates">
+          <h3>Наши тарифы</h3>
+          <div class="rate-card card">
+            <div class="rate-price">500₽</div>
+            <div class="rate-description">1 день (до 9 часов работы)<br>* ТЕСТОВЫЙ ДЕНЬ</div>
+          </div>
+          <div class="rate-card card">
+            <div class="rate-price">1200₽</div>
+            <div class="rate-description">1 день (до 9 часов работы)<br>* ВКЛ УБОРКУ И РАСХОДНЫЕ МАТЕРИАЛЫ</div>
+          </div>
+          <div class="rate-card card">
+            <div class="rate-price">15.000₽</div>
+            <div class="rate-description">1 месяц (до 30 рабочих смен)<br>* ВКЛ УБОРКУ И ЛОКЕР ДЛЯ ХРАНЕНИЯ</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Masters Section -->
+    <section class="masters-section section">
+      <h2 class="section-title">Наши мастера:</h2>
+      <div class="masters-grid grid grid-4">
+        <div class="master-card card">
+          <h3>Колорист - тонирование, мелирование</h3>
+          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
+        </div>
+        <div class="master-card card">
+          <h3>Мастер по кератину</h3>
+          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
+        </div>
+        <div class="master-card card">
+          <h3>Мастер по цветным окрашиваниям</h3>
+          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
+        </div>
+        <div class="master-card card">
+          <h3>Колорист блонд, однотонные, тонирование</h3>
+          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
+        </div>
+        <div class="master-card card">
+          <h3>Бровист - лэшмейкер</h3>
+          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
+        </div>
+        <div class="master-card card">
+          <h3>Команда BLONDE PLACE</h3>
+          <a href="https://blondeplace.ru/#masters" target="_blank" class="master-link">Портфолио</a>
         </div>
       </div>
     </section>
 
     <!-- Location & Contact Section -->
-    <section class="location-section section">
-      <div class="location-content grid grid-2">
-        <div class="location-info">
-          <h2>Удобное расположение в центре</h2>
-          <p>
-            Наш салон находится в самом центре Санкт-Петербурга, рядом с тремя станциями метро. 
-            Легко добраться из любой точки города.
-          </p>
-          <div class="contact-info">
-            <div class="contact-item">
-              <strong>📍 Адрес:</strong>
-              <span>г. Санкт-Петербург, Дегтярная, дом 9</span>
-            </div>
-            <div class="contact-item">
-              <strong>📞 Телефон:</strong>
-              <a href="tel:+79819608722">+7 (981) 960-87-22</a>
-            </div>
-            <div class="contact-item">
-              <strong>⏰ Режим работы:</strong>
-              <span>Пн-Вс: 10:00 - 21:00</span>
-            </div>
-            <div class="contact-item">
-              <strong>🚇 Метро:</strong>
-              <span>Площадь Восстания (12 мин), Александра Невского (19 мин), Маяковского (12 мин)</span>
-            </div>
+    <section class="contacts-section section">
+      <h2 class="section-title">Наши контакты</h2>
+      <div class="contact-content grid grid-2">
+        <div class="contact-info">
+          <div class="contact-item">
+            <strong>📞 Телефон:</strong>
+            <a href="tel:+79819608722">+7 (981) 960-87-22</a>
+          </div>
+          <div class="contact-item">
+            <strong>📍 Адрес:</strong>
+            <span>г. Санкт-Петербург, Дегтярная, дом 9</span>
+          </div>
+          <div class="contact-item">
+            <strong>🚇 Метро:</strong>
+            <span>
+              м. Площадь Восстания, 12 мин<br>
+              м. Александра Невского, 19 мин<br>
+              м. Маяковского, 12 мин
+            </span>
           </div>
         </div>
-        <div class="location-visual">
-          <div class="map-placeholder">
-            <div class="map-icon">🗺️</div>
-            <h3>Мы на карте</h3>
-            <p>г. Санкт-Петербург<br>Дегтярная, дом 9</p>
-            <div class="metro-badges">
-              <span class="metro-badge">🚇 Площадь Восстания</span>
-              <span class="metro-badge">🚇 Александра Невского</span>
-              <span class="metro-badge">🚇 Маяковского</span>
-            </div>
+        <div class="reviews-section">
+          <div class="rating-block">
+            <div class="rating-stars">★★★★★</div>
+            <div class="rating-score">4,8</div>
+            <div class="rating-text">218 отзывов · 337 оценок</div>
           </div>
+          <a href="https://yandex.ru/maps/" target="_blank" class="btn btn-secondary">Яндекс карты</a>
+          <button class="btn btn-primary">Оставить отзыв</button>
         </div>
       </div>
     </section>
 
-    <!-- Recent Posts Section -->
+    <!-- Blog Posts Section -->
     {recentPosts.length > 0 && (
       <section class="recent-posts-section section">
-        <div class="section-header">
-          <h2 class="section-title">Блог о красоте</h2>
-          <a href="/blog/" class="view-all-link">Все статьи →</a>
-        </div>
+        <h2 class="section-title">Новостная лента:</h2>
         <p class="section-subtitle">
-          Экспертные советы по уходу за волосами и beauty-процедурам от наших мастеров
+          Фото работ, видео-ролики с укладками, секреты по уходу и много полезной, интересной информации в нашем блоге.
         </p>
         <div class="posts-grid grid grid-3">
           {recentPosts.map((post) => (
@@ -204,22 +222,11 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
                   <img src={post.data.heroImage} alt={post.data.title} loading="lazy" />
                 ) : (
                   <div class="post-placeholder">
-                    <div class="placeholder-icon">📝</div>
-                    <span class="post-category">{post.data.category}</span>
+                    <div class="placeholder-text">📝</div>
                   </div>
                 )}
               </div>
               <div class="post-content">
-                <div class="post-meta">
-                  <span class="post-date">
-                    {new Date(post.data.pubDate).toLocaleDateString('ru-RU', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </span>
-                  <span class="post-category-tag">{post.data.category}</span>
-                </div>
                 <h3 class="post-title">
                   <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
                 </h3>
@@ -231,101 +238,78 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
             </article>
           ))}
         </div>
+        <div class="blog-cta text-center mt-4">
+          <a href="/blog/" class="btn btn-primary">Переходите, изучайте, вдохновляйтесь вместе с нами!</a>
+        </div>
       </section>
     )}
 
-    <!-- CTA Section -->
+    <!-- Final CTA Section -->
     <section class="final-cta-section">
       <div class="cta-content">
-        <h2>Готовы к преображению?</h2>
+        <h2>Получите скидку 10% на первое посещение салона BLONDE PLACE</h2>
         <p>
-          Запишитесь на консультацию к нашим мастерам и получите персональные рекомендации. 
-          Мы создадим идеальный образ, который подчеркнет вашу индивидуальность.
+          Вы можете получить скидку 10% на первый визит в наш салон.
+          Скидка действует на все услуги салона.
+          Заполните форму ниже и мы свяжемся с Вами в течение 20 минут.
         </p>
         <div class="cta-buttons">
-          <a href="tel:+79819608722" class="btn btn-primary btn-large">
-            📞 Записаться на консультацию
+          <button class="btn btn-primary btn-large">
+            Оставить заявку
+          </button>
+          <a href="tel:+79819608722" class="btn btn-secondary">
+            📞 Позвонить
           </a>
-          <a href="/contacts/" class="btn btn-secondary">
-            Все контакты
-          </a>
-        </div>
-        <div class="cta-features">
-          <div class="cta-feature">
-            <span class="cta-feature-icon">✅</span>
-            <span>Бесплатная консультация</span>
-          </div>
-          <div class="cta-feature">
-            <span class="cta-feature-icon">✅</span>
-            <span>Индивидуальный подход</span>
-          </div>
-          <div class="cta-feature">
-            <span class="cta-feature-icon">✅</span>
-            <span>Гарантия качества</span>
-          </div>
         </div>
       </div>
     </section>
   </div>
 
   <style>
-    /* Hero Section */
+    /* Hero Section в стиле blondeplace.ru */
     .hero-section {
-      background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(240, 193, 75, 0.05) 100%);
-      border-radius: 30px;
-      margin-bottom: 5rem;
+      background: linear-gradient(135deg, rgba(248, 246, 244, 0.95) 0%, rgba(250, 249, 247, 0.95) 100%);
+      border-radius: 20px;
+      margin-bottom: 4rem;
     }
 
     .hero-content {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 4rem;
+      gap: 3rem;
       align-items: center;
-      padding: 4rem;
+      padding: 3rem;
     }
 
     .hero-title {
-      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-size: clamp(2rem, 4vw, 3.5rem);
       margin-bottom: 2rem;
-      line-height: 1.1;
+      line-height: 1.2;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #2a2a2a;
     }
 
     .highlight {
-      background: linear-gradient(135deg, #d4af37, #f0c14b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #d4a574;
+      font-weight: 600;
+      text-transform: lowercase;
+      font-size: 0.8em;
     }
 
     .hero-description {
-      font-size: 1.2rem;
-      color: #6b5b4d;
+      font-size: 1.1rem;
+      color: #2a2a2a;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: #666;
       margin-bottom: 2rem;
-      line-height: 1.7;
-    }
-
-    .hero-stats {
-      display: flex;
-      gap: 2rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .stat-item {
-      text-align: center;
-    }
-
-    .stat-number {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      font-weight: 700;
-      color: #d4af37;
-      line-height: 1;
-    }
-
-    .stat-label {
-      font-size: 0.9rem;
-      color: #8b7355;
-      margin-top: 0.25rem;
+      line-height: 1.6;
     }
 
     .hero-cta {
@@ -336,232 +320,185 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
 
     .hero-visual {
       position: relative;
+      height: 300px;
+      background: linear-gradient(135deg, rgba(245, 213, 184, 0.3) 0%, rgba(230, 196, 168, 0.3) 100%);
+      border-radius: 15px;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 400px;
     }
 
-    .hero-badge {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(20px);
-      padding: 2rem;
-      border-radius: 25px;
-      text-align: center;
-      box-shadow: 0 10px 40px rgba(212, 175, 55, 0.2);
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      z-index: 2;
+    /* Services Section */
+    .services-section {
+      margin-bottom: 4rem;
     }
 
-    .badge-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-
-    .badge-text strong {
-      display: block;
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      color: #2c1810;
-      margin-bottom: 0.5rem;
-    }
-
-    .badge-text span {
-      color: #d4af37;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .hero-decoration {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      overflow: hidden;
-      border-radius: 20px;
-    }
-
-    .deco-circle {
-      position: absolute;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(240, 193, 75, 0.1));
-    }
-
-    .deco-1 {
-      width: 150px;
-      height: 150px;
-      top: 20px;
-      right: 20px;
-    }
-
-    .deco-2 {
-      width: 100px;
-      height: 100px;
-      bottom: 30px;
-      left: 30px;
-    }
-
-    .deco-3 {
-      width: 80px;
-      height: 80px;
-      top: 50%;
-      left: 20px;
-    }
-
-    /* Service Cards */
     .service-card {
       text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .service-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-
-    .service-card h3 {
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
-    }
-
-    .service-card p {
-      color: #6b5b4d;
-      font-size: 0.95rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .service-price {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: #d4af37;
-    }
-
-    /* Feature Cards */
-    .feature-card {
-      text-align: center;
-    }
-
-    .feature-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .feature-card h3 {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-    }
-
-    .feature-card p {
-      color: #6b5b4d;
-      font-size: 0.95rem;
-    }
-
-    /* Location Section */
-    .location-section {
-      background: rgba(255, 255, 255, 0.5);
-      border-radius: 30px;
-      padding: 4rem 2rem;
-    }
-
-    .location-info h2 {
-      margin-bottom: 1.5rem;
-    }
-
-    .location-info p {
-      font-size: 1.1rem;
-      margin-bottom: 2rem;
-    }
-
-    .contact-info {
-      display: grid;
-      gap: 1rem;
-    }
-
-    .contact-item {
+      padding: 1.5rem;
+      min-height: 120px;
       display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .contact-item strong {
-      color: #d4af37;
-      font-weight: 600;
-    }
-
-    .contact-item a {
-      color: #2c1810;
-      font-weight: 500;
-    }
-
-    .map-placeholder {
-      background: linear-gradient(135deg, #f5f1eb, #e8ddd4);
-      border-radius: 20px;
-      padding: 3rem 2rem;
-      text-align: center;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
+      align-items: center;
       justify-content: center;
     }
 
-    .map-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-    }
-
-    .map-placeholder h3 {
-      margin-bottom: 1rem;
-    }
-
-    .map-placeholder p {
-      color: #6b5b4d;
-      margin-bottom: 2rem;
-    }
-
-    .metro-badges {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .metro-badge {
-      background: rgba(212, 175, 55, 0.1);
-      color: #2c1810;
-      padding: 0.5rem 1rem;
-      border-radius: 15px;
-      font-size: 0.9rem;
+    .service-card h3 {
+      font-size: 1rem;
       font-weight: 500;
+      color: #2a2a2a;
+      text-transform: lowercase;
+      line-height: 1.3;
     }
 
-    /* Posts Section */
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
+    /* Features Section */
+    .feature-card {
+      padding: 2rem;
+      text-align: left;
+    }
+
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2a2a2a;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .feature-card p {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* Coworking Section */
+    .coworking-section {
+      background: rgba(248, 246, 244, 0.5);
+      border-radius: 20px;
+      padding: 3rem 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .coworking-info h2 {
+      margin-bottom: 1.5rem;
+      color: #2a2a2a;
+    }
+
+    .coworking-info p {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .coworking-rates h3 {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .rate-card {
+      text-align: center;
+      padding: 1.5rem;
       margin-bottom: 1rem;
     }
 
-    .view-all-link {
-      color: #d4af37;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 1.1rem;
+    .rate-price {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #d4a574;
+      margin-bottom: 1rem;
     }
 
-    .view-all-link:hover {
+    .rate-description {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    /* Masters Section */
+    .master-card {
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .master-card h3 {
+      font-size: 0.95rem;
+      color: #2a2a2a;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+
+    .master-link {
+      color: #d4a574;
+      text-decoration: underline;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .master-link:hover {
+      color: #b8956a;
+    }
+
+    /* Contacts Section */
+    .contact-item {
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-item strong {
+      display: block;
+      color: #2a2a2a;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-item a {
+      color: #d4a574;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .contact-item a:hover {
       text-decoration: underline;
     }
 
+    .contact-item span {
+      color: #666;
+    }
+
+    .reviews-section {
+      text-align: center;
+    }
+
+    .rating-block {
+      margin-bottom: 2rem;
+    }
+
+    .rating-stars {
+      font-size: 1.5rem;
+      color: #ffd700;
+      margin-bottom: 0.5rem;
+    }
+
+    .rating-score {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2a2a2a;
+      margin-bottom: 0.5rem;
+    }
+
+    .rating-text {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /* Posts Section */
     .post-card {
       overflow: hidden;
     }
 
     .post-image {
-      height: 200px;
+      height: 150px;
       overflow: hidden;
+      margin-bottom: 1rem;
     }
 
     .post-image img {
@@ -572,72 +509,47 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
     }
 
     .post-card:hover .post-image img {
-      transform: scale(1.05);
+      transform: scale(1.02);
     }
 
     .post-placeholder {
       height: 100%;
-      background: linear-gradient(135deg, #d4af37, #f0c14b);
+      background: linear-gradient(135deg, #f5d5b8, #e6c4a8);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       color: white;
+      border-radius: 10px;
     }
 
-    .placeholder-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-
-    .post-content {
-      padding: 1.5rem;
-    }
-
-    .post-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .post-date {
-      color: #8b7355;
-    }
-
-    .post-category-tag {
-      background: #d4af37;
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 500;
+    .placeholder-text {
+      font-size: 2rem;
     }
 
     .post-title a {
-      color: #2c1810;
+      color: #2a2a2a;
       text-decoration: none;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: 600;
       line-height: 1.3;
     }
 
     .post-title a:hover {
-      color: #d4af37;
+      color: #d4a574;
     }
 
     .post-excerpt {
-      color: #6b5b4d;
-      font-size: 0.95rem;
+      color: #666;
+      font-size: 0.9rem;
       margin-bottom: 1rem;
+      line-height: 1.5;
     }
 
     .read-more {
-      color: #d4af37;
+      color: #d4a574;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 0.95rem;
+      font-weight: 500;
+      font-size: 0.9rem;
     }
 
     .read-more:hover {
@@ -646,24 +558,24 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
 
     /* Final CTA Section */
     .final-cta-section {
-      background: linear-gradient(135deg, #2c1810, #1a0e08);
-      color: #f5f1eb;
-      padding: 5rem 3rem;
-      border-radius: 30px;
+      background: linear-gradient(135deg, rgba(245, 213, 184, 0.2) 0%, rgba(230, 196, 168, 0.2) 100%);
+      padding: 4rem 3rem;
+      border-radius: 20px;
       text-align: center;
-      margin-top: 5rem;
+      margin-top: 4rem;
     }
 
     .final-cta-section h2 {
-      color: #f5f1eb;
-      font-size: 2.5rem;
+      color: #2a2a2a;
+      font-size: 2rem;
       margin-bottom: 1.5rem;
+      font-weight: 600;
     }
 
     .final-cta-section p {
-      font-size: 1.2rem;
-      color: #c4b5a6;
-      margin-bottom: 2.5rem;
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 2rem;
       max-width: 600px;
       margin-left: auto;
       margin-right: auto;
@@ -674,33 +586,11 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
       gap: 1rem;
       justify-content: center;
       flex-wrap: wrap;
-      margin-bottom: 2rem;
     }
 
     .btn-large {
-      padding: 1.2rem 2.5rem;
-      font-size: 1.1rem;
-    }
-
-    .cta-features {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 2rem;
-    }
-
-    .cta-feature {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #c4b5a6;
-      font-size: 0.95rem;
-    }
-
-    .cta-feature-icon {
-      color: #d4af37;
-      font-size: 1.1rem;
+      padding: 1rem 2.5rem;
+      font-size: 1rem;
     }
 
     /* Responsive Design */
@@ -711,31 +601,24 @@ const pageDescription = "BlondePlace Beauty Studio - ведущий салон �
         text-align: center;
       }
 
-      .hero-stats {
-        justify-content: center;
-      }
-
       .hero-visual {
-        height: 300px;
+        height: 200px;
       }
 
-      .location-content {
+      .coworking-content {
         grid-template-columns: 1fr;
       }
 
-      .section-header {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-      }
-
-      .cta-features {
-        flex-direction: column;
-        align-items: center;
+      .contact-content {
+        grid-template-columns: 1fr;
       }
 
       .final-cta-section {
         padding: 3rem 2rem;
+      }
+
+      .final-cta-section h2 {
+        font-size: 1.5rem;
       }
     }
   </style>
