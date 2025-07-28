@@ -6,24 +6,37 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href={Astro.url} />
     
-    <!-- FAVICON -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <!-- 📱 PWA MANIFEST -->
+    <link rel="manifest" href="/site.webmanifest" />
     
-    <!-- PWA THEME COLOR -->
+    <!-- 🍎 APPLE PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="BLONDE PLACE" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- 🎨 PWA THEME -->
     <meta name="theme-color" content="#ff6b9d" />
+    <meta name="msapplication-TileColor" content="#ff6b9d" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
     
-    <!-- Google & Yandex Verification -->
+    <!-- 🔗 FAVICON -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    
+    <!-- 📊 Google & Yandex -->
     <meta name="google-site-verification" content="QmTdEF5xHLHXsL1FEcotg-xZTPfD14z9BxH6D64b0ds" />
     <meta name="yandex-verification" content="92b03968d7c06925" />
     
-    <!-- OpenGraph -->
+    <!-- 🌐 OpenGraph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:title" content={title} />
@@ -31,57 +44,53 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
     <meta property="og:image" content="https://blondeplace.netlify.app/og-image.jpg" />
     <meta property="og:site_name" content="BLONDE PLACE" />
     
-    <!-- Twitter Card -->
+    <!-- 🐦 Twitter Card -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={Astro.url} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content="https://blondeplace.netlify.app/og-image.jpg" />
     
-    <!-- PERFECT ACCESSIBILITY - ВЫСОКИЙ КОНТРАСТ -->
+    <!-- 🎯 PERFECT ACCESSIBILITY -->
     <style>
-      /* 🎯 PERFECT CONTRAST RATIOS - ACCESSIBILITY 100% */
       .Consultation_consultation__highlight__esun9,
       .Services_services__highlight__lBCUU {
-        color: #000000 !important;          /* Черный текст */
-        background-color: #ffd700 !important; /* Золотой фон вместо желтого */
+        color: #000000 !important;
+        background-color: #ffd700 !important;
         padding: 3px 8px !important;
         border-radius: 4px !important;
         font-weight: bold !important;
-        border: 1px solid #000000 !important; /* Черная рамка для контраста */
+        border: 1px solid #000000 !important;
       }
       
       .Button_transparent__6L3R2 {
-        color: #ffffff !important;          /* Белый текст */
-        background-color: #ff6b9d !important; /* Розовый фон */
-        border: 2px solid #000000 !important; /* Черная рамка */
+        color: #ffffff !important;
+        background-color: #ff6b9d !important;
+        border: 2px solid #000000 !important;
         font-weight: bold !important;
         text-decoration: none !important;
       }
       
       .Button_transparent__6L3R2:hover {
-        color: #000000 !important;          /* Черный при наведении */
-        background-color: #ffd700 !important; /* Золотой при наведении */
+        color: #000000 !important;
+        background-color: #ffd700 !important;
         border: 2px solid #000000 !important;
       }
       
-      /* ОСНОВНЫЕ СЕКЦИИ - ВЫСОКИЙ КОНТРАСТ */
       .Services_services__ShMKK,
       .Consultation_consultation__zS8eJ {
-        color: #000000 !important;          /* Черный текст */
-        background-color: #ffffff !important; /* Белый фон */
+        color: #000000 !important;
+        background-color: #ffffff !important;
       }
       
-      /* ССЫЛКИ - ВЫСОКИЙ КОНТРАСТ */
       a {
-        color: #0066cc !important; /* Темно-синий для ссылок */
+        color: #0066cc !important;
       }
       
       a:hover {
-        color: #004499 !important; /* Еще темнее при наведении */
+        color: #004499 !important;
       }
       
-      /* ЗАГОЛОВКИ - ВЫСОКИЙ КОНТРАСТ */
       h1, h2, h3, h4, h5, h6 {
         color: #000000 !important;
       }
@@ -91,5 +100,51 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
   </head>
   <body>
     <slot />
+    
+    <!-- 📱 PWA SERVICE WORKER -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then((registration) => {
+              console.log('PWA: Service Worker registered successfully:', registration.scope);
+              
+              // Проверка обновлений
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('PWA: New content available, reload to update');
+                  }
+                });
+              });
+            })
+            .catch((error) => {
+              console.log('PWA: Service Worker registration failed:', error);
+            });
+        });
+      }
+      
+      // PWA Install prompt
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log('PWA: Install prompt available');
+      });
+      
+      // PWA Install button (можно добавить позже)
+      function installPWA() {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('PWA: User accepted install');
+            }
+            deferredPrompt = null;
+          });
+        }
+      }
+    </script>
   </body>
 </html>
