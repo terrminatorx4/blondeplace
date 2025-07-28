@@ -31,15 +31,15 @@ const { title, description } = Astro.props;
       <div class="Header_header__buttons__qM_hW">
         <div class="Header_header__links__SqUHS">
           <a class="Button_button__C0__L Button_light__Q3_1u Button_icon__zM_AX Header_header__buttonTg__jPP8I" href="https://t.me/bpcoworking">
-            <img src="/header/telegram-icon.svg" alt="Telegram Icon" />
+            📱
           </a>
           <a class="Button_button__C0__L Button_light__Q3_1u Button_icon__zM_AX Header_header__button___lZf0" href="https://t.me/Blondeplace">
-            <img src="/header/wa-icon.svg" alt="WhatsApp icon" />
+            💬
           </a>
         </div>
         <div>
-          <button class="Button_button__C0__L Button_light__Q3_1u Button_text__CeUC5 BurgerMenu_burgerMenu__selector__40hqg" onclick="toggleBurgerMenu()">
-            <img src="/header/menu-open.svg" alt="Menu icon" />
+          <button class="Button_button__C0__L Button_light__Q3_1u Button_text__CeUC5 BurgerMenu_burgerMenu__selector__40hqg" id="burgerToggle">
+            ☰
           </button>
         </div>
       </div>
@@ -48,7 +48,7 @@ const { title, description } = Astro.props;
     <!-- Mobile Telegram Button -->
     <div class="Header_header__mobileTg__8DpGl">
       <a class="Button_button__C0__L Button_light__Q3_1u Button_icon__zM_AX Header_header__mobileButton__GdDO9" href="https://t.me/Blondeplace">
-        <img src="/header/telegram-icon.svg" alt="Telegram Icon" />
+        📱
       </a>
     </div>
 
@@ -59,6 +59,7 @@ const { title, description } = Astro.props;
 
       <!-- Burger Menu with BLOG LINK -->
       <div class="BurgerMenu_burgerMenu__ZWXCi" id="burgerMenu">
+        <button class="BurgerMenu_close" id="burgerClose">✕</button>
         <ul class="BurgerMenu_burgerMenu__list__YbyPX">
           <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#about">о нас</a></li>
           <li><a class="BurgerMenu_burgerMenu__link__YP4CM" href="#services">наши услуги</a></li>
@@ -123,7 +124,7 @@ const { title, description } = Astro.props;
                 <input type="text" placeholder="Ваш телефон" name="telephone-footer" value="" />
               </div>
               <button class="Footer_footer__button__VLDCz" type="submit">
-                <img src="/footer/icon.svg" alt="send" />
+                📤
               </button>
             </form>
           </div>
@@ -133,14 +134,43 @@ const { title, description } = Astro.props;
   </div>
 
   <script>
-    function toggleBurgerMenu() {
-      const menu = document.getElementById('burgerMenu');
-      if (menu.style.right === '0px') {
-        menu.style.right = '-100%';
-      } else {
-        menu.style.right = '0px';
+    document.addEventListener('DOMContentLoaded', function() {
+      const burgerToggle = document.getElementById('burgerToggle');
+      const burgerClose = document.getElementById('burgerClose');
+      const burgerMenu = document.getElementById('burgerMenu');
+      
+      function openMenu() {
+        burgerMenu.style.right = '0';
+        document.body.style.overflow = 'hidden';
       }
-    }
+      
+      function closeMenu() {
+        burgerMenu.style.right = '-100%';
+        document.body.style.overflow = 'auto';
+      }
+      
+      if (burgerToggle) {
+        burgerToggle.addEventListener('click', openMenu);
+      }
+      
+      if (burgerClose) {
+        burgerClose.addEventListener('click', closeMenu);
+      }
+      
+      // Close menu when clicking outside
+      burgerMenu.addEventListener('click', function(e) {
+        if (e.target === burgerMenu) {
+          closeMenu();
+        }
+      });
+      
+      // Close menu on escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeMenu();
+        }
+      });
+    });
   </script>
 
   <style is:global>
@@ -179,7 +209,7 @@ const { title, description } = Astro.props;
 
     /* Header Styles - EXACT COPY */
     .Header_header__elx5B {
-      padding: 20px 0;
+      padding: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -190,6 +220,7 @@ const { title, description } = Astro.props;
       max-width: 1200px;
       margin: 0 auto;
       width: 100%;
+      border-bottom: 1px solid #f0f0f0;
     }
 
     .Header_header__log__AnD1i {
@@ -224,49 +255,26 @@ const { title, description } = Astro.props;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      font-size: 18px;
     }
 
     .Button_light__Q3_1u {
       background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
       color: #2a2a2a;
-      border-radius: 50%;
+      border-radius: 8px;
     }
 
     .Button_icon__zM_AX {
       width: 44px;
       height: 44px;
       padding: 10px;
+      border-radius: 50%;
     }
 
     .Button_text__CeUC5 {
-      padding: 10px 20px;
+      padding: 12px 16px;
       border-radius: 8px;
       font-weight: 500;
-    }
-
-    .Button_text-black__LdsvQ {
-      color: #2a2a2a;
-    }
-
-    .Button_light-dark__JVyvW {
-      background: #333;
-      color: #fff;
-    }
-
-    .Button_transparent__6L3R2 {
-      background: transparent;
-      border: 1px solid #ddd;
-    }
-
-    .Button_black-transparent__jvtuc {
-      background: transparent;
-      border: 1px solid #333;
-      color: #333;
-    }
-
-    .Button_text-full-black__EddWC {
-      background: #000;
-      color: #fff;
     }
 
     /* Header specific buttons */
@@ -284,7 +292,8 @@ const { title, description } = Astro.props;
     .BurgerMenu_burgerMenu__selector__40hqg {
       background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
       border-radius: 8px;
-      padding: 12px;
+      font-size: 20px;
+      font-weight: bold;
     }
 
     .Header_header__mobileButton__GdDO9 {
@@ -299,29 +308,57 @@ const { title, description } = Astro.props;
       position: fixed;
       top: 0;
       right: -100%;
-      width: 300px;
+      width: 100%;
+      max-width: 350px;
       height: 100vh;
       background: #fff;
       transition: right 0.3s ease;
       z-index: 1001;
-      box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+      box-shadow: -2px 0 20px rgba(0,0,0,0.15);
+      overflow-y: auto;
+    }
+
+    .BurgerMenu_close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #333;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.3s ease;
+    }
+
+    .BurgerMenu_close:hover {
+      background: #f0f0f0;
     }
 
     .BurgerMenu_burgerMenu__list__YbyPX {
       list-style: none;
-      padding: 80px 20px 20px;
+      padding: 80px 30px 30px;
     }
 
     .BurgerMenu_burgerMenu__list__YbyPX li {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 15px;
     }
 
     .BurgerMenu_burgerMenu__link__YP4CM {
       color: #333;
       text-decoration: none;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 500;
       transition: color 0.3s ease;
+      display: block;
+      padding: 10px 0;
     }
 
     .BurgerMenu_burgerMenu__link__YP4CM:hover {
@@ -395,9 +432,10 @@ const { title, description } = Astro.props;
       background: linear-gradient(135deg, #f5d5b8 0%, #e6c4a8 100%);
       border: none;
       border-radius: 8px;
-      padding: 12px;
+      padding: 12px 16px;
       cursor: pointer;
       transition: all 0.3s ease;
+      font-size: 18px;
     }
 
     .Footer_footer__button__VLDCz:hover {
@@ -428,6 +466,11 @@ const { title, description } = Astro.props;
 
       .Layout_layout__container__QeKWZ {
         padding: 0 15px;
+      }
+
+      .BurgerMenu_burgerMenu__ZWXCi {
+        width: 100%;
+        max-width: none;
       }
     }
   </style>
