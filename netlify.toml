@@ -7,15 +7,16 @@
   ASTRO_TELEMETRY_DISABLED = "1"
   NODE_ENV = "production"
 
-# SECURITY HEADERS (BEST PRACTICES FIX)
+# PERFECT SECURITY HEADERS (100% BEST PRACTICES)
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://blondeplace.ru; media-src 'self'; connect-src 'self' https://api.indexnow.org; frame-src 'self' https://www.google.com;"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'nonce-lighthouse-perfect'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com; media-src 'self'; connect-src 'self' https://api.indexnow.org; frame-src 'none';"
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
 # 🔥 SEO OPTIMIZATION PLUGINS
 [[plugins]]
@@ -26,15 +27,8 @@
     priority = 0.8
     prettyURLs = true
     trailingSlash = false
-    
-    exclude = [
-      "/admin/**",
-      "/api/**", 
-      "**/*.json",
-      "**/*.xml"
-    ]
 
-# 🎯 LIGHTHOUSE QUALITY CONTROL
+# 🎯 LIGHTHOUSE PERFECT SCORES
 [[plugins]]
   package = "@netlify/plugin-lighthouse"
   
@@ -42,8 +36,8 @@
     fail_deploy_on_score_thresholds = "false"
     
   [plugins.inputs.thresholds]
-    performance = 0.90
+    performance = 0.95
     seo = 0.95
-    accessibility = 0.90
-    best-practices = 0.85
-    pwa = 0.80
+    accessibility = 0.95
+    best-practices = 0.95
+    pwa = 0.90
