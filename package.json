@@ -1,14 +1,16 @@
 {
   "name": "blondeplace",
   "version": "1.0.0",
-  "description": "BlondePlace Beauty Website",
+  "description": "BlondePlace Beauty Website with SEO Optimization",
   "type": "module",
   "scripts": {
     "factory": "node factory.js",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test:seo": "lighthouse https://blondeplace.netlify.app --view",
+    "test:speed": "curl -w '@curl-format.txt' -o /dev/null -s https://blondeplace.netlify.app"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
@@ -18,5 +20,9 @@
     "astro": "^4.15.12",
     "@astrojs/netlify": "^5.5.3",
     "@astrojs/sitemap": "^3.2.1"
+  },
+  "devDependencies": {
+    "@netlify/plugin-sitemap": "^0.8.1",
+    "netlify-plugin-minify-html": "^0.4.0"
   }
 }
