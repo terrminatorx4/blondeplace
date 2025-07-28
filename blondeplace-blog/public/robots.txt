@@ -1,0 +1,25 @@
+# BlondePlace Beauty Robots.txt (Butler Logic)
+User-agent: *
+
+# Запрещаем индексацию URL с рекламными и служебными метками
+Disallow: *?utm*=
+Disallow: *?openstat=
+
+# Явный запрет на служебные директории
+Disallow: /node_modules/
+
+# --- Продвинутая защита от парсинга ---
+# Запрещаем доступ боту OpenAI (ChatGPT)
+User-agent: GPTBot
+Disallow: /
+
+# Запрещаем доступ боту Google AI
+User-agent: Google-Extended
+Disallow: /
+
+# Запрещаем доступ боту Common Crawl
+User-agent: CCBot
+Disallow: /
+
+# --- Указание на карту сайта ---
+Sitemap: https://blondeplace.netlify.app/sitemap.xml
