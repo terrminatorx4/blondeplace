@@ -63,15 +63,31 @@ const BEAUTY_CATEGORIES = [
 
 // ===== КОНФИГУРАЦИЯ AI =====
 const MODEL_CHOICE = process.env.MODEL_CHOICE || 'gemini';
-const API_KEY_CURRENT = process.env.API_KEY_CURRENT || process.env.GEMINI_API_KEY;
-const BATCH_SIZE = parseInt(process.env.BATCH_SIZE) || 5;
+const GEMINI_API_KEY_CURRENT = process.env.GEMINI_API_KEY_CURRENT;
+const OPENROUTER_API_KEY_CURRENT = process.env.OPENROUTER_API_KEY_CURRENT;
+const BATCH_SIZE = parseInt(process.env.BATCH_SIZE_PER_THREAD) || 1;
 const THREAD_ID = process.env.THREAD_ID || '1';
 const TOTAL_THREADS = parseInt(process.env.TOTAL_THREADS) || 1;
 
-if (!API_KEY_CURRENT) {
-    console.error('❌ API ключ не найден! Установите GEMINI_API_KEY или API_KEY_CURRENT');
-    process.exit(1);
+// Выбираем правильный API ключ в зависимости от модели
+let API_KEY_CURRENT;
+if (MODEL_CHOICE === 'gemini') {
+    API_KEY_CURRENT = GEMINI_API_KEY_CURRENT;
+    if (!API_KEY_CURRENT) {
+        console.error('❌ Gemini API ключ не найден! Установите GEMINI_API_KEY_CURRENT');
+        process.exit(1);
+    }
+    console.log(`💄 [Beauty Поток #${THREAD_ID}] Использую модель Gemini с ключом ...${API_KEY_CURRENT.slice(-4)}`);
+} else {
+    API_KEY_CURRENT = OPENROUTER_API_KEY_CURRENT;
+    if (!API_KEY_CURRENT) {
+        console.error('❌ OpenRouter API ключ не найден! Установите OPENROUTER_API_KEY_CURRENT');
+        process.exit(1);
+    }
+    console.log(`💄 [Beauty Поток #${THREAD_ID}] Использую модель OpenRouter с ключом ...${API_KEY_CURRENT.slice(-4)}`);
 }
+
+
 
 // ===== ИНИЦИАЛИЗАЦИЯ AI =====
 const genAI = new GoogleGenerativeAI(API_KEY_CURRENT);
