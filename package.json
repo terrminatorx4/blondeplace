@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "factory": "node factory.js",
+    "diagnostic": "node diagnostic.js",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",

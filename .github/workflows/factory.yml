@@ -140,17 +140,71 @@ jobs:
           # Запускаем factory.js через npm script
           npm run factory
           
-          if [[ -z $(git status --porcelain) ]]; then
-            echo "✅ Thread ${{ matrix.thread }}: Контент уже существует или не создан"
+          # Проверяем есть ли новые файлы для коммита
+          NEW_FILES=$(git ls-files --others --exclude-standard src/content/posts/*.md 2>/dev/null || true)
+          MODIFIED_FILES=$(git diff --name-only src/content/posts/*.md 2>/dev/null || true)
+          
+          if [[ -z "$NEW_FILES" && -z "$MODIFIED_FILES" ]]; then
+            echo "✅ Thread ${{ matrix.thread }}: Новый контент не создан или уже существует"
             exit 0
           fi
           
           echo "🔥 Thread ${{ matrix.thread }}: Найден новый beauty контент. Публикую..."
           
-          git add src/content/posts/*.md
+          # Добавляем только новые/измененные файлы
+          if [[ -n "$NEW_FILES" ]]; then
+            echo "$NEW_FILES" | xargs -r git add
+          fi
+          if [[ -n "$MODIFIED_FILES" ]]; then
+            echo "$MODIFIED_FILES" | xargs -r git add
+          fi
+          
+          # Проверяем что есть что коммитить
+          if git diff --cached --quiet; then
+            echo "✅ Thread ${{ matrix.thread }}: Нет изменений для коммита"
+            exit 0
+          fi
+          
+          # Коммитим изменения
           git commit -m "🎨 Beauty content from thread ${{ matrix.thread }} (${{ github.event.inputs.model_choice }})"
-          git pull --rebase
-          git push
+          
+          # Пытаемся запушить с retry логикой для избежания конфликтов
+          MAX_RETRIES=5
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo "🔄 Push attempt $i/$MAX_RETRIES"
+            
+            # Получаем последние изменения
+            git fetch origin main
+            
+            # Проверяем нужен ли rebase
+            LOCAL=$(git rev-parse HEAD)
+            REMOTE=$(git rev-parse origin/main)
+            
+            if [[ "$LOCAL" != "$REMOTE" ]]; then
+              echo "📥 Rebase required, syncing with remote..."
+              if git rebase origin/main; then
+                echo "✅ Rebase successful"
+              else
+                echo "❌ Rebase failed, aborting and retrying..."
+                git rebase --abort
+                sleep $((i * 2))
+                continue
+              fi
+            fi
+            
+            # Пытаемся запушить
+            if git push origin HEAD:main; then
+              echo "✅ Push successful on attempt $i"
+              break
+            else
+              echo "❌ Push failed on attempt $i, retrying..."
+              if [[ $i -eq $MAX_RETRIES ]]; then
+                echo "💥 All push attempts failed for thread ${{ matrix.thread }}"
+                exit 1
+              fi
+              sleep $((i * 2))
+            fi
+          done
 
       - name: 🎉 Thread Success
         if: ${{ success() && matrix.thread <= fromJson(github.event.inputs.thread_count) }}

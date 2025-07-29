@@ -23,23 +23,29 @@ const GEMINI_MODEL_NAME = "gemini-2.5-pro";
 // --- ИНИЦИАЛИЗАЦИЯ ПОТОКА ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
+const batchSize = parseInt(process.env.BATCH_SIZE_PER_THREAD, 10) || parseInt(process.env.BATCH_SIZE, 10) || 1;
+
 // Получаем API ключ в зависимости от модели
 const GEMINI_API_KEY_CURRENT = process.env.GEMINI_API_KEY_CURRENT;
 const OPENROUTER_API_KEY_CURRENT = process.env.OPENROUTER_API_KEY_CURRENT;
 
 let apiKey;
-if (modelChoice === 'deepseek') {
+if (modelChoice === 'deepseek' || modelChoice === 'openrouter') {
     apiKey = OPENROUTER_API_KEY_CURRENT;
 } else {
     apiKey = GEMINI_API_KEY_CURRENT;
 }
 
 if (!apiKey) {
+    console.error(`[Поток #${threadId}] ❌ API ключ не найден!`);
+    console.error(`[Поток #${threadId}] Модель: ${modelChoice}`);
+    console.error(`[Поток #${threadId}] Gemini ключ: ${GEMINI_API_KEY_CURRENT ? 'НАЙДЕН' : 'НЕ НАЙДЕН'}`);
+    console.error(`[Поток #${threadId}] OpenRouter ключ: ${OPENROUTER_API_KEY_CURRENT ? 'НАЙДЕН' : 'НЕ НАЙДЕН'}`);
     throw new Error(`[Поток #${threadId}] Не был предоставлен API-ключ!`);
 }
 
-if (modelChoice === 'deepseek') {
-    console.log(`🚀 [Поток #${threadId}] Использую модель DeepSeek через OpenRouter с ключом ...${apiKey.slice(-4)}`);
+if (modelChoice === 'deepseek' || modelChoice === 'openrouter') {
+    console.log(`🚀 [Поток #${threadId}] Использую модель ${modelChoice} через OpenRouter с ключом ...${apiKey.slice(-4)}`);
 } else {
     console.log(`✨ [Поток #${threadId}] Использую модель Gemini с ключом ...${apiKey.slice(-4)}`);
 }
@@ -100,7 +106,7 @@ async function generateWithRetry(prompt, maxRetries = 4) {
     let delay = 5000;
     for (let i = 0; i < maxRetries; i++) {
         try {
-            if (modelChoice === 'deepseek') {
+            if (modelChoice === 'deepseek' || modelChoice === 'openrouter') {
                 const response = await fetch(OPENROUTER_API_URL, {
                     method: 'POST',
                     headers: {
@@ -116,7 +122,9 @@ async function generateWithRetry(prompt, maxRetries = 4) {
                 });
                 if (!response.ok) {
                     if (response.status === 429) throw new Error(`429 Too Many Requests`);
-                    throw new Error(`Ошибка HTTP от OpenRouter: ${response.status}`);
+                    if (response.status === 401) throw new Error(`401 Unauthorized - проверьте API ключ`);
+                    if (response.status === 503) throw new Error(`503 Service Unavailable`);
+                    throw new Error(`Ошибка HTTP от OpenRouter: ${response.status} ${response.statusText}`);
                 }
                 const data = await response.json();
                 if (!data.choices || data.choices.length === 0) throw new Error("Ответ от API OpenRouter не содержит поля 'choices'.");
@@ -128,12 +136,20 @@ async function generateWithRetry(prompt, maxRetries = 4) {
                 return result.response.text();
             }
         } catch (error) {
-            if (error.message.includes('503') || error.message.includes('429')) {
+            console.error(`[Поток #${threadId}] Ошибка при попытке ${i + 1}/${maxRetries}:`, error.message);
+            
+            if (error.message.includes('503') || error.message.includes('429') || error.message.includes('quota') || error.message.includes('QUOTA_EXCEEDED')) {
                 console.warn(`[!] [Поток #${threadId}] Модель перегружена или квота исчерпана. Попытка ${i + 1}/${maxRetries}. Жду ${delay / 1000}с...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 delay *= 2;
-            } else {
+            } else if (error.message.includes('401')) {
+                console.error(`[!] [Поток #${threadId}] Ошибка авторизации - неверный API ключ. Завершаю работу.`);
                 throw error;
+            } else {
+                console.error(`[!] [Поток #${threadId}] Неожиданная ошибка:`, error.message);
+                if (i === maxRetries - 1) throw error;
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 1.5;
             }
         }
     }
@@ -224,7 +240,6 @@ async function main() {
     console.log(`[Поток #${threadId}] Запуск рабочего потока...`);
 
     try {
-        const BATCH_SIZE = parseInt(process.env.BATCH_SIZE, 10) || 1;
         const totalThreads = parseInt(process.env.TOTAL_THREADS, 10) || 1;
         
         const fileContent = await fs.readFile(TOPICS_FILE, 'utf-8');
@@ -241,7 +256,7 @@ async function main() {
             return topicSlug && !existingSlugs.includes(topicSlug);
         });
 
-        const topicsForThisThread = newTopics.filter((_, index) => index % totalThreads === (threadId - 1)).slice(0, BATCH_SIZE);
+        const topicsForThisThread = newTopics.filter((_, index) => index % totalThreads === (threadId - 1)).slice(0, batchSize);
 
         if (topicsForThisThread.length === 0) {
             console.log(`[Поток #${threadId}] Нет новых тем для этого потока. Завершение.`);
@@ -277,7 +292,7 @@ async function main() {
                 await fs.writeFile(filePath, fullContent);
                 console.log(`[Поток #${threadId}] [✔] Статья "${topic}" успешно создана.`);
                 
-                // ТОЛЬКО IndexNow уведомления - БЕЗ git операций!
+                // Отправляем IndexNow уведомления для поисковых систем
                 const newUrl = `${SITE_URL}/blog/${slug}/`;
                 await notifyIndexNow(newUrl);
 
