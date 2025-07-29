@@ -17,7 +17,7 @@ const BRAND_CONFIG = {
     location: "Россия",
     services: [
         "Окрашивание волос (блонд, омбре, шатуш, балаяж)",
-        "Стрижки и укладки", 
+        "Стрижки и укладки",
         "Кератиновое выпрямление волос",
         "Ботокс для волос",
         "Маникюр и педикюр",
@@ -31,154 +31,155 @@ const BRAND_CONFIG = {
     expertise: "Профессиональные советы от мастеров с многолетним опытом"
 };
 
-// ===== BEAUTY КАРТИНКИ (ВМЕСТО BUTLER) =====
-const BEAUTY_IMAGES_POOL = [
-    "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2074&auto=format&fit=crop", // Hair salon
-    "https://images.unsplash.com/photo-1487412912207-890745b4773c?q=80&w=2070&auto=format&fit=crop", // Nail art
-    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2069&auto=format&fit=crop", // Makeup
-    "https://images.unsplash.com/photo-1559599101-f09722fb4948?q=80&w=2069&auto=format&fit=crop", // Hair care
-    "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=2069&auto=format&fit=crop", // Beauty salon
-    "https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=2070&auto=format&fit=crop", // Hair styling
-    "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=2070&auto=format&fit=crop", // Spa treatment
-    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2070&auto=format&fit=crop"  // Skincare
+// ===== СИСТЕМНЫЕ ПРОМПТЫ ДЛЯ BEAUTY КОНТЕНТА =====
+const BEAUTY_SYSTEM_PROMPTS = {
+    hair_care: `Ты эксперт по уходу за волосами в салоне красоты ${BRAND_CONFIG.salon_name}. 
+    Пиши профессиональные статьи о уходе за волосами, используя знания трихологии и современных методик.
+    Упоминай качественные продукты и процедуры. Фокусируйся на практических советах.`,
+    
+    hair_coloring: `Ты мастер-колорист с 10+ лет опыта в салоне ${BRAND_CONFIG.salon_name}.
+    Создавай экспертные статьи об окрашивании волос, техниках колорирования, трендах.
+    Обязательно освещай особенности работы с блондом, так как это специализация салона.`,
+    
+    beauty_tips: `Ты beauty-консультант салона красоты ${BRAND_CONFIG.salon_name}.
+    Пиши практические статьи с советами красоты, которые можно применить дома и в салоне.
+    Фокусируйся на современных трендах и профессиональных секретах.`,
+    
+    nail_care: `Ты мастер маникюра в премиальном салоне ${BRAND_CONFIG.salon_name}.
+    Создавай статьи о nail-арте, уходе за ногтями, трендах маникюра и педикюра.
+    Подчеркивай важность профессионального подхода к nail-сервису.`,
+    
+    salon_procedures: `Ты специалист по салонным процедурам в ${BRAND_CONFIG.salon_name}.
+    Пиши о современных beauty-процедурах, их эффективности и особенностях.
+    Объясняй разницу между домашним и салонным уходом.`
+};
+
+// ===== BEAUTY КАТЕГОРИИ =====
+const BEAUTY_CATEGORIES = [
+    'hair-care', 'hair-coloring', 'hairstyles', 'blonde-trends', 'hair-treatments',
+    'nail-care', 'manicure', 'pedicure', 'skincare', 'makeup', 'beauty-tips',
+    'salon-news', 'hair-products', 'beauty-trends', 'seasonal-beauty'
 ];
 
-// Функция для выбора релевантной картинки
-function getBeautyImage(topic, category) {
-    const topicLower = topic.toLowerCase();
-    
-    if (topicLower.includes('волос') || topicLower.includes('окрашивание') || topicLower.includes('стрижк')) {
-        return BEAUTY_IMAGES_POOL[Math.random() < 0.5 ? 0 : 5]; // Hair salon/styling
-    }
-    if (topicLower.includes('ногт') || topicLower.includes('маникюр') || topicLower.includes('nail')) {
-        return BEAUTY_IMAGES_POOL[1]; // Nail art
-    }
-    if (topicLower.includes('макияж') || topicLower.includes('makeup')) {
-        return BEAUTY_IMAGES_POOL[2]; // Makeup
-    }
-    if (topicLower.includes('уход') || topicLower.includes('кожа')) {
-        return BEAUTY_IMAGES_POOL[Math.random() < 0.5 ? 3 : 7]; // Care/skincare
-    }
-    if (topicLower.includes('процедур') || topicLower.includes('салон')) {
-        return BEAUTY_IMAGES_POOL[Math.random() < 0.5 ? 4 : 6]; // Salon/spa
-    }
-    
-    // Default beauty image
-    return BEAUTY_IMAGES_POOL[Math.floor(Math.random() * BEAUTY_IMAGES_POOL.length)];
+// ===== КОНФИГУРАЦИЯ AI =====
+const MODEL_CHOICE = process.env.MODEL_CHOICE || 'gemini';
+const API_KEY_CURRENT = process.env.API_KEY_CURRENT || process.env.GEMINI_API_KEY;
+const BATCH_SIZE = parseInt(process.env.BATCH_SIZE) || 5;
+const THREAD_ID = process.env.THREAD_ID || '1';
+const TOTAL_THREADS = parseInt(process.env.TOTAL_THREADS) || 1;
+
+if (!API_KEY_CURRENT) {
+    console.error('❌ API ключ не найден! Установите GEMINI_API_KEY или API_KEY_CURRENT');
+    process.exit(1);
 }
 
-// ===== НАСТРОЙКИ КОНТЕНТА =====
-const POSTS_DIR = 'src/content/posts';
-const TOPICS_FILE = 'topics.txt';
-const THREAD_ID = parseInt(process.env.THREAD_ID, 10) || 1;
-
-// ===== ССЫЛКИ НА ОСНОВНОЙ САЙТ BLONDEPLACE =====
-const REAL_LINKS_MAP = {
-    "о нас": { url: "https://blondeplace.ru/#about", text: "о нашем салоне" },
-    "услуги": { url: "https://blondeplace.ru/#services", text: "наших услугах" },
-    "скидки": { url: "https://blondeplace.ru/#discount", text: "актуальных скидках" },
-    "почему мы": { url: "https://blondeplace.ru/#why", text: "преимуществах BLONDE PLACE" },
-    "коворкинг": { url: "https://blondeplace.ru/#coworking", text: "beauty коворкинге" },
-    "мастера": { url: "https://blondeplace.ru/#masters", text: "наших мастерах" },
-    "отзывы": { url: "https://blondeplace.ru/#comments", text: "отзывах клиентов" },
-    "бренды": { url: "https://blondeplace.ru/#brands", text: "брендах-партнерах" },
-    "новости": { url: "https://blondeplace.ru/#news", text: "последних новостях" },
-    "телеграм": { url: "https://t.me/Blondeplace", text: "📱 телеграм канале" }
-};
-
-// ===== ИНИЦИАЛИЗАЦИЯ =====
-const modelChoice = process.env.MODEL_CHOICE || 'gemini';
-let model, apiClient;
-
-// Выбираем модель
-if (modelChoice === 'openrouter') {
-    const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
-    
-    const apiKey = process.env.OPENROUTER_API_KEY_CURRENT;
-    if (!apiKey) {
-        throw new Error("[Beauty Поток #" + THREAD_ID + "] OpenRouter API key не найден!");
+// ===== ИНИЦИАЛИЗАЦИЯ AI =====
+const genAI = new GoogleGenerativeAI(API_KEY_CURRENT);
+const model = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+    generationConfig: {
+        temperature: 0.8,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 8192,
     }
-    
-    apiClient = {
-        url: OPENROUTER_API_URL,
-        key: apiKey,
-        model: DEEPSEEK_MODEL_NAME
-    };
-    
-    console.log("💄 [Beauty Поток #" + THREAD_ID + "] Использую модель OpenRouter DeepSeek с ключом ..." + apiKey.slice(-4));
-} else {
-    const apiKey = process.env.GEMINI_API_KEY_CURRENT;
-    if (!apiKey) {
-        throw new Error("[Beauty Поток #" + THREAD_ID + "] Gemini API key не найден!");
-    }
-    
-    const { GoogleGenerativeAI } = await import('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI(apiKey);
-    model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    
-    console.log("💄 [Beauty Поток #" + THREAD_ID + "] Использую модель Gemini с ключом ..." + apiKey.slice(-4));
-}
+});
 
-// ===== BEAUTY SYSTEM PROMPTS =====
-const BEAUTY_SYSTEM_PROMPTS = {
-    hair_care: "Ты — эксперт по уходу за волосами в салоне красоты BlondePlace. Знаешь все о современных техниках окрашивания, восстановлении волос, профессиональных процедурах.",
-    nail_care: "Ты — мастер маникюра и педикюра в салоне BlondePlace. Эксперт по nail-арту, покрытиям, уходу за ногтями и современным тенденциям.",
-    skincare: "Ты — косметолог салона BlondePlace. Специализируешься на уходе за кожей лица, anti-age процедурах, подборе косметики.",
-    salon_procedures: "Ты — технолог салона BlondePlace. Знаешь все о салонных процедурах: кератине, ботоксе для волос, химических завивках.",
-    beauty_tips: "Ты — beauty-консультант салона BlondePlace. Даешь советы по красоте, стилю, подбору образов и уходовых процедур."
-};
-
-// ===== ГЕНЕРАЦИЯ КОНТЕНТА =====
-async function generateWithRetry(prompt, maxRetries = 3) {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            if (modelChoice === 'openrouter') {
-                const response = await fetch(apiClient.url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': "Bearer " + apiClient.key,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: apiClient.model,
-                        messages: [{ role: 'user', content: prompt }],
-                        temperature: 0.7
-                    })
-                });
-                
-                const data = await response.json();
-                return data.choices[0].message.content;
-            } else {
-                const result = await model.generateContent(prompt);
-                const response = await result.response;
-                return response.text();
-            }
-        } catch (error) {
-            console.warn("[Beauty Поток #" + THREAD_ID + "] ⚠️ Попытка " + attempt + "/" + maxRetries + " не удалась: " + error.message);
-            if (attempt === maxRetries) throw error;
-            await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+// ===== ЗАГРУЗКА ТОПИКОВ =====
+async function loadTopics() {
+    try {
+        const topicsContent = await fs.readFile('topics.txt', 'utf-8');
+        const topics = topicsContent
+            .split('\n')
+            .filter(line => line.trim() && !line.startsWith('#'))
+            .map(line => line.trim());
+        
+        if (topics.length === 0) {
+            console.log('📝 Файл topics.txt пуст. Используем базовые beauty топики...');
+            return [
+                'Как ухаживать за блондом дома',
+                'Тренды окрашивания волос 2024',
+                'Секреты долговечного маникюра',
+                'Как выбрать идеальную стрижку',
+                'Уход за кожей лица зимой'
+            ];
         }
+        
+        return topics;
+    } catch (error) {
+        console.log('📝 Файл topics.txt не найден. Создаю с базовыми топиками...');
+        const defaultTopics = [
+            '# Beauty топики для BlondePlace',
+            '# Добавьте свои топики по одному на строку',
+            '',
+            'Как ухаживать за блондом дома',
+            'Тренды окрашивания волос 2024',
+            'Секреты долговечного маникюра',
+            'Как выбрать идеальную стрижку для типа лица',
+            'Уход за кожей лица в зимний период'
+        ].join('\n');
+        
+        await fs.writeFile('topics.txt', defaultTopics);
+        return [];
     }
 }
 
+// ===== ГЕНЕРАЦИЯ BEAUTY КОНТЕНТА =====
 async function generateBeautyContent(topic) {
+    // Определяем категорию на основе топика
     const category = categorizeBeautyTopic(topic);
     const systemPrompt = BEAUTY_SYSTEM_PROMPTS[category] || BEAUTY_SYSTEM_PROMPTS.beauty_tips;
     
-    const prompt = systemPrompt + "\n\nСоздай экспертную статью для блога салона красоты BlondePlace на тему: \"" + topic + "\"\n\nТРЕБОВАНИЯ К КОНТЕНТУ:\n- Объем: 1500-2500 слов (оптимально для SEO)\n- Структура: заголовки H1, H2, H3 в Markdown\n- Тон: экспертный, но доступный\n- Включи практические советы от мастеров BlondePlace\n- Добавь призывы к действию (записаться в салон)\n- Используй профессиональную терминологию\n- Упоминай услуги и процедуры BlondePlace\n\nСТРУКТУРА:\n1. Введение (100-150 слов)\n2. Основные разделы (3-5 блоков по 300-400 слов)\n3. Практические советы (список)\n4. Заключение с призывом к действию\n\nНЕ используй изображения в тексте. Пиши в формате Markdown.";
+    const prompt = `${systemPrompt}
+
+ТЕМА: "${topic}"
+
+Создай экспертную статью для блога салона красоты ${BRAND_CONFIG.salon_name} (${BRAND_CONFIG.domain}).
+
+ТРЕБОВАНИЯ:
+✅ Объем: 1500-2500 слов
+✅ Стиль: экспертный, но доступный
+✅ Структура: заголовки H2, H3, списки, выделения
+✅ SEO: естественное вхождение ключевых слов
+✅ Экспертность: профессиональные советы и рекомендации
+✅ Практичность: конкретные советы, которые можно применить
+✅ Актуальность: современные тренды и методики
+
+ОБЯЗАТЕЛЬНО ВКЛЮЧИ:
+• Профессиональные советы от мастеров
+• Рекомендации по продуктам и процедурам
+• Различие между домашним и салонным уходом
+• Предупреждения о типичных ошибках
+• Когда стоит обратиться к специалисту
+
+ФОРМАТ СТАТЬИ:
+1. Введение (почему эта тема важна)
+2. Основные разделы с подзаголовками
+3. Практические советы и рекомендации
+4. Профессиональные секреты
+5. Заключение с призывом к действию
+
+Пиши от лица эксперта салона ${BRAND_CONFIG.salon_name}. Используй "мы", "наш салон", "наши мастера".
+Естественно упоминай, что в салоне можно получить профессиональную консультацию.
+
+ВАЖНО: Не используй прямую рекламу. Фокусируйся на экспертном контенте с ненавязчивыми упоминаниями салона.`;
 
     try {
-        console.log("[+] [Beauty Поток #" + THREAD_ID + "] Генерирую beauty статью на тему: " + topic);
+        console.log(`[Поток #${THREAD_ID}] 🎨 Генерирую beauty контент: "${topic}"`);
         
-        const content = await generateWithRetry(prompt);
-        const seoData = await generateBeautySEO(topic, category);
-        const frontmatter = await createBeautyFrontmatter(topic, content, seoData);
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
         
-        return frontmatter;
+        if (!text || text.length < 500) {
+            throw new Error('Слишком короткий контент');
+        }
+        
+        console.log(`[Поток #${THREAD_ID}] ✅ Сгенерировано ${text.length} символов для "${topic}"`);
+        return text;
         
     } catch (error) {
-        console.error("[Beauty Поток #" + THREAD_ID + "] ❌ Ошибка генерации для \"" + topic + "\":", error.message);
+        console.error(`[Поток #${THREAD_ID}] ❌ Ошибка генерации для "${topic}":`, error.message);
         return null;
     }
 }
@@ -211,46 +212,47 @@ function categorizeBeautyTopic(topic) {
     return 'beauty_tips';
 }
 
-// ===== ГЕНЕРАЦИЯ SEO ДАННЫХ (ФИКСИРОВАННЫЕ ДЛИНЫ) =====
+// ===== ГЕНЕРАЦИЯ SEO ДАННЫХ =====
 async function generateBeautySEO(topic, category) {
-    const seoPrompt = "Создай SEO-оптимизированные метаданные для статьи салона красоты на тему: \"" + topic + "\"\n\nСТРОГИЕ ТРЕБОВАНИЯ:\n- Title: ТОЧНО 35-40 символов, включай \"BLONDE PLACE\"\n- Description: ТОЧНО 150-160 символов, с призывом к действию\n- Keywords: 5-7 ключевых фраз через запятую\n- Учитывай beauty-тематику\n\nОтвет СТРОГО в JSON формате:\n{\n  \"title\": \"...\",\n  \"description\": \"...\", \n  \"keywords\": \"...\"\n}";
+    const seoPrompt = `Создай SEO-оптимизированные метаданные для статьи салона красоты на тему: "${topic}"
+
+Требования:
+- Title: 50-60 символов, включай "${BRAND_CONFIG.brand}"
+- Description: 140-160 символов, призыв к действию
+- Keywords: 5-7 ключевых фраз через запятую
+- Учитывай beauty-тематику и местную специфику
+
+Ответ в JSON формате:
+{
+  "title": "...",
+  "description": "...", 
+  "keywords": "..."
+}`;
 
     try {
-        const result = await generateWithRetry(seoPrompt);
+        const result = await model.generateContent(seoPrompt);
+        const response = await result.response;
+        const text = response.text();
         
         // Извлекаем JSON из ответа
-        const jsonMatch = result.match(/\{[\s\S]*\}/);
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-            const seoData = JSON.parse(jsonMatch[0]);
-            
-            // ПРИНУДИТЕЛЬНО ОБРЕЗАЕМ ДО НУЖНОЙ ДЛИНЫ
-            if (seoData.title && seoData.title.length > 45) {
-                seoData.title = seoData.title.substring(0, 42) + '...';
-            }
-            
-            if (seoData.description && seoData.description.length > 164) {
-                seoData.description = seoData.description.substring(0, 157) + '...';
-            }
-            
-            return seoData;
+            return JSON.parse(jsonMatch[0]);
         }
         
-        // Fallback SEO с правильными длинами
-        const shortTitle = topic.substring(0, 25) + " BLONDE PLACE";
-        const shortDesc = "Экспертные советы от " + BRAND_CONFIG.brand + ". " + topic.substring(0, 80) + ". Записывайтесь на консультацию!";
-        
+        // Fallback SEO
         return {
-            title: shortTitle.length <= 45 ? shortTitle : shortTitle.substring(0, 42) + '...',
-            description: shortDesc.length <= 164 ? shortDesc : shortDesc.substring(0, 157) + '...',
-            keywords: topic + ", салон красоты, " + BRAND_CONFIG.brand + ", beauty советы, уход за волосами"
+            title: `${topic} | Советы экспертов ${BRAND_CONFIG.brand}`,
+            description: `Профессиональные советы по теме "${topic}" от мастеров салона ${BRAND_CONFIG.brand}. Экспертные рекомендации и практические советы.`,
+            keywords: `${topic}, салон красоты, ${BRAND_CONFIG.brand}, beauty советы, уход за волосами`
         };
         
     } catch (error) {
-        console.warn("[Beauty Поток #" + THREAD_ID + "] ⚠️ Ошибка генерации SEO для \"" + topic + "\". Использую fallback.");
+        console.warn(`[Поток #${THREAD_ID}] ⚠️ Ошибка генерации SEO для "${topic}". Использую fallback.`);
         return {
-            title: topic.substring(0, 30) + " " + BRAND_CONFIG.brand,
-            description: "Советы экспертов " + BRAND_CONFIG.brand + " по теме \"" + topic.substring(0, 60) + "\". Запишитесь на консультацию!",
-            keywords: topic + ", салон красоты, beauty, уход, " + BRAND_CONFIG.brand
+            title: `${topic} | ${BRAND_CONFIG.brand}`,
+            description: `Экспертные советы от салона красоты ${BRAND_CONFIG.brand}. ${topic} - профессиональные рекомендации.`,
+            keywords: `${topic}, салон красоты, beauty, уход, ${BRAND_CONFIG.brand}`
         };
     }
 }
@@ -258,14 +260,27 @@ async function generateBeautySEO(topic, category) {
 // ===== СОЗДАНИЕ FRONTMATTER =====
 async function createBeautyFrontmatter(topic, content, seoData) {
     const category = categorizeBeautyTopic(topic);
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ SLUG С ПОДДЕРЖКОЙ КИРИЛЛИЦЫ
     const slug = topic.toLowerCase()
-        .replace(/[^\w\s-]/g, '')
+        // Транслитерация кириллицы в латиницу
+        .replace(/а/g, 'a').replace(/б/g, 'b').replace(/в/g, 'v').replace(/г/g, 'g')
+        .replace(/д/g, 'd').replace(/е/g, 'e').replace(/ё/g, 'yo').replace(/ж/g, 'zh')
+        .replace(/з/g, 'z').replace(/и/g, 'i').replace(/й/g, 'y').replace(/к/g, 'k')
+        .replace(/л/g, 'l').replace(/м/g, 'm').replace(/н/g, 'n').replace(/о/g, 'o')
+        .replace(/п/g, 'p').replace(/р/g, 'r').replace(/с/g, 's').replace(/т/g, 't')
+        .replace(/у/g, 'u').replace(/ф/g, 'f').replace(/х/g, 'kh').replace(/ц/g, 'ts')
+        .replace(/ч/g, 'ch').replace(/ш/g, 'sh').replace(/щ/g, 'sch').replace(/ы/g, 'y')
+        .replace(/э/g, 'e').replace(/ю/g, 'yu').replace(/я/g, 'ya')
+        // Убираем все кроме букв, цифр, пробелов и дефисов
+        .replace(/[^a-z0-9\s-]/g, '')
+        // Заменяем пробелы на дефисы
         .replace(/\s+/g, '-')
+        // Убираем множественные дефисы
         .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
+        // Убираем дефисы в начале и конце
+        .replace(/^-+|-+$/g, '');
     
-    // ИСПОЛЬЗУЕМ BEAUTY КАРТИНКУ ВМЕСТО BUTLER
-    const heroImage = getBeautyImage(topic, category);
+    const heroImage = `/images/beauty/${category}/${slug}.jpg`;
     const currentDate = new Date().toISOString();
     
     // Schema.org для beauty контента
@@ -274,25 +289,25 @@ async function createBeautyFrontmatter(topic, content, seoData) {
         "@type": "Article",
         headline: seoData.title,
         description: seoData.description,
-        image: heroImage,
+        image: `https://${BRAND_CONFIG.blog_domain}${heroImage}`,
         author: {
             "@type": "Organization",
             name: BRAND_CONFIG.salon_name,
-            url: "https://" + BRAND_CONFIG.domain
+            url: `https://${BRAND_CONFIG.domain}`
         },
         publisher: {
             "@type": "Organization", 
             name: BRAND_CONFIG.brand,
             logo: {
                 "@type": "ImageObject",
-                url: "https://" + BRAND_CONFIG.domain + "/logo.png"
+                url: `https://${BRAND_CONFIG.domain}/logo.png`
             }
         },
         datePublished: currentDate,
         dateModified: currentDate,
         mainEntityOfPage: {
             "@type": "WebPage",
-            "@id": "https://" + BRAND_CONFIG.blog_domain + "/blog/" + slug + "/"
+            "@id": `https://${BRAND_CONFIG.blog_domain}/blog/${slug}/`
         },
         about: [
             {
@@ -306,7 +321,19 @@ async function createBeautyFrontmatter(topic, content, seoData) {
         ]
     };
     
-    const frontmatter = "---\ntitle: " + JSON.stringify(seoData.title) + "\ndescription: " + JSON.stringify(seoData.description) + "\nkeywords: " + JSON.stringify(seoData.keywords) + "\npubDate: " + JSON.stringify(currentDate) + "\nauthor: " + JSON.stringify(BRAND_CONFIG.author) + "\nheroImage: " + JSON.stringify(heroImage) + "\ncategory: " + JSON.stringify(category) + "\nschema: " + JSON.stringify(schema) + "\n---\n\n" + content + "\n";
+    const frontmatter = `---
+title: ${JSON.stringify(seoData.title)}
+description: ${JSON.stringify(seoData.description)}
+keywords: ${JSON.stringify(seoData.keywords)}
+pubDate: ${JSON.stringify(currentDate)}
+author: ${JSON.stringify(BRAND_CONFIG.author)}
+heroImage: ${JSON.stringify(heroImage)}
+category: ${JSON.stringify(category)}
+schema: ${JSON.stringify(schema)}
+---
+
+${content}
+`;
     
     return frontmatter;
 }
@@ -314,90 +341,88 @@ async function createBeautyFrontmatter(topic, content, seoData) {
 // ===== ОСНОВНАЯ ФУНКЦИЯ =====
 async function main() {
     try {
-        console.log("💄 [Beauty Поток #" + THREAD_ID + "] Запуск beauty рабочего потока...");
+        console.log(`🎨 === BLONDEPLACE BEAUTY FACTORY ===`);
+        console.log(`💄 Салон: ${BRAND_CONFIG.salon_name}`);
+        console.log(`🌐 Домен: ${BRAND_CONFIG.domain}`);
+        console.log(`📱 Поток: #${THREAD_ID} | Пакет: ${BATCH_SIZE} статей`);
+        console.log(`🤖 Модель: ${MODEL_CHOICE}`);
         
-        const topics = await fs.readFile(TOPICS_FILE, 'utf-8');
-        const topicsList = topics.split('\n').filter(line => line.trim() && !line.startsWith('#'));
+        const allTopics = await loadTopics();
         
-        const batchSize = parseInt(process.env.BATCH_SIZE_PER_THREAD, 10) || 1;
-        const startIndex = (THREAD_ID - 1) * batchSize;
-        const endIndex = Math.min(startIndex + batchSize, topicsList.length);
-        const batchTopics = topicsList.slice(startIndex, endIndex);
-        
-        if (batchTopics.length === 0) {
-            console.log("💄 [Beauty Поток #" + THREAD_ID + "] Нет beauty тем для обработки.");
+        if (allTopics.length === 0) {
+            console.log('📝 Топики не найдены. Создан пустой файл topics.txt');
             return;
         }
         
-        console.log("💄 [Beauty Поток #" + THREAD_ID + "] Найдено " + batchTopics.length + " новых beauty тем. Беру в работу.");
+        // Распределяем топики по потокам
+        const threadTopics = allTopics.filter((_, index) => 
+            index % TOTAL_THREADS === (parseInt(THREAD_ID) - 1)
+        );
         
-        for (const topic of batchTopics) {
-            const slug = topic.toLowerCase()
-                .replace(/[^\w\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .replace(/^-|-$/g, '');
-            
-            const filePath = path.join(POSTS_DIR, slug + ".md");
-            
+        const topicsToProcess = threadTopics.slice(0, BATCH_SIZE);
+        
+        if (topicsToProcess.length === 0) {
+            console.log(`[Поток #${THREAD_ID}] 📭 Нет топиков для обработки`);
+            return;
+        }
+        
+        console.log(`[Поток #${THREAD_ID}] 📋 Обрабатываю ${topicsToProcess.length} топиков...`);
+        
+        let successCount = 0;
+        
+        for (const topic of topicsToProcess) {
             try {
-                await fs.access(filePath);
-                console.log("💄 [Beauty Поток #" + THREAD_ID + "] ⏭️ Статья \"" + topic + "\" уже существует. Пропускаю.");
-                continue;
-            } catch {
-                // Файл не существует, продолжаем
-            }
-            
-            const content = await generateBeautyContent(topic);
-            if (content) {
-                await fs.mkdir(path.dirname(filePath), { recursive: true });
-                await fs.writeFile(filePath, content, 'utf-8');
+                // Генерируем контент
+                const content = await generateBeautyContent(topic);
+                if (!content) continue;
                 
-                console.log("💄 [Beauty Поток #" + THREAD_ID + "] [✔] Beauty статья \"" + topic + "\" успешно создана.");
+                // Генерируем SEO
+                const category = categorizeBeautyTopic(topic);
+                const seoData = await generateBeautySEO(topic, category);
                 
-                // IndexNow уведомление
-                const indexUrl = "https://" + BRAND_CONFIG.blog_domain + "/blog/" + slug + "/";
-                await sendIndexNowNotification(indexUrl);
+                // Создаем frontmatter
+                const fullContent = await createBeautyFrontmatter(topic, content, seoData);
+                
+                // Валидация YAML
+                try {
+                    const matter = await import('gray-matter');
+                    matter.default(fullContent);
+                    console.log(`[Поток #${THREAD_ID}] [✔] YAML валидация прошла для "${topic}"`);
+                } catch (yamlError) {
+                    console.error(`[Поток #${THREAD_ID}] [❌] YAML ошибка в "${topic}": ${yamlError.message}`);
+                    continue;
+                }
+                
+                // Сохраняем файл
+                const slug = topic.toLowerCase()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+                
+                const filePath = `src/content/posts/${slug}.md`;
+                await fs.writeFile(filePath, fullContent);
+                
+                console.log(`[Поток #${THREAD_ID}] ✅ Создан: ${filePath}`);
+                successCount++;
+                
+                // Пауза между генерациями
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+            } catch (error) {
+                console.error(`[Поток #${THREAD_ID}] ❌ Ошибка обработки "${topic}":`, error.message);
             }
         }
         
+        console.log(`[Поток #${THREAD_ID}] 🎯 Завершено! Создано статей: ${successCount}/${topicsToProcess.length}`);
+        
     } catch (error) {
-        console.error("💄 [Beauty Поток #" + THREAD_ID + "] ❌ Критическая ошибка:", error.message);
+        console.error(`[Поток #${THREAD_ID}] 💥 Критическая ошибка:`, error);
         process.exit(1);
     }
 }
 
-// ===== INDEXNOW УВЕДОМЛЕНИЯ =====
-async function sendIndexNowNotification(url) {
-    const API_KEY = "df39150ca56f896546628ae3c923dd4a"; // BlondePlace IndexNow token
-    const HOST = "blondeplace.netlify.app";
-    
-    const payload = {
-        host: HOST,
-        key: API_KEY,
-        urlList: [url]
-    };
-    
-    try {
-        console.log("📢 [Beauty Поток #" + THREAD_ID + "] Отправляю уведомление для " + url + " в IndexNow...");
-        
-        const response = await fetch('https://api.indexnow.org/indexnow', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        
-        if (response.ok) {
-            console.log("📢 [Beauty Поток #" + THREAD_ID + "] [✔] Уведомление для " + url + " успешно отправлено. 🔥");
-        } else {
-            console.log("📢 [Beauty Поток #" + THREAD_ID + "] ⚠️ IndexNow ответил: " + response.status);
-        }
-        
-    } catch (error) {
-        console.log("📢 [Beauty Поток #" + THREAD_ID + "] ❌ Ошибка IndexNow: " + error.message);
-    }
-}
-
-if (import.meta.url === "file://" + process.argv[1]) {
+// Запуск фабрики
+if (import.meta.url === `file://${process.argv[1]}`) {
     main();
 }
