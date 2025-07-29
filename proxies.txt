@@ -1,0 +1,14 @@
+# Список прокси серверов
+# Поддерживаемые форматы:
+
+# HTTP прокси
+http://127.0.0.1:8080
+http://user:pass@proxy.example.com:3128
+
+# HTTPS прокси  
+https://127.0.0.1:8080
+https://user:pass@proxy.example.com:3128
+
+# SOCKS5 прокси
+socks5://127.0.0.1:1080
+socks5://user:pass@proxy.example.com:1080
