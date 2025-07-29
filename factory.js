@@ -71,23 +71,19 @@ const TOTAL_THREADS = parseInt(process.env.TOTAL_THREADS) || 1;
 
 // Выбираем правильный API ключ в зависимости от модели
 let API_KEY_CURRENT;
-if (MODEL_CHOICE === 'gemini') {
-    API_KEY_CURRENT = GEMINI_API_KEY_CURRENT;
-    if (!API_KEY_CURRENT) {
-        console.error('❌ Gemini API ключ не найден! Установите GEMINI_API_KEY_CURRENT');
-        process.exit(1);
-    }
-    console.log(`💄 [Beauty Поток #${THREAD_ID}] Использую модель Gemini с ключом ...${API_KEY_CURRENT.slice(-4)}`);
-} else {
+if (MODEL_CHOICE === 'openrouter') {
     API_KEY_CURRENT = OPENROUTER_API_KEY_CURRENT;
     if (!API_KEY_CURRENT) {
         console.error('❌ OpenRouter API ключ не найден! Установите OPENROUTER_API_KEY_CURRENT');
         process.exit(1);
     }
-    console.log(`💄 [Beauty Поток #${THREAD_ID}] Использую модель OpenRouter с ключом ...${API_KEY_CURRENT.slice(-4)}`);
+} else {
+    API_KEY_CURRENT = GEMINI_API_KEY_CURRENT;
+    if (!API_KEY_CURRENT) {
+        console.error('❌ Gemini API ключ не найден! Установите GEMINI_API_KEY_CURRENT');
+        process.exit(1);
+    }
 }
-
-
 
 // ===== ИНИЦИАЛИЗАЦИЯ AI =====
 const genAI = new GoogleGenerativeAI(API_KEY_CURRENT);
@@ -277,7 +273,6 @@ async function generateBeautySEO(topic, category) {
 async function createBeautyFrontmatter(topic, content, seoData) {
     const category = categorizeBeautyTopic(topic);
     // ИСПРАВЛЕННАЯ ФУНКЦИЯ SLUG С ПОДДЕРЖКОЙ КИРИЛЛИЦЫ
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ SLUG С ПОДДЕРЖКОЙ КИРИЛЛИЦЫ
     const slug = topic.toLowerCase()
         // Транслитерация кириллицы в латиницу
         .replace(/а/g, 'a').replace(/б/g, 'b').replace(/в/g, 'v').replace(/г/g, 'g')
@@ -296,6 +291,126 @@ async function createBeautyFrontmatter(topic, content, seoData) {
         .replace(/-+/g, '-')
         // Убираем дефисы в начале и конце
         .replace(/^-+|-+$/g, '');
+    
+    const heroImage = `/images/beauty/${category}/${slug}.jpg`;
+    const currentDate = new Date().toISOString();
+    
+    // Schema.org для beauty контента
+    const schema = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: seoData.title,
+        description: seoData.description,
+        image: `https://${BRAND_CONFIG.blog_domain}${heroImage}`,
+        author: {
+            "@type": "Organization",
+            name: BRAND_CONFIG.salon_name,
+            url: `https://${BRAND_CONFIG.domain}`
+        },
+        publisher: {
+            "@type": "Organization", 
+            name: BRAND_CONFIG.brand,
+            logo: {
+                "@type": "ImageObject",
+                url: `https://${BRAND_CONFIG.domain}/logo.png`
+            }
+        },
+        datePublished: currentDate,
+        dateModified: currentDate,
+        mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": `https://${BRAND_CONFIG.blog_domain}/blog/${slug}/`
+        },
+        about: [
+            {
+                "@type": "Thing",
+                name: "Beauty Care"
+            },
+            {
+                "@type": "Thing", 
+                name: "Hair Care"
+            }
+        ]
+    };
+    
+    const frontmatter = `---
+title: ${JSON.stringify(seoData.title)}
+description: ${JSON.stringify(seoData.description)}
+keywords: ${JSON.stringify(seoData.keywords)}
+pubDate: ${JSON.stringify(currentDate)}
+author: ${JSON.stringify(BRAND_CONFIG.author)}
+heroImage: ${JSON.stringify(heroImage)}
+category: ${JSON.stringify(category)}
+schema: ${JSON.stringify(schema)}
+---
+
+${content}
+`;
+    
+    return frontmatter;
+}
+
+// ===== ОСНОВНАЯ ФУНКЦИЯ =====
+async function main() {
+    try {
+        console.log(`🎨 === BLONDEPLACE BEAUTY FACTORY ===`);
+        console.log(`💄 Салон: ${BRAND_CONFIG.salon_name}`);
+        console.log(`🌐 Домен: ${BRAND_CONFIG.domain}`);
+        console.log(`📱 Поток: #${THREAD_ID} | Пакет: ${BATCH_SIZE} статей`);
+        console.log(`🤖 Модель: ${MODEL_CHOICE}`);
+        
+        const allTopics = await loadTopics();
+        
+        if (allTopics.length === 0) {
+            console.log('📝 Топики не найдены. Создан пустой файл topics.txt');
+            return;
+        }
+        
+        // Распределяем топики по потокам
+        const threadTopics = allTopics.filter((_, index) => 
+            index % TOTAL_THREADS === (parseInt(THREAD_ID) - 1)
+        );
+        
+        const topicsToProcess = threadTopics.slice(0, BATCH_SIZE);
+        
+        if (topicsToProcess.length === 0) {
+            console.log(`[Поток #${THREAD_ID}] 📭 Нет топиков для обработки`);
+            return;
+        }
+        
+        console.log(`[Поток #${THREAD_ID}] 📋 Обрабатываю ${topicsToProcess.length} топиков...`);
+        
+        let successCount = 0;
+        
+        for (const topic of topicsToProcess) {
+            try {
+                // Генерируем контент
+                const content = await generateBeautyContent(topic);
+                if (!content) continue;
+                
+                // Генерируем SEO
+                const category = categorizeBeautyTopic(topic);
+                const seoData = await generateBeautySEO(topic, category);
+                
+                // Создаем frontmatter
+                const fullContent = await createBeautyFrontmatter(topic, content, seoData);
+                
+                // Валидация YAML
+                try {
+                    const matter = await import('gray-matter');
+                    matter.default(fullContent);
+                    console.log(`[Поток #${THREAD_ID}] [✔] YAML валидация прошла для "${topic}"`);
+                } catch (yamlError) {
+                    console.error(`[Поток #${THREAD_ID}] [❌] YAML ошибка в "${topic}": ${yamlError.message}`);
+                    continue;
+                }
+                
+                // Сохраняем файл
+                const slug = topic.toLowerCase()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
                 
                 const filePath = `src/content/posts/${slug}.md`;
                 await fs.writeFile(filePath, fullContent);
