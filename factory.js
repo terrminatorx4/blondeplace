@@ -23,7 +23,16 @@ const GEMINI_MODEL_NAME = "gemini-2.5-pro";
 // --- ИНИЦИАЛИЗАЦИЯ ПОТОКА ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
-const apiKey = process.env.API_KEY_CURRENT;
+// Получаем API ключ в зависимости от модели
+const GEMINI_API_KEY_CURRENT = process.env.GEMINI_API_KEY_CURRENT;
+const OPENROUTER_API_KEY_CURRENT = process.env.OPENROUTER_API_KEY_CURRENT;
+
+let apiKey;
+if (modelChoice === 'deepseek') {
+    apiKey = OPENROUTER_API_KEY_CURRENT;
+} else {
+    apiKey = GEMINI_API_KEY_CURRENT;
+}
 
 if (!apiKey) {
     throw new Error(`[Поток #${threadId}] Не был предоставлен API-ключ!`);
