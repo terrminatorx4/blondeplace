@@ -85,7 +85,7 @@ if (MODEL_CHOICE === 'gemini') {
     console.log(`💄 [Beauty Поток #${THREAD_ID}] Использую модель Gemini с ключом ...${API_KEY_CURRENT.slice(-4)}`);
     
     const genAI = new GoogleGenerativeAI(API_KEY_CURRENT);
-    model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+    model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 } else {
     API_KEY_CURRENT = OPENROUTER_API_KEY_CURRENT;
     if (!API_KEY_CURRENT) {
