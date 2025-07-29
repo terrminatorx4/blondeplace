@@ -406,11 +406,7 @@ async function main() {
                 }
                 
                 // Сохраняем файл
-                const slug = topic.toLowerCase()
-                    .replace(/[^\w\s-]/g, '')
-                    .replace(/\s+/g, '-')
-                    .replace(/-+/g, '-')
-                    .replace(/^-|-$/g, '');
+                const slug = slugify(topic);
                 
                 const filePath = `src/content/posts/${slug}.md`;
                 await fs.writeFile(filePath, fullContent);
