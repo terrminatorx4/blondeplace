@@ -1,19 +1,22 @@
-// Файл: factory.js (BlondePlace версия - точная копия Butler логики)
+// Файл: factory.js (BlondePlace версия - ИСПРАВЛЕННАЯ)
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
 import fetch from 'node-fetch';
 import { execa } from 'execa';
 
+// --- КОНСТАНТЫ ---
+const SITE_URL = 'https://blondeplace.netlify.app';
+const BRAND_NAME = 'BlondePlace';
+const BRAND_BLOG_NAME = 'Блог BlondePlace';
+const BRAND_AUTHOR_NAME = 'Эксперт BlondePlace';
+const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1522338242992-e1a54906a8da?q=80&w=2070&auto=format&fit=crop';
+const INDEXNOW_API_KEY = '2f4e6a8b9c1d3e5f7a8b9c0d1e2f3a4b5c6d7e8f';
+
 // --- НАСТРОЙКИ ОПЕРАЦИИ ---
 const TARGET_URL_MAIN = "https://blondeplace.ru";
 const TOPICS_FILE = 'topics.txt';
 const POSTS_DIR = 'src/content/posts';
-const SITE_URL = "https://blondeplace.netlify.app";
-const BRAND_NAME = "BlondePlace";
-const BRAND_BLOG_NAME = `Блог ${BRAND_NAME}`;
-const BRAND_AUTHOR_NAME = `Эксперт ${BRAND_NAME}`;
-const FALLBACK_IMAGE_URL = "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?q=80&w=2070&auto=format&fit=crop";
 
 // --- НАСТРОЙКИ МОДЕЛЕЙ ---
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -74,17 +77,6 @@ function getContextualLink(topic) {
     return REAL_LINKS_MAP.general[Math.floor(Math.random() * REAL_LINKS_MAP.general.length)];
 }
 
-async function isUrlAccessible(url) {
-    if (typeof url !== 'string' || !url.startsWith('http')) return false;
-    try {
-        const response = await fetch(url, { method: 'HEAD', timeout: 5000 });
-        return response.ok;
-    } catch (error) {
-        console.warn(`[!] Предупреждение: не удалось проверить URL изображения: ${url}. Ошибка: ${error.message}`);
-        return false;
-    }
-}
-
 function slugify(text) {
     const cleanedText = text.toString().replace(/[\x00-\x1F\x7F-\x9F]/g, "").trim();
     const from = "а б в г д е ё ж з и й к л м н о п р с т у ф х ц ч ш щ ъ ы ь э ю я".split(' ');
@@ -142,10 +134,9 @@ async function generateWithRetry(prompt, maxRetries = 4) {
 
 async function notifyIndexNow(url) {
     console.log(`📢 [Поток #${threadId}] Отправляю уведомление для ${url} в IndexNow...`);
-    const API_KEY = "2f4e6a8b9c1d3e5f7a8b9c0d1e2f3a4b5c6d7e8f";  // Уникальный токен для BlondePlace
     const HOST = "blondeplace.netlify.app";
     
-    const payload = JSON.stringify({ host: HOST, key: API_KEY, urlList: [url] });
+    const payload = JSON.stringify({ host: HOST, key: INDEXNOW_API_KEY, urlList: [url] });
 
     try {
         await execa('curl', ['-X', 'POST', 'https://yandex.com/indexnow', '-H', 'Content-Type: application/json; charset=utf-8', '-d', payload]);
@@ -162,10 +153,17 @@ async function generatePost(topic, slug, interlinks) {
     const planPrompt = `Создай детальный, экспертный план-структуру для SEO-статьи на тему "${topic}". Контекст: статья пишется для блога салона красоты ${BRAND_NAME}.`;
     const plan = await generateWithRetry(planPrompt);
 
-    const articlePrompt = `Напиши экспертную, полезную SEO-статью по этому плану:\n\n${plan}\n\nТема: "${topic}". ВАЖНО: строго следуй плану и используй синтаксис Markdown для всех заголовков (# для H1, ## для H2, ### для H3). Текст должен быть написан от лица салона красоты ${BRAND_NAME}. ЗАПРЕЩЕНО: не выдумывай и не вставляй в текст никакие ссылки или URL-адреса. Не пиши никакого сопроводительного текста перед первым заголовком, такого как "Конечно, вот статья". Сразу начинай с заголовка H1.`;
+    const articlePrompt = `Напиши экспертную, полезную SEO-статью по этому плану:\n\n${plan}\n\nТема: "${topic}". ВАЖНО: строго следуй плану и используй синтаксис Markdown для всех заголовков (# для H1, ## для H2, ### для H3). Текст должен быть написан от лица салона красоты ${BRAND_NAME}. КРИТИЧЕСКИ ВАЖНО: НЕ ВСТАВЛЯЙ В ТЕКСТ НИКАКИХ ИЗОБРАЖЕНИЙ ![...], ССЫЛОК, URL-АДРЕСОВ ИЛИ МЕДИА-КОНТЕНТА. Пиши только чистый текст с заголовками. Не пиши никакого сопроводительного текста перед первым заголовком. Сразу начинай с заголовка H1.`;
     let articleText = await generateWithRetry(articlePrompt);
 
-    articleText = articleText.replace(/!\[.*?\]\((?!http).*?\)/g, '');
+    // СУПЕР-ЖЁСТКАЯ ОЧИСТКА от всех возможных неправильных ссылок и изображений
+    articleText = articleText.replace(/!\[.*?\]\(.*?\)/g, ''); // Убираем ВСЕ изображения
+    articleText = articleText.replace(/\[.*?\]\([^\)]*\)/g, ''); // Убираем все ссылки
+    articleText = articleText.replace(/https?:\/\/[^\s\)\]]+/g, ''); // Убираем все URL
+    articleText = articleText.replace(/https-[^\s\)\]]+/g, ''); // Убираем битые https- ссылки
+    articleText = articleText.replace(/www\.[^\s]+/g, ''); // Убираем www ссылки
+    articleText = articleText.replace(/[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/g, ''); // Убираем домены
+    articleText = articleText.replace(/\*\s*Пример.*?\*/g, ''); // Убираем подписи к изображениям
 
     if (interlinks.length > 0) {
         let interlinkingBlock = '\n\n---\n\n## Читайте также\n\n';
@@ -195,8 +193,8 @@ async function generatePost(topic, slug, interlinks) {
     const reviewCount = Math.floor(Math.random() * (900 - 300 + 1)) + 300;
     const ratingValue = (Math.random() * (5.0 - 4.7) + 4.7).toFixed(1);
 
-    const isImageOk = await isUrlAccessible(seoData.heroImage);
-    const finalHeroImage = isImageOk ? seoData.heroImage : FALLBACK_IMAGE_URL;
+    // Всегда используем fallback изображение для стабильности
+    const finalHeroImage = FALLBACK_IMAGE_URL;
 
     const fullSchema = {
       "@context": "https://schema.org", "@type": "HowTo", "name": seoData.title,
@@ -297,4 +295,4 @@ async function main() {
     }
 }
 
-main(); 
+main();
