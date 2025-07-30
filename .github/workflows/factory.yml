@@ -64,7 +64,7 @@ jobs:
       - name: 📦 Install dependencies
         if: steps.check_thread.outputs.should_run == 'true'
         run: |
-          npm ci
+          npm install
           npm list --depth=0
 
       - name: 🔑 Setup API Keys
