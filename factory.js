@@ -1,4 +1,4 @@
-// === FACTORY.JS ВЕРСИЯ 8.2 «БЕЗОПАСНЫЙ YAML» ===
+// === FACTORY.JS ВЕРСИЯ 8.3 «БЕЗ REQUIRE» ===
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
@@ -55,25 +55,6 @@ function slugify(text) {
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
         .replace(/^-|-$/g, '');
-}
-
-// --- БЕЗОПАСНОЕ YAML ЭКРАНИРОВАНИЕ ---
-function yamlSafe(str) {
-    if (!str) return '""';
-    
-    // Удаляем все проблемные символы
-    const cleaned = str
-        .replace(/\\/g, '') // Убираем все backslash
-        .replace(/"/g, '') // Убираем кавычки
-        .replace(/'/g, '') // Убираем апострофы
-        .replace(/:/g, ' -') // Заменяем двоеточия
-        .replace(/\n/g, ' ') // Убираем переносы строк
-        .replace(/\r/g, ' ') // Убираем возврат каретки
-        .replace(/\t/g, ' ') // Убираем табы
-        .replace(/\s+/g, ' ') // Убираем множественные пробелы
-        .trim();
-    
-    return `"${cleaned}"`;
 }
 
 // --- AI ГЕНЕРАЦИЯ ---
@@ -246,14 +227,14 @@ async function generatePost(topic, slug, interlinks) {
         }
     };
 
-    // БЕЗОПАСНЫЙ YAML БЕЗ ESCAPE ПОСЛЕДОВАТЕЛЬНОСТЕЙ
+    // ИСПОЛЬЗУЕМ JSON.stringify для БЕЗОПАСНОГО YAML (как в Butler)
     const frontmatter = `---
-title: ${yamlSafe(seoData.title)}
-description: ${yamlSafe(seoData.description)}
-keywords: ${yamlSafe(seoData.keywords)}
-pubDate: "${new Date().toISOString()}"
-author: "${BRAND_AUTHOR_NAME}"
-heroImage: "${finalHeroImage}"
+title: ${JSON.stringify(seoData.title)}
+description: ${JSON.stringify(seoData.description)}
+keywords: ${JSON.stringify(seoData.keywords)}
+pubDate: ${JSON.stringify(new Date().toISOString())}
+author: ${JSON.stringify(BRAND_AUTHOR_NAME)}
+heroImage: ${JSON.stringify(finalHeroImage)}
 schema: ${JSON.stringify(fullSchema)}
 ---
 ${articleText}
@@ -296,11 +277,8 @@ async function notifySearchEngines(urls) {
 // --- ОСНОВНАЯ ФУНКЦИЯ ---
 async function main() {
     try {
-        // ЧИТАЕМ АКТУАЛЬНЫЙ TOPICS.TXT С ПРИНУДИТЕЛЬНЫМ ОБНОВЛЕНИЕМ
-        console.log(`[Поток #${threadId}] 📖 Принудительно читаю свежий topics.txt...`);
-        
-        // Очищаем кэш require если есть
-        delete require.cache[path.resolve('topics.txt')];
+        // ЧИТАЕМ TOPICS.TXT (БЕЗ require)
+        console.log(`[Поток #${threadId}] 📖 Читаю актуальный topics.txt...`);
         
         const topicsContent = fs.readFileSync('topics.txt', 'utf-8');
         const allLines = topicsContent.split('\n').map(line => line.trim());
@@ -356,14 +334,8 @@ async function main() {
             }
         }
 
-        // Обновляем topics.txt с оставшимися темами
-        const updatedContent = [
-            '# 50 тем',
-            'Правильный выбор кисточек для макияжа по назначению',
-            ...topics
-        ].join('\n') + '\n';
-        
-        fs.writeFileSync('topics.txt', updatedContent, 'utf-8');
+        // Обновляем topics.txt
+        fs.writeFileSync('topics.txt', topics.join('\n') + '\n', 'utf-8');
 
         // Уведомляем поисковики
         if (generatedUrls.length > 0) {
