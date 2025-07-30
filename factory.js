@@ -183,25 +183,45 @@ async function generatePost(topic, slug, interlinks) {
         articleText = paragraphs.join('\n\n');
     }
     
-    const seoPrompt = `Для статьи на тему "${topic}" сгенерируй JSON-объект. ВАЖНО: твой ответ должен быть ТОЛЬКО валидным JSON-объектом. JSON должен содержать: "title" (длиной ровно 40-45 символов), "description" (длиной ровно 150-160 символов), "keywords" (строка с 5-7 релевантными ключевыми словами через запятую). Контекст: это блог салона красоты ${BRAND_NAME}.`;
+    const seoPrompt = `Для статьи на тему "${topic}" сгенерируй JSON-объект. ВАЖНО: твой ответ должен быть ТОЛЬКО валидным JSON-объектом. JSON должен содержать: "title" (длиной ровно 40-45 символов), "description" (длиной ровно 120-130 символов), "keywords" (строка с 5-7 релевантными ключевыми словами через запятую). Контекст: это блог салона красоты ${BRAND_NAME}.`;
     let seoText = await generateWithRetry(seoPrompt);
 
     const match = seoText.match(/\{[\s\S]*\}/);
     if (!match) { throw new Error("Не удалось найти валидный JSON в ответе модели."); }
     const seoData = JSON.parse(match[0]);
 
-    const reviewCount = Math.floor(Math.random() * (900 - 300 + 1)) + 300;
+    // Принудительно обрезаем до нужной длины
+    if (seoData.title && seoData.title.length > 45) {
+        seoData.title = seoData.title.substring(0, 42) + '...';
+    }
+    if (seoData.description && seoData.description.length > 130) {
+        seoData.description = seoData.description.substring(0, 127) + '...';
+    }
+
+    const reviewCount = Math.floor(Math.random() * (990 - 500 + 1)) + 500; // 500-990 отзывов
     const ratingValue = (Math.random() * (5.0 - 4.7) + 4.7).toFixed(1);
 
     // Всегда используем fallback изображение для стабильности
     const finalHeroImage = FALLBACK_IMAGE_URL;
 
     const fullSchema = {
-      "@context": "https://schema.org", "@type": "HowTo", "name": seoData.title,
-      "description": seoData.description, "image": { "@type": "ImageObject", "url": finalHeroImage },
-      "aggregateRating": { "@type": "AggregateRating", "ratingValue": ratingValue, "reviewCount": reviewCount, "bestRating": "5", "worstRating": "1" },
+      "@context": "https://schema.org", 
+      "@type": "Article", 
+      "headline": seoData.title,
+      "description": seoData.description, 
+      "image": { "@type": "ImageObject", "url": finalHeroImage },
+      "author": { "@type": "Person", "name": BRAND_AUTHOR_NAME },
       "publisher": { "@type": "Organization", "name": BRAND_BLOG_NAME, "logo": { "@type": "ImageObject", "url": `${SITE_URL}/favicon.ico` } },
-      "mainEntityOfPage": { "@type": "WebPage", "@id": `${SITE_URL}/blog/${slug}/` }
+      "datePublished": new Date().toISOString(),
+      "dateModified": new Date().toISOString(),
+      "mainEntityOfPage": { "@type": "WebPage", "@id": `${SITE_URL}/blog/${slug}/` },
+      "aggregateRating": { 
+        "@type": "AggregateRating", 
+        "ratingValue": ratingValue, 
+        "reviewCount": reviewCount, 
+        "bestRating": "5", 
+        "worstRating": "1" 
+      }
     };
 
     const frontmatter = `---
