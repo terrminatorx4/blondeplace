@@ -80,12 +80,17 @@ jobs:
             echo "::error::Не удалось извлечь API-ключ для потока #${{ matrix.thread }} для модели ${MODEL_CHOICE}."
             exit 1
           fi
-          echo "key=$CURRENT_KEY" >> $GITHUB_OUTPUT
+          
+          # ИСПРАВЛЕНИЕ: Устанавливаем правильные имена переменных для factory.js
+          if [ "$MODEL_CHOICE" == "deepseek" ]; then
+            echo "OPENROUTER_API_KEY_CURRENT=$CURRENT_KEY" >> $GITHUB_ENV
+          else
+            echo "GEMINI_API_KEY_CURRENT=$CURRENT_KEY" >> $GITHUB_ENV
+          fi
 
       - name: 🏭 Run Factory & 📢 Publish & Notify (Thread ${{ matrix.thread }})
         env:
           MODEL_CHOICE: ${{ github.event.inputs.model_choice || 'gemini' }}
-          API_KEY_CURRENT: ${{ steps.set_key.outputs.key }}
           BATCH_SIZE: ${{ github.event.inputs.batch_size_per_thread || 5 }}
           TOTAL_THREADS: ${{ github.event.inputs.threads || 5 }}
           THREAD_ID: ${{ matrix.thread }}
