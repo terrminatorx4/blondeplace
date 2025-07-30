@@ -1,12 +1,12 @@
-name: 🚀 Performance Monitor & Lighthouse Audit
+name: 🚀 Performance Monitor
 
 on:
   workflow_dispatch:
     inputs:
-      test_url:
-        description: 'URL для тестирования'
+      site_url:
+        description: 'URL сайта для тестирования'
         required: true
-        default: 'https://butlerspb-blog.netlify.app'
+        default: 'https://blondeplace.netlify.app'
       check_core_web_vitals:
         description: 'Проверить Core Web Vitals'
         type: boolean
@@ -43,7 +43,7 @@ jobs:
       - name: 🚀 Lighthouse Desktop Audit
         run: |
           echo "🖥️ Запуск Lighthouse аудита для Desktop..."
-          lighthouse ${{ github.event.inputs.test_url }} \
+          lighthouse ${{ github.event.inputs.site_url }} \
             --output=json \
             --output=html \
             --output-path=./lighthouse-desktop \
@@ -54,7 +54,7 @@ jobs:
         if: ${{ github.event.inputs.mobile_test == 'true' }}
         run: |
           echo "📱 Запуск Lighthouse аудита для Mobile..."
-          lighthouse ${{ github.event.inputs.test_url }} \
+          lighthouse ${{ github.event.inputs.site_url }} \
             --output=json \
             --output=html \
             --output-path=./lighthouse-mobile \
@@ -123,7 +123,7 @@ jobs:
         run: |
           echo "🌐 Получение данных из PageSpeed Insights API..."
           API_URL="https://www.googleapis.com/pagespeedonline/v5/runPagespeed"
-          FULL_URL="${API_URL}?url=${{ github.event.inputs.test_url }}&category=performance"
+          FULL_URL="${API_URL}?url=${{ github.event.inputs.site_url }}&category=performance"
           
           echo "📡 Запрос к PageSpeed API..."
           curl -s "$FULL_URL" > pagespeed-results.json
@@ -148,7 +148,7 @@ jobs:
           echo "🔍 Проверка SEO мета-тегов..."
           
           # Получаем HTML страницы
-          curl -s "${{ github.event.inputs.test_url }}" > page.html
+          curl -s "${{ github.event.inputs.site_url }}" > page.html
           
           # Проверяем основные SEO элементы
           TITLE=$(grep -o '<title[^>]*>[^<]*</title>' page.html | sed 's/<[^>]*>//g')

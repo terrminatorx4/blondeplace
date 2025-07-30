@@ -4,11 +4,11 @@ import path from 'path';
 import matter from 'gray-matter'; // Специальный инструмент для работы с frontmatter
 
 const POSTS_DIR = 'src/content/posts';
-const SITE_URL = "https://butlerspb-blog.netlify.app";
-const BRAND_NAME = "ButlerSPB";
+const SITE_URL = "https://blondeplace.netlify.app";
+const BRAND_NAME = "BlondePlace";
 const BRAND_BLOG_NAME = `Блог ${BRAND_NAME}`;
 const BRAND_AUTHOR_NAME = `Эксперт ${BRAND_NAME}`;
-const FALLBACK_IMAGE_URL = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop";
+const FALLBACK_IMAGE_URL = "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?q=80&w=2070&auto=format&fit=crop";
 
 async function fixPosts() {
     console.log('--- Запуск Хирургического Ремонта ---');
