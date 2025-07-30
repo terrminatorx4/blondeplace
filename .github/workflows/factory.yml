@@ -7,7 +7,10 @@ on:
         description: 'Выбор AI модели'
         required: true
         default: 'gemini'
-        type: string
+        type: choice
+        options:
+        - gemini
+        - openrouter
       batch_size_per_thread:
         description: 'Количество статей на поток'
         required: true
@@ -29,46 +32,31 @@ jobs:
     
     strategy:
       matrix:
-        thread: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-      max-parallel: 20
+        thread: [1, 2, 3, 4, 5]
+      max-parallel: 5
       fail-fast: false
     
+    if: matrix.thread <= fromJSON(github.event.inputs.threads || '3')
+    
     steps:
-      - name: 🎯 Check if thread should run
-        id: check_thread
-        run: |
-          MAX_THREADS=${{ github.event.inputs.threads || '3' }}
-          CURRENT_THREAD=${{ matrix.thread }}
-          if [ $CURRENT_THREAD -le $MAX_THREADS ]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
-            echo "✅ Thread $CURRENT_THREAD will run (max: $MAX_THREADS)"
-          else
-            echo "should_run=false" >> $GITHUB_OUTPUT
-            echo "⏭️ Thread $CURRENT_THREAD skipped (max: $MAX_THREADS)"
-          fi
-
       - name: 🛒 Checkout repository
-        if: steps.check_thread.outputs.should_run == 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🏗️ Setup Node.js
-        if: steps.check_thread.outputs.should_run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        if: steps.check_thread.outputs.should_run == 'true'
         run: |
-          npm install
+          npm ci
           npm list --depth=0
 
       - name: 🔑 Setup API Keys
-        if: steps.check_thread.outputs.should_run == 'true'
         run: |
           echo "🔑 Processing API keys for thread ${{ matrix.thread }}"
           
@@ -113,7 +101,6 @@ jobs:
           fi
 
       - name: 🎨 Run Beauty Factory & 📢 Publish & Notify (Thread ${{ matrix.thread }})
-        if: steps.check_thread.outputs.should_run == 'true'
         env:
           MODEL_CHOICE: ${{ github.event.inputs.model_choice || 'gemini' }}
           BATCH_SIZE_PER_THREAD: ${{ github.event.inputs.batch_size_per_thread || 5 }}
@@ -124,19 +111,16 @@ jobs:
           git config --global user.email 'beauty-bot@blondeplace.ru'
           git config --global pull.rebase false
           
-          echo "--- 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Начинаю генерацию beauty контента ---"
-          echo "🤖 Модель: ${{ github.event.inputs.model_choice }}"
-          echo "📊 Статей на поток: ${{ github.event.inputs.batch_size_per_thread }}"
-          echo "🧵 Всего потоков: ${{ github.event.inputs.threads }}"
+          echo "--- 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Начинаю генерацию ---"
           
           npm run factory
           
           if [[ -z $(git status --porcelain) ]]; then
-            echo "✅ Thread ${{ matrix.thread }}: Новых статей для этого потока не найдено. Миссия завершена."
+            echo "✅ 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Новых статей для этого потока не найдено. Миссия завершена."
             exit 0
           fi
 
-          echo "🔥 Thread ${{ matrix.thread }}: Найден новый beauty контент. Публикую..."
+          echo "🔥 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Обнаружены новые статьи о красоте. Начинаю процедуру публикации..."
           
           # Atomic commit and push with conflict resolution
           MAX_RETRIES=5
@@ -164,7 +148,7 @@ jobs:
             fi
             
             # Commit
-            git commit -m "🎨 Beauty content from thread ${{ matrix.thread }} (${{ github.event.inputs.model_choice }})"
+            git commit -m "🎨 Beauty content from thread ${{ matrix.thread }} (${MODEL_CHOICE})"
             
             # Try to push
             if git push origin main; then
@@ -189,8 +173,8 @@ jobs:
           NEW_FILES=$(git diff --name-only $commit_before $commit_after -- 'src/content/posts/*.md' 2>/dev/null || echo "")
           
           if [[ -n "$NEW_FILES" ]]; then
-            echo "📢 Thread ${{ matrix.thread }}: Подготовка уведомления для IndexNow..."
-            API_KEY="2f4e6a8b9c1d3e5f7a8b9c0d1e2f3a4b5c6d7e8f"
+            echo "📢 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Подготовка уведомления для IndexNow..."
+            API_KEY="d1b055ab1eb146d892169bbb2c96550e"
             HOST="blondeplace.netlify.app"
 
             URL_JSON_ARRAY=$(for file in $NEW_FILES; do slug=$(basename "$file" .md); echo "https://blondeplace.netlify.app/blog/${slug}/"; done | jq -R . | jq -s .)
@@ -201,7 +185,7 @@ jobs:
                             --argjson urls "$URL_JSON_ARRAY" \
                             '{host: $host, key: $key, urlList: $urls}')
             
-            echo "--- Диагностика пакета для IndexNow (Thread ${{ matrix.thread }}) ---"
+            echo "--- Диагностика пакета для IndexNow (Beauty Поток №${{ matrix.thread }}) ---"
             echo "$JSON_PAYLOAD"
             echo "--- Конец диагностики ---"
             
@@ -209,7 +193,7 @@ jobs:
             curl -X POST "https://www.bing.com/indexnow" -H "Content-Type: application/json; charset=utf-8" -d "$JSON_PAYLOAD"
           fi
           
-          echo -e "\n✅ Thread ${{ matrix.thread }}: Миссия успешно завершена."
+          echo -e "\n✅ 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Миссия успешно завершена."
 
   notify-completion:
     name: 📢 Уведомление о завершении
