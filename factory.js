@@ -1,10 +1,12 @@
-// === FACTORY.JS ВЕРСИЯ 8.3 «БЕЗ REQUIRE» ===
+// === FACTORY.JS ВЕРСИЯ 9.0 «ТОЧНАЯ КОПИЯ BUTLER ЛОГИКИ» ===
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 
 // --- КОНСТАНТЫ ---
+const TOPICS_FILE = 'topics.txt';
+const POSTS_DIR = 'src/content/posts';
 const SITE_URL = 'https://blondeplace.netlify.app';
 const BRAND_NAME = 'BlondePlace';
 const BRAND_BLOG_NAME = 'Блог BlondePlace';
@@ -13,10 +15,9 @@ const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1522338242992-e1a5
 const INDEXNOW_API_KEY = '2f4e6a8b9c1d3e5f7a8b9c0d1e2f3a4b5c6d7e8f';
 const GEMINI_MODEL_NAME = 'gemini-2.0-flash-exp';
 
-// Определяем модель и API ключ
+// Определяем параметры из environment
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
-const threadId = process.env.THREAD_ID || '1';
-const batchSize = parseInt(process.env.BATCH_SIZE) || 5;
+const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
 
 let apiKey, modelName;
 
@@ -34,10 +35,7 @@ if (modelChoice === 'deepseek') {
     }
 }
 
-console.log(`[Поток #${threadId}] 🚀 Запуск Beauty Factory (Модель: ${modelChoice})`);
-console.log(`[Поток #${threadId}] 📊 Планируется генерация: ${batchSize} статей`);
-
-// --- ФУНКЦИЯ SLUGIFY ---
+// --- ФУНКЦИЯ SLUGIFY (ТОЧНАЯ КОПИЯ BUTLER) ---
 function slugify(text) {
     const translitMap = {
         'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh',
@@ -98,27 +96,6 @@ async function generateWithRetry(prompt, maxRetries = 3) {
     }
 }
 
-// --- ЗАГРУЗКА ИНТЕРЛИНКОВ ---
-function loadInterlinks() {
-    try {
-        const existingPosts = fs.readdirSync('src/content/posts')
-            .filter(file => file.endsWith('.md'))
-            .map(file => {
-                const content = fs.readFileSync(path.join('src/content/posts', file), 'utf-8');
-                const titleMatch = content.match(/^title:\s*["'](.+?)["']/m);
-                const slug = file.replace('.md', '');
-                return titleMatch ? { title: titleMatch[1], slug } : null;
-            })
-            .filter(Boolean);
-
-        console.log(`[Поток #${threadId}] Загружено ${existingPosts.length} существующих статей для интерлинкинга`);
-        return existingPosts;
-    } catch (error) {
-        console.log(`[Поток #${threadId}] Интерлинки недоступны:`, error.message);
-        return [];
-    }
-}
-
 // --- ГЕНЕРАЦИЯ СТАТЬИ ---
 async function generatePost(topic, slug, interlinks) {
     console.log(`[Поток #${threadId}] 🎨 Генерирую статью: "${topic}"`);
@@ -134,48 +111,25 @@ async function generatePost(topic, slug, interlinks) {
 
     const plan = await generateWithRetry(planPrompt);
 
-    const articlePrompt = `Напиши экспертную, полезную SEO-статью по этому плану:\n\n${plan}\n\nТема: "${topic}". ВАЖНО: строго следуй плану и используй синтаксис Markdown для всех заголовков (# для H1, ## для H2, ### для H3). Текст должен быть написан от лица салона красоты ${BRAND_NAME}. АБСОЛЮТНО ЗАПРЕЩЕНО: НЕ ВСТАВЛЯЙ В ТЕКСТ НИКАКИХ ИЗОБРАЖЕНИЙ ![...], ССЫЛОК [...](...), URL-АДРЕСОВ http/https, ДОМЕНОВ .com/.ru/.org, МЕДИА-КОНТЕНТА ИЛИ УПОМИНАНИЙ ДРУГИХ САЙТОВ. ТОЛЬКО ЧИСТЫЙ ТЕКСТ БЕЗ ССЫЛОК. Не пиши никакого сопроводительного текста перед первым заголовком. Сразу начинай с заголовка H1.`;
+    const articlePrompt = `Напиши экспертную, полезную SEO-статью по этому плану:\n\n${plan}\n\nТема: "${topic}". ВАЖНО: строго следуй плану и используй синтаксис Markdown для всех заголовков (# для H1, ## для H2, ### для H3). Текст должен быть написан от лица салона красоты ${BRAND_NAME}. НЕ ВСТАВЛЯЙ В ТЕКСТ НИКАКИХ ИЗОБРАЖЕНИЙ, ССЫЛОК ИЛИ URL-АДРЕСОВ. ТОЛЬКО ЧИСТЫЙ ТЕКСТ. Не пиши никакого сопроводительного текста перед первым заголовком. Сразу начинай с заголовка H1.`;
     let articleText = await generateWithRetry(articlePrompt);
 
-    // УЛЬТРА-ЖЁСТКАЯ ОЧИСТКА от ВСЕХ возможных ссылок и упоминаний
-    articleText = articleText.replace(/!\[.*?\]\(.*?\)/g, ''); // Убираем ВСЕ изображения
-    articleText = articleText.replace(/\[.*?\]\([^\)]*\)/g, ''); // Убираем все ссылки
-    articleText = articleText.replace(/https?:\/\/[^\s\)\]\,\.\!]+/g, ''); // Убираем все URL
-    articleText = articleText.replace(/www\.[^\s\)\]\,\.\!]+/g, ''); // Убираем www ссылки
-    articleText = articleText.replace(/[a-zA-Z0-9\-]+\.(com|ru|org|net|info|biz|co|io|app|dev)[^\s]*/gi, ''); // Убираем все домены
-    articleText = articleText.replace(/https-[^\s\)\]\,\.\!]+/g, ''); // Убираем битые https- ссылки
-    articleText = articleText.replace(/netlify[^\s]*/gi, ''); // Убираем любые упоминания netlify
-    articleText = articleText.replace(/github[^\s]*/gi, ''); // Убираем любые упоминания github
-    articleText = articleText.replace(/\*\s*Пример.*?\*/g, ''); // Убираем подписи к изображениям
+    // Очистка от ссылок и изображений
+    articleText = articleText.replace(/!\[.*?\]\(.*?\)/g, '');
+    articleText = articleText.replace(/\[.*?\]\([^\)]*\)/g, '');
+    articleText = articleText.replace(/https?:\/\/[^\s\)\]\,\.\!]+/g, '');
+    articleText = articleText.replace(/www\.[^\s\)\]\,\.\!]+/g, '');
 
-    // Дополнительная очистка - убираем строки с доменами
-    const lines = articleText.split('\n');
-    articleText = lines.filter(line => {
-        const cleanLine = line.toLowerCase();
-        return !cleanLine.includes('.com') && 
-               !cleanLine.includes('.ru') && 
-               !cleanLine.includes('.org') && 
-               !cleanLine.includes('.net') && 
-               !cleanLine.includes('netlify') && 
-               !cleanLine.includes('github') &&
-               !cleanLine.includes('http') &&
-               !cleanLine.includes('www.');
-    }).join('\n');
-
-    // ИНТЕРЛИНКИНГ
+    // ИНТЕРЛИНКИНГ (КАК В BUTLER)
+    let randomInterlinks = [];
     if (interlinks.length > 0) {
-        const relatedPosts = interlinks
-            .filter(post => {
-                const topicWords = topic.toLowerCase().split(' ');
-                const titleWords = post.title.toLowerCase().split(' ');
-                return topicWords.some(word => titleWords.some(titleWord => titleWord.includes(word) && word.length > 3));
-            })
-            .slice(0, 3);
-
-        if (relatedPosts.length > 0) {
+        const shuffled = [...interlinks].sort(() => 0.5 - Math.random());
+        randomInterlinks = shuffled.slice(0, 3);
+        
+        if (randomInterlinks.length > 0) {
             let relatedSection = '\n\n## Читайте также\n\n';
-            relatedPosts.forEach(post => {
-                relatedSection += `* [${post.title}](/blog/${post.slug}/)\n`;
+            randomInterlinks.forEach(link => {
+                relatedSection += `* [${link.title}](${link.url})\n`;
             });
             articleText += relatedSection;
         }
@@ -201,10 +155,8 @@ async function generatePost(topic, slug, interlinks) {
         seoData.keywords = `красота, ${BRAND_NAME}, салон красоты, уход, стиль`;
     }
 
-    const reviewCount = Math.floor(Math.random() * (990 - 500 + 1)) + 500; // 500-990 отзывов
+    const reviewCount = Math.floor(Math.random() * (990 - 500 + 1)) + 500;
     const ratingValue = (Math.random() * (5.0 - 4.7) + 4.7).toFixed(1);
-
-    // Всегда используем fallback изображение для стабильности
     const finalHeroImage = FALLBACK_IMAGE_URL;
 
     const fullSchema = {
@@ -227,7 +179,7 @@ async function generatePost(topic, slug, interlinks) {
         }
     };
 
-    // ИСПОЛЬЗУЕМ JSON.stringify для БЕЗОПАСНОГО YAML (как в Butler)
+    // BUTLER-STYLE FRONTMATTER (ТОЧНАЯ КОПИЯ)
     const frontmatter = `---
 title: ${JSON.stringify(seoData.title)}
 description: ${JSON.stringify(seoData.description)}
@@ -237,9 +189,9 @@ author: ${JSON.stringify(BRAND_AUTHOR_NAME)}
 heroImage: ${JSON.stringify(finalHeroImage)}
 schema: ${JSON.stringify(fullSchema)}
 ---
-${articleText}
 `;
-    return frontmatter;
+    
+    return frontmatter + articleText;
 }
 
 // --- УВЕДОМЛЕНИЯ INDEXNOW ---
@@ -274,57 +226,65 @@ async function notifySearchEngines(urls) {
     }
 }
 
-// --- ОСНОВНАЯ ФУНКЦИЯ ---
+// --- ОСНОВНАЯ ФУНКЦИЯ (ТОЧНАЯ КОПИЯ BUTLER) ---
 async function main() {
+    console.log(`[Поток #${threadId}] Запуск рабочего потока...`);
+
     try {
-        // ЧИТАЕМ TOPICS.TXT (БЕЗ require)
-        console.log(`[Поток #${threadId}] 📖 Читаю актуальный topics.txt...`);
+        const BATCH_SIZE = parseInt(process.env.BATCH_SIZE_PER_THREAD, 10) || 1;
+        const totalThreads = parseInt(process.env.TOTAL_THREADS, 10) || 1;
         
-        const topicsContent = fs.readFileSync('topics.txt', 'utf-8');
-        const allLines = topicsContent.split('\n').map(line => line.trim());
+        const fileContent = await fs.readFile(TOPICS_FILE, 'utf-8');
+        const allTopics = fileContent.split(/\r?\n/).map(topic => topic.trim()).filter(Boolean);
+
+        const postsDir = path.join(process.cwd(), POSTS_DIR);
+        await fs.mkdir(postsDir, { recursive: true });
         
-        // Фильтруем только АКТУАЛЬНЫЕ темы (убираем служебные строки)
-        const topics = allLines.filter(line => 
-            line && 
-            !line.startsWith('#') && 
-            !line.includes('50 тем') &&
-            !line.includes('Правильный выбор кисточек') && // Исключаем первую тему как служебную
-            line.length > 10 // Минимальная длина темы
-        );
+        const existingFiles = await fs.readdir(postsDir);
+        const existingSlugs = existingFiles.map(file => file.replace('.md', ''));
+        
+        let newTopics = allTopics.filter(topic => {
+            const topicSlug = slugify(topic);
+            return topicSlug && !existingSlugs.includes(topicSlug);
+        });
 
-        console.log(`[Поток #${threadId}] 📋 Найдено ${topics.length} АКТУАЛЬНЫХ тем`);
-        console.log(`[Поток #${threadId}] 🎯 Первые 3 темы: ${topics.slice(0, 3).join(', ')}`);
+        // BUTLER ЛОГИКА РАСПРЕДЕЛЕНИЯ ПО ПОТОКАМ
+        const topicsForThisThread = newTopics.filter((_, index) => index % totalThreads === (threadId - 1)).slice(0, BATCH_SIZE);
 
-        if (topics.length === 0) {
-            console.log(`[Поток #${threadId}] ❌ Нет доступных тем в topics.txt`);
+        if (topicsForThisThread.length === 0) {
+            console.log(`[Поток #${threadId}] Нет новых тем для этого потока. Завершение.`);
             return;
         }
+        
+        console.log(`[Поток #${threadId}] Найдено ${topicsForThisThread.length} новых тем. Беру в работу.`);
 
-        const interlinks = loadInterlinks();
-        const generatedUrls = [];
-
-        for (let i = 0; i < batchSize; i++) {
-            if (topics.length === 0) break;
-
-            const randomIndex = Math.floor(Math.random() * topics.length);
-            const topic = topics.splice(randomIndex, 1)[0].trim();
-            const slug = slugify(topic);
-
-            const outputPath = `src/content/posts/${slug}.md`;
-            if (fs.existsSync(outputPath)) {
-                console.log(`[Поток #${threadId}] ⏭️ Статья "${topic}" уже существует, пропускаю`);
-                continue;
-            }
-
-            try {
-                const content = await generatePost(topic, slug, interlinks);
-                
-                if (!fs.existsSync('src/content/posts')) {
-                    fs.mkdirSync('src/content/posts', { recursive: true });
+        // Загружаем существующие статьи для интерлинкинга
+        let allPostsForLinking = [];
+        for (const slug of existingSlugs) {
+             try {
+                const content = await fs.readFile(path.join(postsDir, `${slug}.md`), 'utf-8');
+                const titleMatch = content.match(/title:\s*["']?(.*?)["']?$/m);
+                if (titleMatch) {
+                    allPostsForLinking.push({ title: titleMatch[1], url: `/blog/${slug}/` });
                 }
+            } catch (e) { /* Игнорируем ошибки чтения */ }
+        }
+        
+        for (const topic of topicsForThisThread) { 
+            try {
+                const slug = slugify(topic);
+                if (!slug) continue;
                 
-                fs.writeFileSync(outputPath, content, 'utf-8');
-                generatedUrls.push(`${SITE_URL}/blog/${slug}/`);
+                const filePath = path.join(postsDir, `${slug}.md`);
+
+                let randomInterlinks = [];
+                if (allPostsForLinking.length > 0) {
+                    const shuffled = [...allPostsForLinking].sort(() => 0.5 - Math.random());
+                    randomInterlinks = shuffled.slice(0, 3);
+                }
+
+                const content = await generatePost(topic, slug, randomInterlinks);
+                await fs.writeFile(filePath, content);
                 
                 console.log(`[Поток #${threadId}] ✅ Создана статья: ${slug}.md`);
                 
@@ -334,15 +294,7 @@ async function main() {
             }
         }
 
-        // Обновляем topics.txt
-        fs.writeFileSync('topics.txt', topics.join('\n') + '\n', 'utf-8');
-
-        // Уведомляем поисковики
-        if (generatedUrls.length > 0) {
-            await notifySearchEngines(generatedUrls);
-        }
-
-        console.log(`[Поток #${threadId}] 🎯 Генерация завершена: ${generatedUrls.length} статей`);
+        console.log(`[Поток #${threadId}] 🎯 Генерация завершена`);
     } catch (error) {
         console.error(`[Поток #${threadId}] 💥 Критическая ошибка:`, error.message);
         process.exit(1);
