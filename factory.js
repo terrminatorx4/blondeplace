@@ -1,4 +1,4 @@
-// === FACTORY.JS ВЕРСИЯ 9.2 «ИСПРАВЛЕНЫ ОБРЕЗАНИЯ + KEYWORDS» ===
+// === FACTORY.JS ВЕРСИЯ 9.3 «БЕЗ ОБРЕЗАНИЯ КАК BUTLER» ===
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
@@ -103,8 +103,7 @@ async function generatePost(topic, slug, interlinks) {
     const planPrompt = `Создай детальный, экспертный план-структуру для SEO-статьи на тему "${topic}". Контекст: статья пишется для блога салона красоты ${BRAND_NAME}.`;
     const plan = await generateWithRetry(planPrompt);
 
-    // ИСПРАВЛЕННЫЙ PROMPT ДЛЯ ЧИСТЫХ ЗАГОЛОВКОВ
-    const articlePrompt = `Напиши экспертную, полезную SEO-статью по этому плану:\n\n${plan}\n\nТема: "${topic}". ВАЖНО: строго следуй плану и используй синтаксис Markdown для всех заголовков (# для H1, ## для H2, ### для H3). Текст должен быть написан от лица салона красоты ${BRAND_NAME}. КРИТИЧЕСКИ ВАЖНО: НЕ ВСТАВЛЯЙ В ТЕКСТ НИКАКИХ ИЗОБРАЖЕНИЙ ![...], ССЫЛОК, URL-АДРЕСОВ ИЛИ МЕДИА-КОНТЕНТА. Пиши только чистый текст с заголовками. Не пиши никакого сопроводительного текста перед первым заголовком. Сразу начинай с заголовка H1. ЗАГОЛОВКИ ДОЛЖНЫ БЫТЬ КОРОТКИМИ БЕЗ НОМЕРОВ И ЛИШНИХ СЛОВ.`;
+    const articlePrompt = `Напиши экспертную, полезную SEO-статью по этому плану:\n\n${plan}\n\nТема: "${topic}". ВАЖНО: строго следуй плану и используй синтаксис Markdown для всех заголовков (# для H1, ## для H2, ### для H3). Текст должен быть написан от лица салона красоты ${BRAND_NAME}. КРИТИЧЕСКИ ВАЖНО: НЕ ВСТАВЛЯЙ В ТЕКСТ НИКАКИХ ИЗОБРАЖЕНИЙ ![...], ССЫЛОК, URL-АДРЕСОВ ИЛИ МЕДИА-КОНТЕНТА. Пиши только чистый текст с заголовками. Не пиши никакого сопроводительного текста перед первым заголовком. Сразу начинай с заголовка H1.`;
     let articleText = await generateWithRetry(articlePrompt);
 
     // СУПЕР-ЖЁСТКАЯ ОЧИСТКА (КАК В BUTLER)
@@ -116,15 +115,6 @@ async function generatePost(topic, slug, interlinks) {
     articleText = articleText.replace(/[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/g, ''); // Убираем домены
     articleText = articleText.replace(/\*\s*Пример.*?\*/g, ''); // Убираем подписи к изображениям
 
-    // ДОПОЛНИТЕЛЬНАЯ ОЧИСТКА ЗАГОЛОВКОВ ОТ НОМЕРОВ
-    articleText = articleText.replace(/^#+\s*\d+\.?\s*/gm, function(match) {
-        const level = match.match(/^#+/)[0];
-        return level + ' ';
-    });
-    
-    // Убираем длинные заголовки с двоеточиями и лишними словами
-    articleText = articleText.replace(/^(#+\s*)([^:\n]*?):\s*[^\n]*?(–|—).*$/gm, '$1$2');
-
     // ИНТЕРЛИНКИНГ (КАК В BUTLER)
     if (interlinks.length > 0) {
         let interlinkingBlock = '\n\n---\n\n## Читайте также\n\n';
@@ -134,21 +124,21 @@ async function generatePost(topic, slug, interlinks) {
         articleText += interlinkingBlock;
     }
 
-    const seoPrompt = `Для статьи на тему "${topic}" сгенерируй JSON-объект. ВАЖНО: твой ответ должен быть ТОЛЬКО валидным JSON-объектом. JSON должен содержать: "title" (длиной ровно 50-60 символов), "description" (длиной ровно 150-160 символов), "keywords" (строка с 5-7 релевантными ключевыми словами через запятую). Контекст: это блог салона красоты ${BRAND_NAME}.`;
+    // ТОЧНО КАК В BUTLER - 40-45/120-130
+    const seoPrompt = `Для статьи на тему "${topic}" сгенерируй JSON-объект. ВАЖНО: твой ответ должен быть ТОЛЬКО валидным JSON-объектом. JSON должен содержать: "title" (длиной ровно 40-45 символов), "description" (длиной ровно 120-130 символов), "keywords" (строка с 5-7 релевантными ключевыми словами через запятую). Контекст: это блог салона красоты ${BRAND_NAME}.`;
     let seoText = await generateWithRetry(seoPrompt);
 
     const match = seoText.match(/\{[\s\S]*\}/);
     if (!match) { throw new Error("Не удалось найти валидный JSON в ответе модели."); }
     const seoData = JSON.parse(match[0]);
 
-    // УБРАЛИ ПРИНУДИТЕЛЬНОЕ ОБРЕЗАНИЕ!
-    // Теперь используем то что сгенерировала AI, только если слишком длинно - тогда обрезаем
-    if (seoData.title && seoData.title.length > 70) {
-        seoData.title = seoData.title.substring(0, 67) + '...';
-    }
-    if (seoData.description && seoData.description.length > 180) {
-        seoData.description = seoData.description.substring(0, 177) + '...';
-    }
+    // УБИРАЕМ ВСЁ ОБРЕЗАНИЕ! БЕРЁМ КАК ЕСТЬ ОТ AI!
+    // if (seoData.title && seoData.title.length > 45) {
+    //     seoData.title = seoData.title.substring(0, 42) + '...';
+    // }
+    // if (seoData.description && seoData.description.length > 130) {
+    //     seoData.description = seoData.description.substring(0, 127) + '...';
+    // }
 
     // КРИТИЧНО: Убеждаемся что keywords всегда есть
     if (!seoData.keywords || seoData.keywords.length < 10) {
