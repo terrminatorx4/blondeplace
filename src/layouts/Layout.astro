@@ -1,5 +1,17 @@
 ---
-const { title = 'BLONDE PLACE - Салон красоты в Санкт-Петербурге', description = 'Профессиональные услуги красоты в центре СПб: окрашивание волос, стрижки, маникюр, уход за кожей. Beauty коворкинг.' } = Astro.props;
+export interface Props {
+	title?: string;
+	description?: string;
+	keywords?: string;
+	schema?: any;
+}
+
+const { 
+  title = 'BLONDE PLACE - Салон красоты в Санкт-Петербурге', 
+  description = 'Профессиональные услуги красоты в центре СПб: окрашивание волос, стрижки, маникюр, уход за кожей. Beauty коворкинг.',
+  keywords,
+  schema
+} = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -11,8 +23,14 @@ const { title = 'BLONDE PLACE - Салон красоты в Санкт-Пете
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {keywords && <meta name="keywords" content={keywords} />}
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href={Astro.url} />
+    
+    <!-- Schema.org JSON-LD для Rich Snippets -->
+    {schema && (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    )}
     
     <!-- 📱 PWA MANIFEST -->
     <link rel="manifest" href="/site.webmanifest" />
