@@ -1,179 +1,215 @@
-name: 🚀 BlondePlace Beauty Factory (Atomic Lock)
+name: 🎨 BlondePlace Beauty Content Factory
 
 on:
   workflow_dispatch:
     inputs:
       model_choice:
-        description: 'Выбор AI модели (gemini/openrouter)'
+        description: 'Выбор AI модели'
         required: true
         default: 'gemini'
-        type: string
-      articles_per_thread:
-        description: 'Количество статей на 1 поток'
+        type: choice
+        options:
+        - gemini
+        - openrouter
+      batch_size_per_thread:
+        description: 'Количество статей на поток'
         required: true
-        default: '1'
+        default: '5'
         type: string
-      thread_count:
-        description: 'Количество потоков (параллельно)'
+      threads:
+        description: 'Количество потоков'
         required: true
-        default: '1'
+        default: '3'
         type: string
 
+env:
+  NODE_VERSION: '18'
+
 jobs:
-  generate_and_publish:
+  beauty-content-generation:
+    name: 🎨 Генерация Beauty Контента (Поток ${{ matrix.thread }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     
     strategy:
       matrix:
-        thread: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-      max-parallel: 20
+        thread: [1, 2, 3, 4, 5]
+      max-parallel: 5
       fail-fast: false
-
+    
+    if: matrix.thread <= fromJSON(github.event.inputs.threads || '3')
+    
     steps:
-      - name: ✅ Skip Extra Threads
-        if: ${{ matrix.thread > fromJson(github.event.inputs.thread_count) }}
-        run: |
-          echo "⏭️ Skipping thread ${{ matrix.thread }} (only ${{ github.event.inputs.thread_count }} threads requested)"
-          exit 0
-
-      - name: ✅ Checkout Repository
-        if: ${{ matrix.thread <= fromJson(github.event.inputs.thread_count) }}
+      - name: 🛒 Checkout repository
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 1
 
-      - name: 📦 Setup Node.js
-        if: ${{ matrix.thread <= fromJson(github.event.inputs.thread_count) }}
+      - name: 🏗️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: 🔧 Install Dependencies
-        if: ${{ matrix.thread <= fromJson(github.event.inputs.thread_count) }}
+      - name: 📦 Install dependencies
         run: |
-          npm install
-          echo "Dependencies installed successfully"
+          npm ci
+          npm list --depth=0
 
-      - name: 🔑 Get API Keys from Pool (IMPROVED)
-        if: ${{ matrix.thread <= fromJson(github.event.inputs.thread_count) }}
-        id: get-keys
+      - name: 🔑 Setup API Keys
         run: |
           echo "🔑 Processing API keys for thread ${{ matrix.thread }}"
           
-          # Получаем ключи из GitHub Secrets
-          GEMINI_KEYS_RAW="${{ secrets.GEMINI_API_KEYS_POOL }}"
-          OPENROUTER_KEYS_RAW="${{ secrets.OPENROUTER_API_KEYS_POOL }}"
-          
-          echo "📊 Gemini keys available: $([ -n "$GEMINI_KEYS_RAW" ] && echo "YES" || echo "NO")"
-          echo "📊 OpenRouter keys available: $([ -n "$OPENROUTER_KEYS_RAW" ] && echo "YES" || echo "NO")"
-          
-          # ПРОВЕРЯЕМ НАЛИЧИЕ НУЖНОЙ МОДЕЛИ
           if [ "${{ github.event.inputs.model_choice }}" == "gemini" ]; then
-            if [ -z "$GEMINI_KEYS_RAW" ]; then
-              echo "❌ Gemini model selected but no Gemini keys available!"
+            echo "📊 Setting up Gemini API keys..."
+            GEMINI_KEYS="${{ secrets.GEMINI_API_KEYS_POOL }}"
+            if [ -z "$GEMINI_KEYS" ]; then
+              echo "❌ GEMINI_API_KEYS_POOL is empty!"
               exit 1
             fi
-          elif [ "${{ github.event.inputs.model_choice }}" == "openrouter" ]; then
-            if [ -z "$OPENROUTER_KEYS_RAW" ]; then
-              echo "❌ OpenRouter model selected but no OpenRouter keys available!"
-              echo "💡 Tip: Add OPENROUTER_API_KEYS_POOL secret or use 'gemini' model"
+            
+            echo "📊 Gemini keys available: YES"
+            echo "📊 OpenRouter keys available: NO"
+            
+            GEMINI_KEYS_COUNT=$(echo "$GEMINI_KEYS" | tr ',' '\n' | wc -l)
+            echo "📊 Gemini keys loaded: $GEMINI_KEYS_COUNT"
+            
+            KEY_INDEX=$(( (${{ matrix.thread }} - 1) % $GEMINI_KEYS_COUNT + 1 ))
+            SELECTED_KEY=$(echo "$GEMINI_KEYS" | tr ',' '\n' | sed -n "${KEY_INDEX}p")
+            
+            echo "✅ Thread ${{ matrix.thread }} using Gemini key index: $KEY_INDEX"
+            echo "GEMINI_API_KEY_CURRENT=$SELECTED_KEY" >> $GITHUB_ENV
+          else
+            echo "📊 Setting up OpenRouter API keys..."
+            OPENROUTER_KEYS="${{ secrets.OPENROUTER_API_KEYS_POOL }}"
+            if [ -z "$OPENROUTER_KEYS" ]; then
+              echo "❌ OPENROUTER_API_KEYS_POOL is empty!"
               exit 1
             fi
+            
+            echo "📊 Gemini keys available: NO"
+            echo "📊 OpenRouter keys available: YES"
+            
+            OPENROUTER_KEYS_COUNT=$(echo "$OPENROUTER_KEYS" | tr ',' '\n' | wc -l)
+            echo "📊 OpenRouter keys loaded: $OPENROUTER_KEYS_COUNT"
+            
+            KEY_INDEX=$(( (${{ matrix.thread }} - 1) % $OPENROUTER_KEYS_COUNT + 1 ))
+            SELECTED_KEY=$(echo "$OPENROUTER_KEYS" | tr ',' '\n' | sed -n "${KEY_INDEX}p")
+            
+            echo "✅ Thread ${{ matrix.thread }} using OpenRouter key index: $KEY_INDEX"
+            echo "OPENROUTER_API_KEY_CURRENT=$SELECTED_KEY" >> $GITHUB_ENV
           fi
-          
-          # Создаем массивы ключей ТОЛЬКО если они есть
-          if [ -n "$GEMINI_KEYS_RAW" ]; then
-            echo "$GEMINI_KEYS_RAW" | tr ',' '\n' > gemini_keys.txt
-            GEMINI_COUNT=$(wc -l < gemini_keys.txt)
-            echo "📊 Gemini keys loaded: $GEMINI_COUNT"
-          fi
-          
-          if [ -n "$OPENROUTER_KEYS_RAW" ]; then
-            echo "$OPENROUTER_KEYS_RAW" | tr ',' '\n' > openrouter_keys.txt
-            OPENROUTER_COUNT=$(wc -l < openrouter_keys.txt)
-            echo "📊 OpenRouter keys loaded: $OPENROUTER_COUNT"
-          fi
-          
-          # Вычисляем индекс для текущего потока
-          THREAD_NUM=${{ matrix.thread }}
-          INDEX=$(( ($THREAD_NUM - 1) % 20 + 1 ))
-          
-          # Получаем ключи в зависимости от выбранной модели
-          if [ "${{ github.event.inputs.model_choice }}" == "gemini" ]; then
-            GEMINI_KEY=$(sed -n "${INDEX}p" gemini_keys.txt | tr -d '[:space:]')
-            if [ -z "$GEMINI_KEY" ]; then
-              GEMINI_KEY=$(head -n1 gemini_keys.txt | tr -d '[:space:]')
-            fi
-            echo "GEMINI_API_KEY_CURRENT=$GEMINI_KEY" >> $GITHUB_ENV
-            echo "✅ Thread $THREAD_NUM using Gemini key index: $INDEX"
-          
-          elif [ "${{ github.event.inputs.model_choice }}" == "openrouter" ]; then
-            OPENROUTER_KEY=$(sed -n "${INDEX}p" openrouter_keys.txt | tr -d '[:space:]')
-            if [ -z "$OPENROUTER_KEY" ]; then
-              OPENROUTER_KEY=$(head -n1 openrouter_keys.txt | tr -d '[:space:]')
-            fi
-            echo "OPENROUTER_API_KEY_CURRENT=$OPENROUTER_KEY" >> $GITHUB_ENV
-            echo "✅ Thread $THREAD_NUM using OpenRouter key index: $INDEX"
-          fi
-          
-          # Очищаем временные файлы
-          rm -f gemini_keys.txt openrouter_keys.txt
 
-      - name: 🏭 Generate Content (Thread ${{ matrix.thread }})
-        if: ${{ matrix.thread <= fromJson(github.event.inputs.thread_count) }}
+      - name: 🎨 Run Beauty Factory & 📢 Publish & Notify (Thread ${{ matrix.thread }})
         env:
-          MODEL_CHOICE: ${{ github.event.inputs.model_choice }}
-          BATCH_SIZE_PER_THREAD: ${{ github.event.inputs.articles_per_thread }}
+          MODEL_CHOICE: ${{ github.event.inputs.model_choice || 'gemini' }}
+          BATCH_SIZE_PER_THREAD: ${{ github.event.inputs.batch_size_per_thread || 5 }}
+          TOTAL_THREADS: ${{ github.event.inputs.threads || 3 }}
           THREAD_ID: ${{ matrix.thread }}
         run: |
           git config --global user.name 'BlondePlace Beauty Bot'
           git config --global user.email 'beauty-bot@blondeplace.ru'
+          git config --global pull.rebase false
           
-          echo "--- 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Начинаю генерацию beauty контента ---"
-          echo "🤖 Модель: ${{ github.event.inputs.model_choice }}"
-          echo "📊 Статей на поток: ${{ github.event.inputs.articles_per_thread }}"
-          echo "🧵 Всего потоков: ${{ github.event.inputs.thread_count }}"
+          echo "--- 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Начинаю генерацию ---"
           
-          # Запускаем factory.js через npm script
           npm run factory
           
           if [[ -z $(git status --porcelain) ]]; then
-            echo "✅ Thread ${{ matrix.thread }}: Контент уже существует или не создан"
+            echo "✅ 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Новых статей для этого потока не найдено. Миссия завершена."
             exit 0
           fi
-          
-          echo "🔥 Thread ${{ matrix.thread }}: Найден новый beauty контент. Публикую..."
-          
-          git add src/content/posts/*.md
-          git commit -m "🎨 Beauty content from thread ${{ matrix.thread }} (${{ github.event.inputs.model_choice }})"
-          git pull --rebase
-          git push
 
-      - name: 🎉 Thread Success
-        if: ${{ success() && matrix.thread <= fromJson(github.event.inputs.thread_count) }}
-        run: |
-          echo "✅ BEAUTY THREAD ${{ matrix.thread }} COMPLETED"
-          echo "🤖 Model: ${{ github.event.inputs.model_choice }}"
-          echo "📊 Articles per thread: ${{ github.event.inputs.articles_per_thread }}"
-          echo "🎨 Beauty content generated successfully"
+          echo "🔥 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Обнаружены новые статьи о красоте. Начинаю процедуру публикации..."
+          
+          # Atomic commit and push with conflict resolution
+          MAX_RETRIES=5
+          RETRY_DELAY=3
+          
+          for ((i=1; i<=MAX_RETRIES; i++)); do
+            echo "🔄 Attempt $i/$MAX_RETRIES: Syncing and pushing..."
+            
+            # Stash any changes first
+            git stash push -u -m "Thread ${{ matrix.thread }} - attempt $i" || echo "Nothing to stash"
+            
+            # Pull latest changes
+            git pull --rebase origin main || echo "Pull completed"
+            
+            # Pop stashed changes back
+            git stash pop || echo "No stash to pop"
+            
+            # Add files
+            git add src/content/posts/*.md 2>/dev/null || echo "No files to add"
+            
+            # Check if there's anything to commit
+            if git diff --cached --quiet; then
+              echo "✅ No changes to commit in attempt $i"
+              break
+            fi
+            
+            # Commit
+            git commit -m "🎨 Beauty content from thread ${{ matrix.thread }} (${MODEL_CHOICE})"
+            
+            # Try to push
+            if git push origin main; then
+              echo "✅ Push successful on attempt $i"
+              break
+            else
+              echo "⚠️ Push failed on attempt $i"
+              if [ $i -eq $MAX_RETRIES ]; then
+                echo "::error::Failed to push after $MAX_RETRIES attempts"
+                exit 1
+              else
+                # Reset the commit for retry
+                git reset HEAD~1
+                sleep $RETRY_DELAY
+              fi
+            fi
+          done
+          
+          commit_after=$(git rev-parse HEAD)
+          commit_before=$(git rev-parse HEAD~1)
+          
+          NEW_FILES=$(git diff --name-only $commit_before $commit_after -- 'src/content/posts/*.md' 2>/dev/null || echo "")
+          
+          if [[ -n "$NEW_FILES" ]]; then
+            echo "📢 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Подготовка уведомления для IndexNow..."
+            API_KEY="d1b055ab1eb146d892169bbb2c96550e"
+            HOST="blondeplace.netlify.app"
 
-  completion:
-    needs: generate_and_publish
+            URL_JSON_ARRAY=$(for file in $NEW_FILES; do slug=$(basename "$file" .md); echo "https://blondeplace.netlify.app/blog/${slug}/"; done | jq -R . | jq -s .)
+
+            JSON_PAYLOAD=$(jq -n \
+                            --arg host "$HOST" \
+                            --arg key "$API_KEY" \
+                            --argjson urls "$URL_JSON_ARRAY" \
+                            '{host: $host, key: $key, urlList: $urls}')
+            
+            echo "--- Диагностика пакета для IndexNow (Beauty Поток №${{ matrix.thread }}) ---"
+            echo "$JSON_PAYLOAD"
+            echo "--- Конец диагностики ---"
+            
+            curl -X POST "https://yandex.com/indexnow" -H "Content-Type: application/json; charset=utf-8" -d "$JSON_PAYLOAD"
+            curl -X POST "https://www.bing.com/indexnow" -H "Content-Type: application/json; charset=utf-8" -d "$JSON_PAYLOAD"
+          fi
+          
+          echo -e "\n✅ 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Миссия успешно завершена."
+
+  notify-completion:
+    name: 📢 Уведомление о завершении
     runs-on: ubuntu-latest
+    needs: beauty-content-generation
     if: always()
     
     steps:
-      - name: 🎊 Beauty Factory Report
+      - name: 📊 Summary
         run: |
-          echo "🚀 BLONDE PLACE BEAUTY FACTORY COMPLETED"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "🤖 Model used: ${{ github.event.inputs.model_choice }}"
-          echo "📊 Articles per thread: ${{ github.event.inputs.articles_per_thread }}"
-          echo "🧵 Total threads: ${{ github.event.inputs.thread_count }}"
-          echo "🌐 Site: https://blondeplace.netlify.app/"
-          echo "🔗 Blog: https://blondeplace.netlify.app/blog/"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "🎉 Beauty mission accomplished!"
+          echo "🎨 === BLONDEPLACE BEAUTY FACTORY ЗАВЕРШЕНА ==="
+          echo "💄 Модель: ${{ github.event.inputs.model_choice || 'gemini' }}"
+          echo "📝 Статей на поток: ${{ github.event.inputs.batch_size_per_thread || 5 }}"
+          echo "🧵 Потоков: ${{ github.event.inputs.threads || 3 }}"
+          echo "🎯 Общий статус: ${{ needs.beauty-content-generation.result }}"
+          echo ""
+          echo "🏪 Проект: BlondePlace Beauty Blog"
+          echo "🌐 Сайт: https://blondeplace.netlify.app"
+          echo "💅 Салон: https://blondeplace.ru"
