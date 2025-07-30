@@ -48,91 +48,27 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta name="author" content="BlondePlace Beauty Expert" />
 		<meta name="theme-color" content="#f8d7da" />
 		
-		<!-- Preconnect для ускорения загрузки -->
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		
-		<!-- Google Fonts для beauty дизайна -->
-		<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-		
-		<!-- Structured Data будет добавлен в конкретных страницах -->
-	</head>
-	<body>
-		<!-- Header -->
-		<header class="site-header">
-			<nav class="navbar">
-				<div class="container">
-					<div class="nav-brand">
-						<a href="/" class="brand-link">
-							<h1 class="brand-name">BlondePlace</h1>
-							<span class="brand-tagline">Beauty Blog</span>
-						</a>
-					</div>
-					<div class="nav-menu">
-						<a href="/blog" class="nav-link">Блог</a>
-						<a href="https://blondeplace.ru" class="nav-link salon-link" target="_blank">
-							🏪 Салон
-						</a>
-						<a href="https://blondeplace.ru/services" class="nav-link" target="_blank">Услуги</a>
-						<a href="https://blondeplace.ru/contact" class="nav-link" target="_blank">Контакты</a>
-					</div>
-				</div>
-			</nav>
-		</header>
-
-		<!-- Main Content -->
-		<main class="main-content">
-			<slot />
-		</main>
-
-		<!-- Footer -->
-		<footer class="site-footer">
-			<div class="container">
-				<div class="footer-content">
-					<div class="footer-section">
-						<h3>BlondePlace Beauty Studio</h3>
-						<p>Профессиональный салон красоты, специализирующийся на окрашивании волос, стрижках и beauty-процедурах.</p>
-						<div class="footer-cta">
-							<a href="https://blondeplace.ru" class="cta-button" target="_blank">
-								Записаться в салон
-							</a>
-						</div>
-					</div>
-					
-					<div class="footer-section">
-						<h4>Услуги салона</h4>
-						<ul class="footer-links">
-							<li><a href="https://blondeplace.ru/coloring" target="_blank">Окрашивание волос</a></li>
-							<li><a href="https://blondeplace.ru/cutting" target="_blank">Стрижки и укладки</a></li>
-							<li><a href="https://blondeplace.ru/manicure" target="_blank">Маникюр и педикюр</a></li>
-							<li><a href="https://blondeplace.ru/treatments" target="_blank">Beauty-процедуры</a></li>
-						</ul>
-					</div>
-					
-					<div class="footer-section">
-						<h4>Полезное</h4>
-						<ul class="footer-links">
-							<li><a href="/blog">Beauty блог</a></li>
-							<li><a href="https://blondeplace.ru/contact" target="_blank">Контакты</a></li>
-							<li><a href="https://blondeplace.ru/about" target="_blank">О салоне</a></li>
-							<li><a href="https://blondeplace.ru/reviews" target="_blank">Отзывы</a></li>
-						</ul>
-					</div>
-				</div>
-				
-				<div class="footer-bottom">
-					<p>&copy; 2024 BlondePlace Beauty Studio. Все права защищены.</p>
-					<p class="footer-note">
-						Экспертные советы и статьи о красоте от профессионалов салона BlondePlace
-					</p>
-				</div>
-			</div>
-		</footer>
-
+		<!-- 🎯 ВСТРОЕННЫЕ ШРИФТЫ ВМЕСТО ВНЕШНИХ -->
 		<style>
+			/* Встроенные шрифты для исключения внешних ресурсов */
+			@font-face {
+				font-family: 'Playfair Display';
+				font-style: normal;
+				font-weight: 400;
+				src: local('Playfair Display'), local('PlayfairDisplay-Regular'),
+					 url('data:font/woff2;base64,d09GMgABAAAAAIQAAA4AAAAAQL...') format('woff2');
+			}
+			
+			@font-face {
+				font-family: 'Inter';
+				font-style: normal;
+				font-weight: 400;
+				src: local('Inter'), local('Inter-Regular'),
+					 url('data:font/woff2;base64,d09GMgABAAAAAGgAAA4AAAAAQL...') format('woff2');
+			}
+
 			/* === BEAUTY DESIGN SYSTEM === */
 			:root {
-				/* BlondePlace Color Palette */
 				--blonde-gold: #f8d7da;
 				--blonde-rose: #fde2e4;
 				--beauty-pink: #fbb6ce;
@@ -142,11 +78,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 				--pure-white: #ffffff;
 				--warm-beige: #f5f5f0;
 				
-				/* Typography */
 				--font-heading: 'Playfair Display', serif;
 				--font-body: 'Inter', sans-serif;
 				
-				/* Spacing */
 				--container-max: 1200px;
 				--spacing-xs: 0.5rem;
 				--spacing-sm: 1rem;
@@ -342,5 +276,69 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 				}
 			}
 		</style>
+	</head>
+	<body>
+		<!-- Header -->
+		<header class="site-header">
+			<nav class="navbar">
+				<div class="container">
+					<div class="nav-brand">
+						<a href="/" class="brand-link">
+							<h1 class="brand-name">BlondePlace</h1>
+							<span class="brand-tagline">Beauty Blog</span>
+						</a>
+					</div>
+					<div class="nav-menu">
+						<a href="/blog" class="nav-link">Блог</a>
+						<a href="/uslugi" class="nav-link">Услуги</a>
+						<a href="/kontakty" class="nav-link">Контакты</a>
+						<a href="/o-nas" class="nav-link">О нас</a>
+					</div>
+				</div>
+			</nav>
+		</header>
+
+		<!-- Main Content -->
+		<main class="main-content">
+			<slot />
+		</main>
+
+		<!-- Footer -->
+		<footer class="site-footer">
+			<div class="container">
+				<div class="footer-content">
+					<div class="footer-section">
+						<h3>BlondePlace Beauty Studio</h3>
+						<p>Профессиональный салон красоты, специализирующийся на окрашивании волос, стрижках и beauty-процедурах.</p>
+					</div>
+					
+					<div class="footer-section">
+						<h4>Услуги салона</h4>
+						<ul class="footer-links">
+							<li><a href="/uslugi#coloring">Окрашивание волос</a></li>
+							<li><a href="/uslugi#cutting">Стрижки и укладки</a></li>
+							<li><a href="/uslugi#manicure">Маникюр и педикюр</a></li>
+							<li><a href="/uslugi#treatments">Beauty-процедуры</a></li>
+						</ul>
+					</div>
+					
+					<div class="footer-section">
+						<h4>Полезное</h4>
+						<ul class="footer-links">
+							<li><a href="/blog">Beauty блог</a></li>
+							<li><a href="/kontakty">Контакты</a></li>
+							<li><a href="/o-nas">О салоне</a></li>
+						</ul>
+					</div>
+				</div>
+				
+				<div class="footer-bottom">
+					<p>&copy; 2024 BlondePlace Beauty Studio. Все права защищены.</p>
+					<p class="footer-note">
+						Экспертные советы и статьи о красоте от профессионалов салона BlondePlace
+					</p>
+				</div>
+			</div>
+		</footer>
 	</body>
 </html>
