@@ -22,21 +22,42 @@ on:
         default: '3'
         type: string
 
+permissions:
+  contents: write
+  actions: write
+
 env:
   NODE_VERSION: '18'
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set_matrix.outputs.matrix }}
+    steps:
+      - name: Create thread matrix
+        id: set_matrix
+        run: |
+          MAX_THREADS=20
+          REQUESTED_THREADS=${{ github.event.inputs.threads || 3 }}
+          
+          if (( REQUESTED_THREADS > MAX_THREADS )); then
+            echo "::warning::Запрошено больше потоков (${REQUESTED_THREADS}), чем доступно ключей (${MAX_THREADS}). Будет использовано ${MAX_THREADS}."
+            REQUESTED_THREADS=$MAX_THREADS
+          fi
+          MATRIX=$(seq 1 $REQUESTED_THREADS | jq -R . | jq -s .)
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
   beauty-content-generation:
     name: 🎨 Генерация Beauty Контента (Поток ${{ matrix.thread }})
     runs-on: ubuntu-latest
+    needs: prepare
     
     strategy:
       matrix:
-        thread: [1, 2, 3, 4, 5]
-      max-parallel: 5
+        thread: ${{ fromJson(needs.prepare.outputs.matrix) }}
+      max-parallel: 20
       fail-fast: false
-    
-    if: matrix.thread <= fromJSON(github.event.inputs.threads || '3')
     
     steps:
       - name: 🛒 Checkout repository
@@ -53,7 +74,7 @@ jobs:
 
       - name: 📦 Install dependencies
         run: |
-          npm ci
+          npm install
           npm list --depth=0
 
       - name: 🔑 Setup API Keys
@@ -111,16 +132,19 @@ jobs:
           git config --global user.email 'beauty-bot@blondeplace.ru'
           git config --global pull.rebase false
           
-          echo "--- 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Начинаю генерацию ---"
+          echo "--- 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Начинаю генерацию beauty контента ---"
+          echo "🤖 Модель: ${{ github.event.inputs.model_choice || 'gemini' }}"
+          echo "📊 Статей на поток: ${{ github.event.inputs.batch_size_per_thread || 5 }}"
+          echo "🧵 Всего потоков: ${{ github.event.inputs.threads || 3 }}"
           
           npm run factory
           
           if [[ -z $(git status --porcelain) ]]; then
-            echo "✅ 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Новых статей для этого потока не найдено. Миссия завершена."
+            echo "✅ Thread ${{ matrix.thread }}: Новых статей для этого потока не найдено. Завершение."
             exit 0
           fi
 
-          echo "🔥 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Обнаружены новые статьи о красоте. Начинаю процедуру публикации..."
+          echo "🔥 Thread ${{ matrix.thread }}: Найден новый beauty контент. Публикую..."
           
           # Atomic commit and push with conflict resolution
           MAX_RETRIES=5
@@ -148,7 +172,7 @@ jobs:
             fi
             
             # Commit
-            git commit -m "🎨 Beauty content from thread ${{ matrix.thread }} (${MODEL_CHOICE})"
+            git commit -m "🎨 Beauty content from thread ${{ matrix.thread }} (${{ github.event.inputs.model_choice || 'gemini' }})"
             
             # Try to push
             if git push origin main; then
@@ -166,34 +190,6 @@ jobs:
               fi
             fi
           done
-          
-          commit_after=$(git rev-parse HEAD)
-          commit_before=$(git rev-parse HEAD~1)
-          
-          NEW_FILES=$(git diff --name-only $commit_before $commit_after -- 'src/content/posts/*.md' 2>/dev/null || echo "")
-          
-          if [[ -n "$NEW_FILES" ]]; then
-            echo "📢 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Подготовка уведомления для IndexNow..."
-            API_KEY="d1b055ab1eb146d892169bbb2c96550e"
-            HOST="blondeplace.netlify.app"
-
-            URL_JSON_ARRAY=$(for file in $NEW_FILES; do slug=$(basename "$file" .md); echo "https://blondeplace.netlify.app/blog/${slug}/"; done | jq -R . | jq -s .)
-
-            JSON_PAYLOAD=$(jq -n \
-                            --arg host "$HOST" \
-                            --arg key "$API_KEY" \
-                            --argjson urls "$URL_JSON_ARRAY" \
-                            '{host: $host, key: $key, urlList: $urls}')
-            
-            echo "--- Диагностика пакета для IndexNow (Beauty Поток №${{ matrix.thread }}) ---"
-            echo "$JSON_PAYLOAD"
-            echo "--- Конец диагностики ---"
-            
-            curl -X POST "https://yandex.com/indexnow" -H "Content-Type: application/json; charset=utf-8" -d "$JSON_PAYLOAD"
-            curl -X POST "https://www.bing.com/indexnow" -H "Content-Type: application/json; charset=utf-8" -d "$JSON_PAYLOAD"
-          fi
-          
-          echo -e "\n✅ 🎨 BEAUTY ПОТОК #${{ matrix.thread }}: Миссия успешно завершена."
 
   notify-completion:
     name: 📢 Уведомление о завершении
