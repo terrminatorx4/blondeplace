@@ -16,9 +16,16 @@ const { Content } = await post.render();
 
 const pageTitle = post.data.title;
 const pageDescription = post.data.description;
+const pageKeywords = post.data.keywords;
+const pageSchema = post.data.schema;
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
+<Layout 
+  title={pageTitle} 
+  description={pageDescription}
+  keywords={pageKeywords}
+  schema={pageSchema}
+>
   <main class="blog-post">
     <div class="container">
       <!-- Hero Image Section с ФИКСИРОВАННЫМ РАЗМЕРОМ -->
