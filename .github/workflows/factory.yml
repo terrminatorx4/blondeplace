@@ -141,7 +141,7 @@ jobs:
           
           if [[ -n "$NEW_FILES" ]]; then
             echo "📢 ЭСКАДРОН #${{ matrix.thread }}: Подготовка уведомления для IndexNow..."
-            API_KEY="d1b055ab1eb146d892169bbb2c96550e"
+            API_KEY="2f4e6a8b9c1d3e5f7a8b9c0d1e2f3a4b5c6d7e8f"
             HOST="blondeplace.netlify.app"
 
             URL_JSON_ARRAY=$(for file in $NEW_FILES; do slug=$(basename "$file" .md); echo "https://blondeplace.netlify.app/blog/${slug}/"; done | jq -R . | jq -s .)
