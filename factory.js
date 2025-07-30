@@ -1,4 +1,4 @@
-// === FACTORY.JS ВЕРСИЯ 8.0 «ИДЕАЛЬНЫЙ SEO» ===
+// === FACTORY.JS ВЕРСИЯ 8.1 «ПРАВИЛЬНОЕ ЧТЕНИЕ TOPICS» ===
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
@@ -33,6 +33,9 @@ if (modelChoice === 'deepseek') {
         throw new Error(`[Поток #${threadId}] Gemini API ключ не найден!`);
     }
 }
+
+console.log(`[Поток #${threadId}] 🚀 Запуск Beauty Factory (Модель: ${modelChoice})`);
+console.log(`[Поток #${threadId}] 📊 Планируется генерация: ${batchSize} статей`);
 
 // --- ФУНКЦИЯ SLUGIFY ---
 function slugify(text) {
@@ -224,10 +227,15 @@ async function generatePost(topic, slug, interlinks) {
         }
     };
 
+    // ИСПРАВЛЕНИЕ YAML: экранируем кавычки
+    const safeTitle = seoData.title.replace(/"/g, '\\"').replace(/:/g, '\\:');
+    const safeDescription = seoData.description.replace(/"/g, '\\"').replace(/:/g, '\\:');
+    const safeKeywords = seoData.keywords.replace(/"/g, '\\"').replace(/:/g, '\\:');
+
     const frontmatter = `---
-title: "${seoData.title.replace(/"/g, '\\"')}"
-description: "${seoData.description.replace(/"/g, '\\"')}"
-keywords: "${seoData.keywords.replace(/"/g, '\\"')}"
+title: "${safeTitle}"
+description: "${safeDescription}"
+keywords: "${safeKeywords}"
 pubDate: "${new Date().toISOString()}"
 author: "${BRAND_AUTHOR_NAME}"
 heroImage: "${finalHeroImage}"
@@ -273,11 +281,15 @@ async function notifySearchEngines(urls) {
 // --- ОСНОВНАЯ ФУНКЦИЯ ---
 async function main() {
     try {
-        console.log(`[Поток #${threadId}] 🚀 Запуск Beauty Factory (Модель: ${modelChoice})`);
-        console.log(`[Поток #${threadId}] 📊 Планируется генерация: ${batchSize} статей`);
-
+        // ЧИТАЕМ АКТУАЛЬНЫЙ TOPICS.TXT
+        console.log(`[Поток #${threadId}] 📖 Читаю актуальный topics.txt...`);
         const topicsContent = fs.readFileSync('topics.txt', 'utf-8');
-        const topics = topicsContent.split('\n').filter(line => line.trim() && !line.startsWith('#'));
+        const topics = topicsContent.split('\n')
+            .map(line => line.trim())
+            .filter(line => line && !line.startsWith('#') && !line.includes('50 тем'));
+
+        console.log(`[Поток #${threadId}] 📋 Найдено ${topics.length} тем в topics.txt`);
+        console.log(`[Поток #${threadId}] 🎯 Первые 3 темы: ${topics.slice(0, 3).join(', ')}`);
 
         if (topics.length === 0) {
             console.log(`[Поток #${threadId}] ❌ Нет доступных тем в topics.txt`);
