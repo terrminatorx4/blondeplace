@@ -1,0 +1,16 @@
+# Формат: email:cookies
+# Поддерживаются разные форматы куков:
+
+# 1. Простой формат (name=value; name2=value2)
+user1@outlook.com:sessionid=abc123; auth_token=xyz789; csrftoken=token123
+
+# 2. JSON формат
+user2@hotmail.com:{"sessionid": "abc123", "auth_token": "xyz789", "csrftoken": "token123"}
+
+# 3. Многострочный формат (разделитель |)
+user3@live.com|sessionid=abc123
+auth_token=xyz789
+csrftoken=token123
+
+# 4. Полный набор Outlook куков
+user4@outlook.com:MSPAuth=cookievalue; MSPProf=cookievalue; MSPSoft=cookievalue; MSPRequ=cookievalue; MUID=cookievalue; ai_user=cookievalue; ai_session=cookievalue
