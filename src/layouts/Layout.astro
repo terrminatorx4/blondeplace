@@ -16,7 +16,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
-		<meta name="keywords" content="салон красоты, BlondePlace, уход за волосами, окрашивание, блонд, мелирование, красота, стиль, маникюр, beauty процедуры, nail арт, косметология, стрижки, укладки, spa уход, anti age" />
+		{keywords && <meta name="keywords" content={keywords} />}
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="robots" content="index, follow" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
