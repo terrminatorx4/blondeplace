@@ -21,7 +21,7 @@ const POSTS_DIR = 'src/content/posts';
 // --- НАСТРОЙКИ МОДЕЛЕЙ ---
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
-const GEMINI_MODEL_NAME = "gemini-1.5-flash"; // ИСПРАВЛЕНО: Flash вместо Pro
+const GEMINI_MODEL_NAME = "gemini-2.5-flash"; // ИСПРАВЛЕНО: Flash вместо Pro
 
 // --- ИНИЦИАЛИЗАЦИЯ ПОТОКА ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
