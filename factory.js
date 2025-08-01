@@ -1,4 +1,4 @@
-// Файл: factory.js (BlondePlace версия - С GITHUB SECRETS КАК В BUTLER FACTORY)
+// Файл: factory.js (BlondePlace версия - ТОЧНАЯ ЛОГИКА BUTLER FACTORY)
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
@@ -27,54 +27,88 @@ const GEMINI_MODEL_NAME = "gemini-1.5-flash"; // ИСПРАВЛЕНО: Flash в�
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
 
-// 🔑 РОТАЦИЯ API КЛЮЧЕЙ ЧЕРЕЗ GITHUB SECRETS (КАК В BUTLER FACTORY)
+// 🔑 УМНАЯ РОТАЦИЯ API КЛЮЧЕЙ (КАК В BUTLER FACTORY)
+let availableApiKeys = [];
+let currentKeyIndex = 0;
 let apiKey;
 let keyInfo;
+
+// Глобальные переменные для отслеживания используемых ключей
+const usedKeys = new Set(); // Отслеживаем использованные ключи по всем потокам
 
 function loadApiKeysFromSecrets() {
     try {
         // Читаем GitHub Secret с пулом ключей
         const poolSecret = process.env.GEMINI_API_KEYS_POOL;
         
-        if (poolSecret) {
-            // Парсим ключи из секрета (разделенные переносами)
-            const apiKeys = poolSecret.split('\n')
-                .map(key => key.trim())
-                .filter(key => key.length > 0);
-
-            if (apiKeys.length === 0) {
-                throw new Error('GitHub Secret GEMINI_API_KEYS_POOL пуст или не содержит валидных ключей');
-            }
-
-            // Ротация ключей по номеру потока (как в Butler Factory)
-            const keyIndex = (threadId - 1) % apiKeys.length;
-            apiKey = apiKeys[keyIndex];
-            keyInfo = `Pool KEY_${keyIndex + 1}/${apiKeys.length} (...${apiKey.slice(-4)})`;
-
-            console.log(`[🔑] [Поток #${threadId}] Загружен пул из ${apiKeys.length} ключей из GitHub Secrets, использую ${keyInfo}`);
-            
-        } else {
-            // Фоллбэк на переменную окружения если нет секрета
-            console.warn(`[!] [Поток #${threadId}] GitHub Secret GEMINI_API_KEYS_POOL не найден, использую API_KEY_CURRENT`);
-            apiKey = process.env.API_KEY_CURRENT;
-            keyInfo = `ENV (...${apiKey ? apiKey.slice(-4) : 'NULL'})`;
+        if (!poolSecret) {
+            throw new Error('GitHub Secret GEMINI_API_KEYS_POOL не найден!');
         }
 
-        if (!apiKey) {
-            throw new Error(`[Поток #${threadId}] Не удалось получить API-ключ ни из GitHub Secrets, ни из переменной окружения!`);
+        // Парсим ключи из секрета (разделенные переносами)
+        availableApiKeys = poolSecret.split('\n')
+            .map(key => key.trim())
+            .filter(key => key.length > 0);
+
+        if (availableApiKeys.length === 0) {
+            throw new Error('GitHub Secret GEMINI_API_KEYS_POOL пуст или не содержит валидных ключей');
         }
+
+        // ИЗНАЧАЛЬНАЯ РОТАЦИЯ ПО НОМЕРУ ПОТОКА (как в Butler Factory)
+        currentKeyIndex = (threadId - 1) % availableApiKeys.length;
+        apiKey = availableApiKeys[currentKeyIndex];
+        keyInfo = `Pool KEY_${currentKeyIndex + 1}/${availableApiKeys.length} (...${apiKey.slice(-4)})`;
+
+        console.log(`[🔑] [Поток #${threadId}] Загружен пул из ${availableApiKeys.length} ключей из GitHub Secrets, использую ${keyInfo}`);
 
     } catch (error) {
-        console.error(`[!] [Поток #${threadId}] Ошибка при загрузке ключей: ${error.message}`);
-        
-        // Последний фоллбэк
-        apiKey = process.env.API_KEY_CURRENT;
-        keyInfo = `FALLBACK (...${apiKey ? apiKey.slice(-4) : 'NULL'})`;
-        
-        if (!apiKey) {
-            throw new Error(`[Поток #${threadId}] Критическая ошибка: не удалось получить ни один API ключ!`);
+        console.error(`[!] [Поток #${threadId}] Критическая ошибка при загрузке ключей: ${error.message}`);
+        throw error;
+    }
+}
+
+// 🎯 ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ НА СЛЕДУЮЩИЙ СВОБОДНЫЙ КЛЮЧ (КАК В BUTLER FACTORY)
+function switchToNextAvailableKey() {
+    if (availableApiKeys.length <= 1) {
+        console.warn(`[!] [Поток #${threadId}] Нет других ключей для переключения`);
+        return false;
+    }
+
+    // Ищем следующий свободный ключ
+    let nextKeyIndex = -1;
+    
+    // Сначала проверяем ключи после текущего пула (резервные)
+    for (let i = availableApiKeys.length; i > currentKeyIndex; i--) {
+        const testIndex = i % availableApiKeys.length;
+        if (!usedKeys.has(testIndex)) {
+            nextKeyIndex = testIndex;
+            break;
         }
     }
+    
+    // Если резервные закончились, ищем среди всех
+    if (nextKeyIndex === -1) {
+        for (let i = 0; i < availableApiKeys.length; i++) {
+            if (i !== currentKeyIndex && !usedKeys.has(i)) {
+                nextKeyIndex = i;
+                break;
+            }
+        }
+    }
+
+    if (nextKeyIndex === -1) {
+        console.error(`[!] [Поток #${threadId}] Все ключи исчерпаны!`);
+        return false;
+    }
+
+    // Переключаемся на новый ключ
+    usedKeys.add(currentKeyIndex); // Помечаем старый ключ как использованный
+    currentKeyIndex = nextKeyIndex;
+    apiKey = availableApiKeys[currentKeyIndex];
+    keyInfo = `Pool KEY_${currentKeyIndex + 1}/${availableApiKeys.length} (...${apiKey.slice(-4)}) [SWITCHED]`;
+
+    console.log(`[🔄] [Поток #${threadId}] Переключение на свободный ключ: ${keyInfo}`);
+    return true;
 }
 
 // Загружаем ключи при старте
@@ -100,6 +134,7 @@ function slugify(text) {
 
 async function generateWithRetry(prompt, maxRetries = 4) {
     let delay = 5000;
+    
     for (let i = 0; i < maxRetries; i++) {
         try {
             if (modelChoice === 'deepseek') {
@@ -118,7 +153,9 @@ async function generateWithRetry(prompt, maxRetries = 4) {
                 });
 
                 if (!response.ok) {
-                    if (response.status === 429) throw new Error(`429 Too Many Requests`);
+                    if (response.status === 429) {
+                        throw new Error(`429 Too Many Requests - Quota exhausted for ${keyInfo}`);
+                    }
                     throw new Error(`Ошибка HTTP от OpenRouter: ${response.status}`);
                 }
 
@@ -135,11 +172,28 @@ async function generateWithRetry(prompt, maxRetries = 4) {
         } catch (error) {
             console.warn(`[!] [Поток #${threadId}] [${keyInfo}] Попытка ${i + 1}/${maxRetries}: ${error.message}`);
             
-            if (error.message.includes('503') || error.message.includes('429') || error.message.includes('500')) {
+            // 🎯 КЛЮЧЕВАЯ ЛОГИКА BUTLER FACTORY: ПЕРЕКЛЮЧЕНИЕ ПРИ 429 ОШИБКЕ
+            if (error.message.includes('429') || error.message.includes('Quota exhausted')) {
+                console.warn(`[!] [Поток #${threadId}] Квота исчерпана для ${keyInfo}, попытка переключения...`);
+                
+                // Пытаемся переключиться на следующий свободный ключ
+                if (switchToNextAvailableKey()) {
+                    console.log(`[✨] [Поток #${threadId}] Переключился на ${keyInfo}, повторяю запрос...`);
+                    continue; // Повторяем запрос с новым ключом БЕЗ увеличения счетчика попыток
+                } else {
+                    console.error(`[!] [Поток #${threadId}] Не удалось найти свободный ключ для переключения`);
+                }
+            }
+            
+            if (error.message.includes('503') || error.message.includes('500')) {
                 console.warn(`[!] [Поток #${threadId}] Модель перегружена. Попытка ${i + 1}/${maxRetries}. Жду ${delay / 1000}с...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 delay *= 2;
-            } else {
+            } else if (i === maxRetries - 1) {
+                // Последняя попытка - пробуем переключить ключ даже при других ошибках
+                if (switchToNextAvailableKey()) {
+                    console.log(`[🔄] [Поток #${threadId}] Последняя попытка с новым ключом ${keyInfo}`);
+                }
                 throw error;
             }
         }
