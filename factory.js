@@ -188,12 +188,12 @@ ${plan}
 
     const seoPrompt = `Для статьи на тему "${topic}" сгенерируй JSON-объект.
 
-КРИТИЧЕСКИ ВАЖНО: ответ ТОЛЬКО валидный JSON.
+КРИТИЧЕСКИ ВАЖНО: ответ ТОЛЬКО валидный JSON без дополнительного текста, комментариев, markdown форматирования. Начинай ответ сразу с { и заканчивай }. Никакого текста до или после JSON!
 
 JSON должен содержать:
 - "title" (СТРОГО 42-45 символов, включи основное ключевое слово)
 - "description" (СТРОГО 152-162 символа, продающий, с призывом к действию)
-- "keywords" (СТРОГО 3-5 ключевых слов через запятую, БЕЗ общих слов)
+- "keywords" (СТРОГО строка: 3-5 ключевых слов через запятую, БЕЗ общих слов)
 
 КРИТИЧЕСКИЕ требования к keywords:
 - Используй ТОЛЬКО термины ИЗ ТЕМЫ статьи
@@ -204,11 +204,50 @@ JSON должен содержать:
 
     let seoText = await generateWithRetry(seoPrompt);
 
-    let match = seoText.match(/\{[^{}]*\}/); if (!match) { match = seoText.match(/\{[\s\S]*?\}/); } if (!match) { const cleanSeoText = seoText.replace(/```json|```|`/g, "").trim(); match = cleanSeoText.match(/\{[\s\S]*?\}/); }
+    // УЛУЧШЕННЫЙ JSON ПАРСИНГ С FALLBACK
+    let match = seoText.match(/\{[^{}]*\}/);
     if (!match) {
-        throw new Error("Не удалось найти валидный JSON в ответе модели.");
+        match = seoText.match(/\{[\s\S]*?\}/);
     }
-    const seoData = JSON.parse(match[0]);
+    if (!match) {
+        const cleanSeoText = seoText.replace(/```json|```|`/g, "").trim();
+        match = cleanSeoText.match(/\{[\s\S]*?\}/);
+    }
+
+    let seoData;
+    if (!match) {
+        console.warn(`[!] [Поток #${threadId}] JSON не найден в ответе модели. Создаю fallback SEO данные.`);
+        
+        // FALLBACK SEO ДАННЫЕ
+        const fallbackTitle = topic.length <= 45 ? topic : topic.slice(0, 42) + "...";
+        const fallbackDesc = `Экспертная статья о ${topic.toLowerCase()} от салона BlondePlace. Узнайте секреты профессионалов и получите идеальный результат!`;
+        const trimmedDesc = fallbackDesc.length <= 162 ? fallbackDesc : fallbackDesc.slice(0, 159) + "...";
+        
+        seoData = {
+            title: fallbackTitle,
+            description: trimmedDesc,
+            keywords: topic
+        };
+        
+        console.log(`[Поток #${threadId}] Использую fallback SEO: title=${seoData.title.length} chars, desc=${seoData.description.length} chars`);
+    } else {
+        try {
+            seoData = JSON.parse(match[0]);
+        } catch (parseError) {
+            console.warn(`[!] [Поток #${threadId}] Ошибка парсинга JSON: ${parseError.message}. Создаю fallback SEO данные.`);
+            
+            // FALLBACK SEO ДАННЫЕ
+            const fallbackTitle = topic.length <= 45 ? topic : topic.slice(0, 42) + "...";
+            const fallbackDesc = `Экспертная статья о ${topic.toLowerCase()} от салона BlondePlace. Узнайте секреты профессионалов и получите идеальный результат!`;
+            const trimmedDesc = fallbackDesc.length <= 162 ? fallbackDesc : fallbackDesc.slice(0, 159) + "...";
+            
+            seoData = {
+                title: fallbackTitle,
+                description: trimmedDesc,
+                keywords: topic
+            };
+        }
+    }
 
     const reviewCount = Math.floor(Math.random() * (900 - 300 + 1)) + 300;
     const ratingValue = (Math.random() * (5.0 - 4.7) + 4.7).toFixed(1);
@@ -252,10 +291,17 @@ JSON должен содержать:
         }
     };
 
+    // БЕЗОПАСНАЯ ОБРАБОТКА KEYWORDS
+    const safeKeywords = typeof seoData.keywords === "string" 
+        ? seoData.keywords 
+        : Array.isArray(seoData.keywords) 
+            ? seoData.keywords.join(", ") 
+            : topic;
+
     const frontmatter = `---
 title: ${JSON.stringify(seoData.title)}
 description: ${JSON.stringify(seoData.description)}
-keywords: ${typeof seoData.keywords === "string" ? JSON.stringify(seoData.keywords) : JSON.stringify(Array.isArray(seoData.keywords) ? seoData.keywords.join(", ") : topic)}
+keywords: ${JSON.stringify(safeKeywords)}
 pubDate: ${JSON.stringify(new Date().toISOString())}
 author: ${JSON.stringify(BRAND_AUTHOR_NAME)}
 heroImage: ${JSON.stringify(finalHeroImage)}
