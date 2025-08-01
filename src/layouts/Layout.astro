@@ -7,7 +7,7 @@ export interface Props {
         schema?: any;
 }
 
-const { title, description = "Ð­ÐºÑÐ¿ÐµÑ€Ñ‚Ð½Ñ‹Ðµ ÑÐ¾Ð²ÐµÑ‚Ñ‹ Ð¿Ð¾ ÐºÑ€Ð°ÑÐ¾Ñ‚Ðµ Ð¾Ñ‚ ÑÐ°Ð»Ð¾Ð½Ð° BlondePlace", heroImage, keywords, schema } = Astro.props;
+const { title, description = "Экспертные советы по красоте от салона BlondePlace", heroImage, keywords, schema } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -16,7 +16,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         <head>
                 <meta charset="UTF-8" />
                 <meta name="description" content={description} />
-                <meta name="keywords" content={keywords || "ÑÐ°Ð»Ð¾Ð½ ÐºÑ€Ð°ÑÐ¾Ñ‚Ñ‹ BlondePlace, beauty Ð¿Ñ€Ð¾Ñ†ÐµÐ´ÑƒÑ€Ñ‹, Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ñ‹Ð¹ ÑƒÑ…Ð¾Ð´"} />
+                <meta name="keywords" content={keywords || "салон красоты BlondePlace, beauty процедуры, профессиональный уход"} />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <meta name="robots" content="index, follow" />
                 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -46,12 +46,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
                 <meta property="twitter:description" content={description} />
                 {heroImage && <meta property="twitter:image" content={new URL(heroImage, Astro.url)} />}
 
-                <!-- Beauty-ÑÐ¿ÐµÑ†Ð¸Ñ„Ð¸Ñ‡Ð½Ñ‹Ðµ Ð¼ÐµÑ‚Ð°-Ñ‚ÐµÐ³Ð¸ -->
+                <!-- Beauty-специфичные мета-теги -->
                 <meta name="author" content="BlondePlace Beauty Expert" />
                 <meta name="theme-color" content="#f8d7da" />
 
-                <!-- ðŸ† ÐšÐ Ð˜Ð¢Ð˜Ð§ÐÐ«Ð• SEO Ð­Ð›Ð•ÐœÐ•ÐÐ¢Ð« Ð”Ð›Ð¯ 100% ÐžÐŸÐ¢Ð˜ÐœÐ˜Ð—ÐÐ¦Ð˜Ð˜ -->
-                <meta name="google-site-verification" content="W6kVbKYlVQFr7mF44C1iCiQ4uIYm13e1FIdPBRWZ8Kc" /><!-- Yandex.Metrika counter -->
+                <!-- 🏆 КРИТИЧНЫЕ SEO ЭЛЕМЕНТЫ ДЛЯ 100% ОПТИМИЗАЦИИ -->
+                <meta name="google-site-verification" content="W6kVbKYlVQFr7mF44C1iCiQ4uIYm13e1FIdPBRWZ8Kc" />
+
+                <!-- Yandex.Metrika counter -->
                 <script type="text/javascript">
                     (function(m,e,t,r,i,k,a){
                         m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -63,7 +65,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
                     ym(103564367, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
                 </script>
 
-                <!-- ðŸŽ¯ Ð’Ð¡Ð¢Ð ÐžÐ•ÐÐÐ«Ð• Ð¡Ð¢Ð˜Ð›Ð˜ Ð‘Ð•Ð— Ð’ÐÐ•Ð¨ÐÐ˜Ð¥ Ð Ð•Ð¡Ð£Ð Ð¡ÐžÐ’ -->
+                <!-- 🎯 ВСТРОЕННЫЕ СТИЛИ БЕЗ ВНЕШНИХ РЕСУРСОВ -->
                 <style>
                         /* === BEAUTY DESIGN SYSTEM === */
                         :root {
@@ -252,7 +254,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
                 </style>
         </head>
         <body>
-                <!-- ðŸ† ÐšÐ Ð˜Ð¢Ð˜Ð§ÐÐ«Ð™ NOSCRIPT Ð”Ð›Ð¯ YANDEX.METRIKA -->
+                <!-- 🏆 КРИТИЧНЫЙ NOSCRIPT ДЛЯ YANDEX.METRIKA -->
                 <noscript><div><img src="https://mc.yandex.ru/watch/103564367" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 
                 <!-- Header -->
@@ -266,10 +268,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
                                                 </a>
                                         </div>
                                         <div class="nav-menu">
-                                                <a href="/blog" class="nav-link">Ð‘Ð»Ð¾Ð³</a>
-                                                <a href="/uslugi" class="nav-link">Ð£ÑÐ»ÑƒÐ³Ð¸</a>
-                                                <a href="/kontakty" class="nav-link">ÐšÐ¾Ð½Ñ‚Ð°ÐºÑ‚Ñ‹</a>
-                                                <a href="/o-nas" class="nav-link">Ðž Ð½Ð°Ñ</a>
+                                                <a href="/blog" class="nav-link">Блог</a>
+                                                <a href="/uslugi" class="nav-link">Услуги</a>
+                                                <a href="/kontakty" class="nav-link">Контакты</a>
+                                                <a href="/o-nas" class="nav-link">О нас</a>
                                         </div>
                                 </div>
                         </nav>
@@ -286,33 +288,33 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
                                 <div class="footer-content">
                                         <div class="footer-section">
                                                 <h3>BlondePlace Beauty Studio</h3>
-                                                <p>ÐŸÑ€Ð¾Ñ„ÐµÑÑÐ¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ñ‹Ð¹ ÑÐ°Ð»Ð¾Ð½ ÐºÑ€Ð°ÑÐ¾Ñ‚Ñ‹, ÑÐ¿ÐµÑ†Ð¸Ð°Ð»Ð¸Ð·Ð¸Ñ€ÑƒÑŽÑ‰Ð¸Ð¹ÑÑ Ð½Ð° Ð¾ÐºÑ€Ð°ÑˆÐ¸Ð²Ð°Ð½Ð¸Ð¸ Ð²Ð¾Ð»Ð¾Ñ, ÑÑ‚Ñ€Ð¸Ð¶ÐºÐ°Ñ… Ð¸ beauty-Ð¿Ñ€Ð¾Ñ†ÐµÐ´ÑƒÑ€Ð°Ñ….</p>
+                                                <p>Профессиональный салон красоты, специализирующийся на окрашивании волос, стрижках и beauty-процедурах.</p>
                                         </div>
 
                                         <div class="footer-section">
-                                                <h4>Ð£ÑÐ»ÑƒÐ³Ð¸ ÑÐ°Ð»Ð¾Ð½Ð°</h4>
+                                                <h4>Услуги салона</h4>
                                                 <ul class="footer-links">
-                                                        <li><a href="/uslugi#coloring">ÐžÐºÑ€Ð°ÑˆÐ¸Ð²Ð°Ð½Ð¸Ðµ Ð²Ð¾Ð»Ð¾Ñ</a></li>
-                                                        <li><a href="/uslugi#cutting">Ð¡Ñ‚Ñ€Ð¸Ð¶ÐºÐ¸ Ð¸ ÑƒÐºÐ»Ð°Ð´ÐºÐ¸</a></li>
-                                                        <li><a href="/uslugi#manicure">ÐœÐ°Ð½Ð¸ÐºÑŽÑ€ Ð¸ Ð¿ÐµÐ´Ð¸ÐºÑŽÑ€</a></li>
-                                                        <li><a href="/uslugi#treatments">Beauty-Ð¿Ñ€Ð¾Ñ†ÐµÐ´ÑƒÑ€Ñ‹</a></li>
+                                                        <li><a href="/uslugi#coloring">Окрашивание волос</a></li>
+                                                        <li><a href="/uslugi#cutting">Стрижки и укладки</a></li>
+                                                        <li><a href="/uslugi#manicure">Маникюр и педикюр</a></li>
+                                                        <li><a href="/uslugi#treatments">Beauty-процедуры</a></li>
                                                 </ul>
                                         </div>
 
                                         <div class="footer-section">
-                                                <h4>ÐŸÐ¾Ð»ÐµÐ·Ð½Ð¾Ðµ</h4>
+                                                <h4>Полезное</h4>
                                                 <ul class="footer-links">
-                                                        <li><a href="/blog">Beauty Ð±Ð»Ð¾Ð³</a></li>
-                                                        <li><a href="/kontakty">ÐšÐ¾Ð½Ñ‚Ð°ÐºÑ‚Ñ‹</a></li>
-                                                        <li><a href="/o-nas">Ðž ÑÐ°Ð»Ð¾Ð½Ðµ</a></li>
+                                                        <li><a href="/blog">Beauty блог</a></li>
+                                                        <li><a href="/kontakty">Контакты</a></li>
+                                                        <li><a href="/o-nas">О салоне</a></li>
                                                 </ul>
                                         </div>
                                 </div>
 
                                 <div class="footer-bottom">
-                                        <p>&copy; 2024 BlondePlace Beauty Studio. Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð·Ð°Ñ‰Ð¸Ñ‰ÐµÐ½Ñ‹.</p>
+                                        <p>&copy; 2024 BlondePlace Beauty Studio. Все права защищены.</p>
                                         <p class="footer-note">
-                                                Ð­ÐºÑÐ¿ÐµÑ€Ñ‚Ð½Ñ‹Ðµ ÑÐ¾Ð²ÐµÑ‚Ñ‹ Ð¸ ÑÑ‚Ð°Ñ‚ÑŒÐ¸ Ð¾ ÐºÑ€Ð°ÑÐ¾Ñ‚Ðµ Ð¾Ñ‚ Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¾Ð½Ð°Ð»Ð¾Ð² ÑÐ°Ð»Ð¾Ð½Ð° BlondePlace
+                                                Экспертные советы и статьи о красоте от профессионалов салона BlondePlace
                                         </p>
                                 </div>
                         </div>
