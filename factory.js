@@ -1,4 +1,4 @@
-// Файл: factory.js (BlondePlace версия - ИСПРАВЛЕНЫ КРИТИЧЕСКИЕ ОШИБКИ!)
+// Файл: factory.js (BlondePlace версия - ТОЧНАЯ КОПИЯ BUTLER FACTORY!)
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
@@ -21,127 +21,22 @@ const POSTS_DIR = 'src/content/posts';
 // --- НАСТРОЙКИ МОДЕЛЕЙ ---
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
-const GEMINI_MODEL_NAME = "gemini-2.5-flash"; // 🔧 ИСПРАВЛЕНО: gemini-2.5-flash (НЕ 2.5!)
+const GEMINI_MODEL_NAME = "gemini-2.5-flash";
 
 // --- ИНИЦИАЛИЗАЦИЯ ПОТОКА ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
+const apiKey = process.env.API_KEY_CURRENT; // 🎯 ТОЧНО КАК В BUTLER FACTORY!
 
-// 🔑 УМНАЯ РОТАЦИЯ API КЛЮЧЕЙ (КАК В BUTLER FACTORY)
-let availableApiKeys = [];
-let currentKeyIndex = 0;
-let apiKey;
-let keyInfo;
-
-// Глобальные переменные для отслеживания используемых ключей
-const usedKeys = new Set(); // Отслеживаем использованные ключи по всем потокам
-
-function loadApiKeysFromSecrets() {
-    try {
-        // 🔍 ОТЛАДКА: Проверяем все переменные окружения
-        console.log(`[🔍] [Поток #${threadId}] Отладка переменных окружения:`);
-        console.log(`[🔍] [Поток #${threadId}] NODE_ENV: ${process.env.NODE_ENV || 'не установлено'}`);
-        console.log(`[🔍] [Поток #${threadId}] GITHUB_ACTIONS: ${process.env.GITHUB_ACTIONS || 'не установлено'}`);
-        console.log(`[🔍] [Поток #${threadId}] RUNNER_OS: ${process.env.RUNNER_OS || 'не установлено'}`);
-        
-        // Читаем GitHub Secret с пулом ключей
-        const poolSecret = process.env.GEMINI_API_KEYS_POOL;
-        
-        console.log(`[🔍] [Поток #${threadId}] GEMINI_API_KEYS_POOL существует: ${!!poolSecret}`);
-        if (poolSecret) {
-            console.log(`[🔍] [Поток #${threadId}] GEMINI_API_KEYS_POOL длина: ${poolSecret.length} символов`);
-            console.log(`[🔍] [Поток #${threadId}] GEMINI_API_KEYS_POOL первые 20 символов: ${poolSecret.substring(0, 20)}...`);
-        }
-
-        if (!poolSecret) {
-            console.error(`[!] [Поток #${threadId}] GitHub Secret GEMINI_API_KEYS_POOL не найден!`);
-            console.error(`[!] [Поток #${threadId}] Доступные переменные окружения с 'API' в названии:`);
-            Object.keys(process.env).filter(key => key.includes('API')).forEach(key => {
-                console.error(`[!] [Поток #${threadId}] - ${key}: ${process.env[key] ? 'установлено' : 'не установлено'}`);
-            });
-            throw new Error('GitHub Secret GEMINI_API_KEYS_POOL не найден!');
-        }
-
-        // Парсим ключи из секрета (разделенные переносами)
-        availableApiKeys = poolSecret.split('\n')
-            .map(key => key.trim())
-            .filter(key => key.length > 0);
-
-        console.log(`[🔍] [Поток #${threadId}] Обработано ключей: ${availableApiKeys.length}`);
-        if (availableApiKeys.length > 0) {
-            console.log(`[🔍] [Поток #${threadId}] Первый ключ начинается с: ${availableApiKeys[0].substring(0, 20)}...`);
-            console.log(`[🔍] [Поток #${threadId}] Последний ключ начинается с: ${availableApiKeys[availableApiKeys.length - 1].substring(0, 20)}...`);
-        }
-
-        if (availableApiKeys.length === 0) {
-            throw new Error('GitHub Secret GEMINI_API_KEYS_POOL пуст или не содержит валидных ключей');
-        }
-
-        // ИЗНАЧАЛЬНАЯ РОТАЦИЯ ПО НОМЕРУ ПОТОКА (как в Butler Factory)
-        currentKeyIndex = (threadId - 1) % availableApiKeys.length;
-        apiKey = availableApiKeys[currentKeyIndex];
-        keyInfo = `Pool KEY_${currentKeyIndex + 1}/${availableApiKeys.length} (...${apiKey.slice(-4)})`;
-
-        console.log(`[🔑] [Поток #${threadId}] Загружен пул из ${availableApiKeys.length} ключей из GitHub Secrets, использую ${keyInfo}`);
-
-    } catch (error) {
-        console.error(`[!] [Поток #${threadId}] Критическая ошибка при загрузке ключей: ${error.message}`);
-        throw error;
-    }
+if (!apiKey) {
+    throw new Error(`[Поток #${threadId}] Не был предоставлен API-ключ (API_KEY_CURRENT)!`);
 }
-
-// 🎯 ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ НА СЛЕДУЮЩИЙ СВОБОДНЫЙ КЛЮЧ (КАК В BUTLER FACTORY)
-function switchToNextAvailableKey() {
-    if (availableApiKeys.length <= 1) {
-        console.warn(`[!] [Поток #${threadId}] Нет других ключей для переключения`);
-        return false;
-    }
-
-    // Ищем следующий свободный ключ
-    let nextKeyIndex = -1;
-    
-    // Сначала проверяем ключи после текущего пула (резервные)
-    for (let i = availableApiKeys.length; i > currentKeyIndex; i--) {
-        const testIndex = i % availableApiKeys.length;
-        if (!usedKeys.has(testIndex)) {
-            nextKeyIndex = testIndex;
-            break;
-        }
-    }
-    
-    // Если резервные закончились, ищем среди всех
-    if (nextKeyIndex === -1) {
-        for (let i = 0; i < availableApiKeys.length; i++) {
-            if (i !== currentKeyIndex && !usedKeys.has(i)) {
-                nextKeyIndex = i;
-                break;
-            }
-        }
-    }
-
-    if (nextKeyIndex === -1) {
-        console.error(`[!] [Поток #${threadId}] Все ключи исчерпаны!`);
-        return false;
-    }
-
-    // Переключаемся на новый ключ
-    usedKeys.add(currentKeyIndex); // Помечаем старый ключ как использованный
-    currentKeyIndex = nextKeyIndex;
-    apiKey = availableApiKeys[currentKeyIndex];
-    keyInfo = `Pool KEY_${currentKeyIndex + 1}/${availableApiKeys.length} (...${apiKey.slice(-4)}) [SWITCHED]`;
-
-    console.log(`[🔄] [Поток #${threadId}] Переключение на свободный ключ: ${keyInfo}`);
-    return true;
-}
-
-// Загружаем ключи при старте
-loadApiKeysFromSecrets();
 
 // 🏆 ЛОГИРОВАНИЕ КАК В BUTLER FACTORY
 if (modelChoice === 'deepseek') {
-    console.log(`🚀 [Поток #${threadId}] Использую модель DeepSeek через OpenRouter с ключом ${keyInfo}`);
+    console.log(`🚀 [Поток #${threadId}] Использую модель DeepSeek через OpenRouter с ключом ...${apiKey.slice(-4)}`);
 } else {
-    console.log(`✨ [Поток #${threadId}] Использую модель Gemini ${GEMINI_MODEL_NAME} с ключом ${keyInfo}`);
+    console.log(`✨ [Поток #${threadId}] Использую модель Gemini с ключом ...${apiKey.slice(-4)}`);
 }
 
 function slugify(text) {
@@ -177,7 +72,7 @@ async function generateWithRetry(prompt, maxRetries = 4) {
 
                 if (!response.ok) {
                     if (response.status === 429) {
-                        throw new Error(`429 Too Many Requests - Quota exhausted for ${keyInfo}`);
+                        throw new Error(`429 Too Many Requests`);
                     }
                     throw new Error(`Ошибка HTTP от OpenRouter: ${response.status}`);
                 }
@@ -193,35 +88,16 @@ async function generateWithRetry(prompt, maxRetries = 4) {
                 return result.response.text();
             }
         } catch (error) {
-            console.warn(`[!] [Поток #${threadId}] [${keyInfo}] Попытка ${i + 1}/${maxRetries}: ${error.message}`);
-            
-            // 🎯 КЛЮЧЕВАЯ ЛОГИКА BUTLER FACTORY: ПЕРЕКЛЮЧЕНИЕ ПРИ 429 ОШИБКЕ
-            if (error.message.includes('429') || error.message.includes('Quota exhausted')) {
-                console.warn(`[!] [Поток #${threadId}] Квота исчерпана для ${keyInfo}, попытка переключения...`);
-                
-                // Пытаемся переключиться на следующий свободный ключ
-                if (switchToNextAvailableKey()) {
-                    console.log(`[✨] [Поток #${threadId}] Переключился на ${keyInfo}, повторяю запрос...`);
-                    continue; // Повторяем запрос с новым ключом БЕЗ увеличения счетчика попыток
-                } else {
-                    console.error(`[!] [Поток #${threadId}] Не удалось найти свободный ключ для переключения`);
-                }
-            }
-            
-            if (error.message.includes('503') || error.message.includes('500')) {
+            if (error.message.includes('503') || error.message.includes('429')) {
                 console.warn(`[!] [Поток #${threadId}] Модель перегружена. Попытка ${i + 1}/${maxRetries}. Жду ${delay / 1000}с...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 delay *= 2;
-            } else if (i === maxRetries - 1) {
-                // Последняя попытка - пробуем переключить ключ даже при других ошибках
-                if (switchToNextAvailableKey()) {
-                    console.log(`[🔄] [Поток #${threadId}] Последняя попытка с новым ключом ${keyInfo}`);
-                }
+            } else {
                 throw error;
             }
         }
     }
-    throw new Error(`[Поток #${threadId}] Не удалось получить ответ от модели ${modelChoice} (${keyInfo}) после ${maxRetries} попыток.`);
+    throw new Error(`[Поток #${threadId}] Не удалось получить ответ от модели ${modelChoice} после ${maxRetries} попыток.`);
 }
 
 async function notifyIndexNow(url) {
@@ -243,7 +119,7 @@ async function notifyIndexNow(url) {
 }
 
 async function generatePost(topic, slug, interlinks) {
-    console.log(`[+] [Поток #${threadId}] [${keyInfo}] Генерирую ДЕТАЛЬНУЮ статью на тему: ${topic}`);
+    console.log(`[+] [Поток #${threadId}] Генерирую ДЕТАЛЬНУЮ статью на тему: ${topic}`);
 
     // 🎯 BUTLER-СТИЛЬ: СУПЕР-ДЕТАЛЬНЫЙ ПЛАН
     const planPrompt = `Создай максимально детальный, многоуровневый план для портной SEO-статьи на тему "${topic}".
@@ -395,10 +271,10 @@ ${articleText}
 }
 
 async function main() {
-    console.log(`[🚀] [Поток #${threadId}] [${keyInfo}] Запуск рабочего потока для модели ${GEMINI_MODEL_NAME}...`);
+    console.log(`[Поток #${threadId}] Запуск рабочего потока...`);
 
     try {
-        const BATCH_SIZE = parseInt(process.env.BATCH_SIZE_PER_THREAD, 10) || 1;
+        const BATCH_SIZE = parseInt(process.env.BATCH_SIZE, 10) || 1;
         const totalThreads = parseInt(process.env.TOTAL_THREADS, 10) || 1;
 
         const fileContent = await fs.readFile(TOPICS_FILE, 'utf-8');
@@ -422,7 +298,7 @@ async function main() {
             return;
         }
 
-        console.log(`[🎯] [Поток #${threadId}] [${keyInfo}] Найдено ${topicsForThisThread.length} новых тем. Беру в работу.`);
+        console.log(`[Поток #${threadId}] Найдено ${topicsForThisThread.length} новых тем. Беру в работу.`);
 
         let allPostsForLinking = [];
         for (const slug of existingSlugs) {
@@ -449,23 +325,23 @@ async function main() {
 
                 const fullContent = await generatePost(topic, slug, randomInterlinks);
                 await fs.writeFile(filePath, fullContent);
-                console.log(`[✔] [Поток #${threadId}] [${keyInfo}] Статья "${topic}" успешно создана.`);
+                console.log(`[Поток #${threadId}] [✔] Статья "${topic}" успешно создана.`);
 
                 const newUrl = `${SITE_URL}/blog/${slug}/`;
                 await notifyIndexNow(newUrl);
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
             } catch (e) {
-                console.error(`[!] [Поток #${threadId}] [${keyInfo}] Ошибка при обработке темы "${topic}": ${e.message}`);
+                console.error(`[!] [Поток #${threadId}] Ошибка при обработке темы "${topic}": ${e.message}`);
                 if (e.message.includes('429') || e.message.includes('API key')) {
-                    console.error(`[!] [Поток #${threadId}] [${keyInfo}] Ключ API исчерпан. Завершаю работу этого потока.`);
+                    console.error(`[!] [Поток #${threadId}] Ключ API исчерпан. Завершаю работу этого потока.`);
                     break;
                 }
                 continue;
             }
         }
     } catch (error) {
-        console.error(`[Поток #${threadId}] [${keyInfo}] [!] Критическая ошибка:`, error);
+        console.error(`[Поток #${threadId}] [!] Критическая ошибка:`, error);
         process.exit(1);
     }
 }
