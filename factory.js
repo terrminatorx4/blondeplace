@@ -11,7 +11,7 @@ const BRAND_NAME = 'BlondePlace';
 const BRAND_BLOG_NAME = 'Блог BlondePlace';
 const BRAND_AUTHOR_NAME = 'Эксперт BlondePlace';
 const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-const INDEXNOW_API_KEY = 'df39150ca56f896546628ae3c923dd4a';
+const INDEXNOW_API_KEY = 'df39150ca56f896546628ae3c923dd4a'; // TODO: Verify IndexNow key
 
 // --- НАСТРОЙКИ ОПЕРАЦИИ ---
 const TARGET_URL_MAIN = "https://blondeplace.ru";
@@ -150,7 +150,7 @@ ${plan}
 - Строго следуй плану и используй правильные Markdown заголовки (# ## ###)
 - НЕ добавляй изображения ![...], ссылки, URL-адреса
 - Начинай сразу с заголовка H1
-- ВАЖНО: избегай частого повторения одних слов, используй синонимы и разнообразную лексику для снижения тошноты текста
+- ВАЖНОТ: СЬ избегай повторений! спользуй синонимы, перифразы, разную лексику. Тошнота  ЫШ 5! аждый абзац - новые слова и выражения!
 
 ОБЪЕМ: минимум 15000 символов - это критично важно!`;
 
