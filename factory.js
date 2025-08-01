@@ -204,7 +204,7 @@ JSON должен содержать:
 
     let seoText = await generateWithRetry(seoPrompt);
 
-    const match = seoText.match(/\{[\s\S]*\}/);
+    let match = seoText.match(/\{[^{}]*\}/); if (!match) { match = seoText.match(/\{[\s\S]*?\}/); } if (!match) { const cleanSeoText = seoText.replace(/```json|```|`/g, "").trim(); match = cleanSeoText.match(/\{[\s\S]*?\}/); }
     if (!match) {
         throw new Error("Не удалось найти валидный JSON в ответе модели.");
     }
