@@ -135,7 +135,7 @@ async function generatePost(topic, slug, interlinks) {
     const plan = await generateWithRetry(planPrompt);
 
     // BUTLER-СТИЛЬ: ТРЕБОВАНИЯ К ДЛИНЕ И ЭКСПЕРТНОСТИ
-    const articlePrompt = `Напиши исчерпывающую, экспертную статью объемом МИНИМУМ 12000 символов по этому плану:
+    const articlePrompt = `Напиши исчерпывающую, экспертную статью объемом МИНИМУМ 10000 символов по этому плану:
 
 ${plan}
 
@@ -149,14 +149,14 @@ ${plan}
 - Строго следуй плану и используй правильные Markdown заголовки (# ## ###)
 - НЕ добавляй изображения ![...], ссылки, URL-адреса
 - Начинай сразу с заголовка H1
-- КРИТИЧНО: ЗАПРЕЩЕНО повторять слова! Тошнота СТРОГО до 4.0! Каждое предложение - уникальные слова, синонимы, перифразы. Абзацы максимально разнообразные!
+- КРИТИЧНО: ЗАПРЕЩЕНО повторять слова! Тошнота СТРОГО до 3.0! Каждое предложение - ПОЛНОСТЬЮ уникальные слова, синонимы, перифразы. Абзацы максимально разнообразные! НИ ОДНОГО ПОВТОРА!
 
-ОБЪЕМ: минимум 12000 символов - это критично важно!`;
+ОБЪЕМ: минимум 10000 символов для снижения тошноты!`;
 
     let articleText = await generateWithRetry(articlePrompt);
 
     // ПРОВЕРКА ДЛИНЫ И ДОПОЛНЕНИЕ ЕСЛИ НУЖНО
-    if (articleText.length < 10000) {
+    if (articleText.length < 8000) {
         const extensionPrompt = `Дополни и расширь статью на тему "${topic}". Добавь больше деталей:
 - Практические примеры и кейсы
 - Детальные пошаговые инструкции  
@@ -166,7 +166,7 @@ ${plan}
 
 Текущая статья: ${articleText}
 
-Увеличь объем минимум в 1.5 раза, сохраняя экспертность и структуру. Используй разнообразную лексику для снижения тошноты!`;
+Увеличь объем минимум в 1.3 раза, сохраняя экспертность и структуру. КРИТИЧНО: Используй ТОЛЬКО уникальную лексику для снижения тошноты до 3.0!`;
 
         articleText = await generateWithRetry(extensionPrompt);
     }
@@ -191,8 +191,8 @@ ${plan}
 КРИТИЧЕСКИ ВАЖНО: ответ ТОЛЬКО валидный JSON без дополнительного текста, комментариев, markdown форматирования. Начинай ответ сразу с { и заканчивай }. Никакого текста до или после JSON!
 
 JSON должен содержать:
-- "title" (СТРОГО 42-45 символов, включи основное ключевое слово)
-- "description" (СТРОГО 152-162 символа, продающий, с призывом к действию)
+- "title" (СТРОГО 40-44 символа, включи основное ключевое слово)
+- "description" (СТРОГО 150-158 символов, продающий, с призывом к действию)
 - "keywords" (СТРОГО строка: 3-5 ключевых слов через запятую, БЕЗ общих слов)
 
 КРИТИЧЕСКИЕ требования к keywords:
@@ -218,10 +218,10 @@ JSON должен содержать:
     if (!match) {
         console.warn(`[!] [Поток #${threadId}] JSON не найден в ответе модели. Создаю fallback SEO данные.`);
         
-        // FALLBACK SEO ДАННЫЕ
-        const fallbackTitle = topic.length <= 45 ? topic : topic.slice(0, 40) + "...";
-        const fallbackDesc = `Экспертная статья о ${topic.toLowerCase()} от салона BlondePlace. Узнайте секреты профессионалов и получите идеальный результат!`;
-        const trimmedDesc = fallbackDesc.length <= 162 ? fallbackDesc : fallbackDesc.slice(0, 157) + "...";
+        // УЛЬТРА-СТРОГИЕ FALLBACK SEO ДАННЫЕ
+        const fallbackTitle = topic.length <= 44 ? topic : topic.slice(0, 41) + "...";
+        const fallbackDesc = `Экспертный гайд о ${topic.toLowerCase()} от BlondePlace. Секреты профи!`;
+        const trimmedDesc = fallbackDesc.length <= 158 ? fallbackDesc : fallbackDesc.slice(0, 155) + "...";
         
         seoData = {
             title: fallbackTitle,
@@ -233,13 +233,25 @@ JSON должен содержать:
     } else {
         try {
             seoData = JSON.parse(match[0]);
+            
+            // ПРОВЕРКА И ОБРЕЗКА ЕСЛИ ПРЕВЫШЕНЫ ЛИМИТЫ
+            if (seoData.title && seoData.title.length > 44) {
+                seoData.title = seoData.title.slice(0, 41) + "...";
+                console.warn(`[!] [Поток #${threadId}] Title обрезан до ${seoData.title.length} символов`);
+            }
+            
+            if (seoData.description && seoData.description.length > 158) {
+                seoData.description = seoData.description.slice(0, 155) + "...";
+                console.warn(`[!] [Поток #${threadId}] Description обрезан до ${seoData.description.length} символов`);
+            }
+            
         } catch (parseError) {
             console.warn(`[!] [Поток #${threadId}] Ошибка парсинга JSON: ${parseError.message}. Создаю fallback SEO данные.`);
             
-            // FALLBACK SEO ДАННЫЕ
-            const fallbackTitle = topic.length <= 45 ? topic : topic.slice(0, 40) + "...";
-            const fallbackDesc = `Экспертная статья о ${topic.toLowerCase()} от салона BlondePlace. Узнайте секреты профессионалов и получите идеальный результат!`;
-            const trimmedDesc = fallbackDesc.length <= 162 ? fallbackDesc : fallbackDesc.slice(0, 157) + "...";
+            // УЛЬТРА-СТРОГИЕ FALLBACK SEO ДАННЫЕ
+            const fallbackTitle = topic.length <= 44 ? topic : topic.slice(0, 41) + "...";
+            const fallbackDesc = `Экспертный гайд о ${topic.toLowerCase()} от BlondePlace. Секреты профи!`;
+            const trimmedDesc = fallbackDesc.length <= 158 ? fallbackDesc : fallbackDesc.slice(0, 155) + "...";
             
             seoData = {
                 title: fallbackTitle,
