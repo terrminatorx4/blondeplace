@@ -177,6 +177,13 @@ ${plan}
     articleText = articleText.replace(/https?:\/\/[^\s\)\]]+/g, '');
     articleText = articleText.replace(/www\.[^\s]+/g, '');
 
+    // ОЧИСТКА ESCAPE-СИМВОЛОВ И ПРОБЛЕМНЫХ ПЕРЕНОСОВ СТРОК
+    articleText = articleText.replace(/\\n/g, '');
+    articleText = articleText.replace(/`n/g, '');
+    articleText = articleText.replace(/\r\n/g, '\n');
+    articleText = articleText.replace(/\r/g, '\n');
+    articleText = articleText.trim();
+
     // Интерлинкинг
     if (interlinks.length > 0) {
         let interlinkingBlock = '\n\n---\n\n## Читайте также\n\n';
@@ -310,6 +317,7 @@ JSON должен содержать:
             ? seoData.keywords.join(", ") 
             : topic;
 
+    // ИСПРАВЛЕННЫЙ FRONTMATTER БЕЗ ПРОБЛЕМНЫХ СИМВОЛОВ
     const frontmatter = `---
 title: ${JSON.stringify(seoData.title)}
 description: ${JSON.stringify(seoData.description)}
@@ -320,8 +328,7 @@ heroImage: ${JSON.stringify(finalHeroImage)}
 schema: ${JSON.stringify(fullSchema)}
 ---
 
-${articleText}
-`;
+${articleText}`;
 
     return frontmatter;
 }
