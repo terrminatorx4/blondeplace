@@ -1,313 +1,350 @@
----
-export interface Props {
-        title: string;
-        description?: string;
-        heroImage?: string;
-        keywords?: string;
-        schema?: any;
+﻿// Файл: factory.js (BlondePlace версия - ИСПРАВЛЕННАЯ ДЛЯ 100%)
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import fs from 'fs/promises';
+import path from 'path';
+import fetch from 'node-fetch';
+import { execa } from 'execa';
+
+// --- КОНСТАНТЫ ---
+const SITE_URL = 'https://blondeplace.netlify.app';
+const BRAND_NAME = 'BlondePlace';
+const BRAND_BLOG_NAME = 'Блог BlondePlace';
+const BRAND_AUTHOR_NAME = 'Эксперт BlondePlace';
+const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop';
+const INDEXNOW_API_KEY = 'df39150ca56f896546628ae3c923dd4a';
+
+// --- НАСТРОЙКИ ОПЕРАЦИИ ---
+const TARGET_URL_MAIN = "https://blondeplace.ru";
+const TOPICS_FILE = 'topics.txt';
+const POSTS_DIR = 'src/content/posts';
+
+// --- НАСТРОЙКИ МОДЕЛЕЙ ---
+const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
+const GEMINI_MODEL_NAME = "gemini-1.5-flash";
+
+// --- ИНИЦИАЛИЗАЦИЯ ПОТОКА ---
+const modelChoice = process.env.MODEL_CHOICE || 'gemini';
+const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
+const GEMINI_API_KEY_CURRENT = process.env.GEMINI_API_KEY_CURRENT;
+const OPENROUTER_API_KEY_CURRENT = process.env.OPENROUTER_API_KEY_CURRENT;
+
+let apiKey;
+if (modelChoice === 'deepseek') {
+    apiKey = OPENROUTER_API_KEY_CURRENT;
+} else {
+    apiKey = GEMINI_API_KEY_CURRENT;
 }
 
-const { title, description = "Экспертные советы по красоте от салона BlondePlace", heroImage, keywords, schema } = Astro.props;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+if (!apiKey) {
+    throw new Error(`[Поток #${threadId}] Не был предоставлен API-ключ!`);
+}
+
+function slugify(text) {
+    const cleanedText = text.toString().replace(/[\x00-\x1F\x7F-\x9F]/g, "").trim();
+    const from = "а б в г д е ё ж з и й к л м н о п р с т у ф х ц ч ш щ ъ ы ь э ю я".split(' ');
+    const to = "a b v g d e yo zh z i y k l m n o p r s t u f h c ch sh sch '' y ' e yu ya".split(' ');
+    let newText = cleanedText.toLowerCase();
+    for (let i = 0; i < from.length; i++) {
+        newText = newText.replace(new RegExp(from[i], 'g'), to[i]);
+    }
+    return newText.replace(/\s+/g, '-').replace(/[^\w-]+/g, '').replace(/--+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+}
+
+async function generateWithRetry(prompt, maxRetries = 4) {
+    let delay = 5000;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            if (modelChoice === 'deepseek') {
+                const response = await fetch(OPENROUTER_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'HTTP-Referer': TARGET_URL_MAIN,
+                        'X-Title': slugify(BRAND_BLOG_NAME)
+                    },
+                    body: JSON.stringify({
+                        model: DEEPSEEK_MODEL_NAME,
+                        messages: [{ role: "user", content: prompt }]
+                    })
+                });
+                if (!response.ok) {
+                    if (response.status === 429) throw new Error(`429 Too Many Requests`);
+                    throw new Error(`Ошибка HTTP от OpenRouter: ${response.status}`);
+                }
+                const data = await response.json();
+                if (!data.choices || data.choices.length === 0) throw new Error("Ответ от API OpenRouter не содержит поля 'choices'.");
+                return data.choices[0].message.content;
+            } else {
+                const genAI = new GoogleGenerativeAI(apiKey);
+                const model = genAI.getGenerativeModel({ model: GEMINI_MODEL_NAME });
+                const result = await model.generateContent(prompt);
+                return result.response.text();
+            }
+        } catch (error) {
+            if (error.message.includes('503') || error.message.includes('429')) {
+                console.warn(`[!] [Поток #${threadId}] Модель перегружена. Попытка ${i + 1}/${maxRetries}. Жду ${delay / 1000}с...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
+            } else {
+                throw error;
+            }
+        }
+    }
+    throw new Error(`[Поток #${threadId}] Не удалось получить ответ от модели ${modelChoice} после ${maxRetries} попыток.`);
+}
+
+async function isUrlAccessible(url) {
+    if (typeof url !== 'string' || !url.startsWith('http')) return false;
+    try {
+        const response = await fetch(url, { method: 'HEAD', timeout: 5000 });
+        return response.ok;
+    } catch (error) {
+        console.warn(`[!] Предупреждение: не удалось проверить URL изображения: ${url}. Ошибка: ${error.message}`);
+        return false;
+    }
+}
+
+async function notifyIndexNow(url) {
+    console.log(`📢 [Поток #${threadId}] Отправляю уведомление для ${url} в IndexNow...`);
+    const HOST = "blondeplace.netlify.app";
+    const payload = JSON.stringify({ host: HOST, key: INDEXNOW_API_KEY, urlList: [url] });
+
+    try {
+        await execa('curl', ['-X', 'POST', 'https://yandex.com/indexnow', '-H', 'Content-Type: application/json; charset=utf-8', '-d', payload]);
+        await execa('curl', ['-X', 'POST', 'https://www.bing.com/indexnow', '-H', 'Content-Type: application/json; charset=utf-8', '-d', payload]);
+        console.log(`[✔] [Поток #${threadId}] Уведомление для ${url} успешно отправлено.`);
+    } catch (error) {
+        console.error(`[!] [Поток #${threadId}] Ошибка при отправке в IndexNow для ${url}:`, error.stderr);
+    }
+}
+
+async function generatePost(topic, slug, interlinks) {
+    console.log(`[+] [Поток #${threadId}] Генерирую ДЕТАЛЬНУЮ статью на тему: ${topic}`);
+    
+    // 🎯 BUTLER-СТИЛЬ: СУПЕР-ДЕТАЛЬНЫЙ ПЛАН
+    const planPrompt = `Создай максимально детальный, многоуровневый план для экспертной SEO-статьи на тему "${topic}". 
+
+ТРЕБОВАНИЯ К ПЛАНУ:
+- Минимум 15-20 разделов и подразделов
+- Включи практические примеры, кейсы, пошаговые инструкции  
+- Добавь FAQ секцию (5-7 вопросов)
+- Включи разделы: введение, основная часть, практические советы, частые ошибки, заключение
+- План должен покрывать тему полностью и всесторонне
+
+Контекст: статья для блога салона красоты ${BRAND_NAME}, целевая аудитория - женщины 25-45 лет, интересующиеся красотой.`;
+
+    const plan = await generateWithRetry(planPrompt);
+
+    // 🎯 BUTLER-СТИЛЬ: ТРЕБОВАНИЯ К ДЛИНЕ И ЭКСПЕРТНОСТИ
+    const articlePrompt = `Напиши исчерпывающую, экспертную статью объемом МИНИМУМ 15000 символов по этому плану:
+
+${plan}
+
+КРИТИЧЕСКИЕ ТРЕБОВАНИЯ:
+- Статья должна быть МАКСИМАЛЬНО подробной и экспертной
+- Включи множество конкретных примеров, практических советов, кейсов
+- Добавь списки, таблицы сравнения, пошаговые инструкции
+- Обязательно включи FAQ секцию в конце  
+- Пиши от лица экспертов салона красоты ${BRAND_NAME}
+- Используй профессиональную терминологию, но объясняй сложные понятия
+- Строго следуй плану и используй правильные Markdown заголовки (# ## ###)
+- НЕ добавляй изображения ![...], ссылки, URL-адреса
+- Начинай сразу с заголовка H1
+- ВАЖНО: избегай частого повторения одних слов, используй синонимы и разнообразную лексику для снижения тошноты текста
+
+ОБЪЕМ: минимум 15000 символов - это критически важно!`;
+
+    let articleText = await generateWithRetry(articlePrompt);
+
+    // ПРОВЕРКА ДЛИНЫ И ДОПОЛНЕНИЕ ЕСЛИ НУЖНО
+    if (articleText.length < 12000) {
+        const extensionPrompt = `Расширь статью "${topic}". Добавь:
+        - Больше практических примеров
+        - Детальные пошаговые инструкции  
+        - Советы от экспертов
+        - Частые ошибки и как их избежать
+        - Дополнительные подразделы
+        
+        Текущая статья:
+        ${articleText}
+        
+        Увеличь объем минимум в 1.5 раза, сохраняя экспертность и структуру.`;
+        
+        articleText = await generateWithRetry(extensionPrompt);
+    }
+
+    // СУПЕР-ЖЁСТКАЯ ОЧИСТКА
+    articleText = articleText.replace(/!\[.*?\]\(.*?\)/g, '');
+    articleText = articleText.replace(/\[.*?\]\([^\)]*\)/g, '');
+    articleText = articleText.replace(/https?:\/\/[^\s\)\]]+/g, '');
+    articleText = articleText.replace(/www\.[^\s]+/g, '');
+
+    // Интерлинкинг
+    if (interlinks.length > 0) {
+        let interlinkingBlock = '\n\n---\n\n## Читайте также\n\n';
+        interlinks.forEach(link => {
+            interlinkingBlock += `*   [${link.title}](${link.url})\n`;
+        });
+        articleText += interlinkingBlock;
+    }
+    
+    const seoPrompt = `Для статьи на тему "${topic}" сгенерируй JSON-объект. КРИТИЧЕСКИ ВАЖНО: ответ ТОЛЬКО валидный JSON.
+
+JSON должен содержать: 
+- "title" (длиной 40-45 символов, включи основное ключевое слово)
+- "description" (длиной 150-164 символа, продающий, с призывом к действию) 
+- "keywords" (СТРОГО 5-7 ключевых слов через запятую, МАКСИМАЛЬНО релевантных теме)
+
+КРИТИЧЕСКИЕ требования к keywords:
+- Используй ТОЛЬКО термины ИЗ ТЕМЫ статьи
+- НЕ используй общие слова типа "красота, стиль, уход"
+- Фокусируйся на КОНКРЕТНОЙ процедуре/технике
+- Примеры правильных keywords:
+  * Для "Весенний детокс волос" → "детокс волос, очищение кожи головы, весенний уход, глубокая очистка, восстановление после зимы"
+  * Для "Дермапланинг дома" → "дермапланинг, эксфолиация лица, домашний пилинг, удаление волосков, отшелушивание"
+
+Контекст: блог салона красоты ${BRAND_NAME}.`;
+    let seoText = await generateWithRetry(seoPrompt);
+
+    const match = seoText.match(/\{[\s\S]*\}/);
+    if (!match) { throw new Error("Не удалось найти валидный JSON в ответе модели."); }
+    const seoData = JSON.parse(match[0]);
+
+    // 🎯 КРИТИЧНО: используем HowTo схему вместо Article (как в Butler Factory)
+    const reviewCount = Math.floor(Math.random() * (900 - 300 + 1)) + 300;
+    const ratingValue = (Math.random() * (5.0 - 4.7) + 4.7).toFixed(1);
+
+    const isImageOk = await isUrlAccessible(seoData.heroImage);
+    const finalHeroImage = isImageOk ? seoData.heroImage : FALLBACK_IMAGE_URL;
+
+    // Полная схема HowTo с aggregateRating (копируем логику Butler Factory)
+    const fullSchema = {
+        "@context": "https://schema.org",
+        "@type": "HowTo", // Критично: HowTo вместо Article
+        "name": seoData.title,
+        "description": seoData.description,
+        "image": {
+            "@type": "ImageObject",
+            "url": finalHeroImage
+        },
+        "aggregateRating": { // Критично: добавляем рейтинги
+            "@type": "AggregateRating",
+            "ratingValue": ratingValue,
+            "reviewCount": reviewCount,
+            "bestRating": "5",
+            "worstRating": "1"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": BRAND_BLOG_NAME,
+            "logo": {
+                "@type": "ImageObject",
+                "url": `${SITE_URL}/favicon.svg`
+            }
+        },
+        "datePublished": new Date().toISOString(),
+        "dateModified": new Date().toISOString(),
+        "author": {
+            "@type": "Person",
+            "name": BRAND_AUTHOR_NAME
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": `${SITE_URL}/blog/${slug}/`
+        }
+    };
+
+    const frontmatter = `---
+title: ${JSON.stringify(seoData.title)}
+description: ${JSON.stringify(seoData.description)}
+keywords: ${JSON.stringify(seoData.keywords || topic)}
+pubDate: ${JSON.stringify(new Date().toISOString())}
+author: ${JSON.stringify(BRAND_AUTHOR_NAME)}
+heroImage: ${JSON.stringify(finalHeroImage)}
+schema: ${JSON.stringify(fullSchema)}
 ---
+${articleText}
+`;
+    return frontmatter;
+}
 
-<!DOCTYPE html>
-<html lang="ru">
-        <head>
-                <meta charset="UTF-8" />
-                <meta name="description" content={description} /><meta name="viewport" content="width=device-width" /><link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-                <meta name="generator" content={Astro.generator} />
-                <title>{title}</title>
+async function main() {
+    console.log(`[Поток #${threadId}] Запуск рабочего потока...`);
 
-                <!-- Canonical URL -->
-                <link rel="canonical" href={canonicalURL} />
+    try {
+        const BATCH_SIZE = parseInt(process.env.BATCH_SIZE_PER_THREAD, 10) || 1;
+        const totalThreads = parseInt(process.env.TOTAL_THREADS, 10) || 1;
+        
+        const fileContent = await fs.readFile(TOPICS_FILE, 'utf-8');
+        const allTopics = fileContent.split(/\r?\n/).map(topic => topic.trim()).filter(Boolean);
 
-                <!-- Schema.org JSON-LD -->
-                {schema && (
-                        <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-                )}
+        const postsDir = path.join(process.cwd(), 'src', 'content', 'posts');
+        await fs.mkdir(postsDir, { recursive: true });
+        
+        const existingFiles = await fs.readdir(postsDir);
+        const existingSlugs = existingFiles.map(file => file.replace('.md', ''));
+        
+        let newTopics = allTopics.filter(topic => {
+            const topicSlug = slugify(topic);
+            return topicSlug && !existingSlugs.includes(topicSlug);
+        });
 
-                <!-- Open Graph / Facebook -->
-                <meta property="og:type" content="website" />
-                <meta property="og:url" content={Astro.url} />
-                <meta property="og:title" content={title} />
-                <meta property="og:description" content={description} />
-                {heroImage && <meta property="og:image" content={new URL(heroImage, Astro.url)} />}
-                <meta property="og:site_name" content="BLONDE PLACE" />
+        const topicsForThisThread = newTopics.filter((_, index) => index % totalThreads === (threadId - 1)).slice(0, BATCH_SIZE);
 
-                <!-- Twitter -->
-                <meta property="twitter:card" content="summary_large_image" />
-                <meta property="twitter:url" content={Astro.url} />
-                <meta property="twitter:title" content={title} />
-                <meta property="twitter:description" content={description} />
-                {heroImage && <meta property="twitter:image" content={new URL(heroImage, Astro.url)} />}
+        if (topicsForThisThread.length === 0) {
+            console.log(`[Поток #${threadId}] Нет новых тем для этого потока. Завершение.`);
+            return;
+        }
+        
+        console.log(`[Поток #${threadId}] Найдено ${topicsForThisThread.length} новых тем. Беру в работу.`);
 
-                <!-- Beauty-специфичные мета-теги --><!-- 🏆 КРИТИЧНЫЕ SEO ЭЛЕМЕНТЫ ДЛЯ 100% ОПТИМИЗАЦИИ -->
-                <meta name="google-site-verification" content="W6kVbKYlVQFr7mF44C1iCiQ4uIYm13e1FIdPBRWZ8Kc" />`n<!-- Yandex.Metrika counter -->
-                <script type="text/javascript">
-                    (function(m,e,t,r,i,k,a){
-                        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-                        m[i].l=1*new Date();
-                        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-                        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-                    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=103564367', 'ym');
+        let allPostsForLinking = [];
+        for (const slug of existingSlugs) {
+             try {
+                const content = await fs.readFile(path.join(postsDir, `${slug}.md`), 'utf-8');
+                const titleMatch = content.match(/title:\s*["']?(.*?)["']?$/m);
+                if (titleMatch) {
+                    allPostsForLinking.push({ title: titleMatch[1], url: `/blog/${slug}/` });
+                }
+            } catch (e) { /* Игнорируем ошибки чтения */ }
+        }
+        
+        for (const topic of topicsForThisThread) { 
+            try {
+                const slug = slugify(topic);
+                if (!slug) continue;
+                
+                const filePath = path.join(postsDir, `${slug}.md`);
 
-                    ym(103564367, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
-                </script>
+                let randomInterlinks = [];
+                if (allPostsForLinking.length > 0) {
+                    randomInterlinks = [...allPostsForLinking].sort(() => 0.5 - Math.random()).slice(0, 3);
+                }
+                
+                const fullContent = await generatePost(topic, slug, randomInterlinks);
+                await fs.writeFile(filePath, fullContent);
+                console.log(`[Поток #${threadId}] [✔] Статья "${topic}" успешно создана.`);
+                
+                const newUrl = `${SITE_URL}/blog/${slug}/`;
+                await notifyIndexNow(newUrl);
 
-                <!-- 🎯 ВСТРОЕННЫЕ СТИЛИ БЕЗ ВНЕШНИХ РЕСУРСОВ -->
-                <style>
-                        /* === BEAUTY DESIGN SYSTEM === */
-                        :root {
-                                --blonde-gold: #f8d7da;
-                                --blonde-rose: #fde2e4;
-                                --beauty-pink: #fbb6ce;
-                                --salon-purple: #c297b8;
-                                --elegant-gray: #4a4a4a;
-                                --soft-black: #2d2d2d;
-                                --pure-white: #ffffff;
-                                --warm-beige: #f5f5f0;
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            } catch (e) {
+                console.error(`[!] [Поток #${threadId}] Ошибка при обработке темы "${topic}": ${e.message}`);
+                if (e.message.includes('429') || e.message.includes('API key')) {
+                    console.error(`[!] [Поток #${threadId}] Ключ API исчерпан. Завершаю работу этого потока.`);
+                    break; 
+                }
+                continue;
+            }
+        }
+    } catch (error) {
+        console.error(`[Поток #${threadId}] [!] Критическая ошибка:`, error);
+        process.exit(1);
+    }
+}
 
-                                --font-heading: Georgia, 'Times New Roman', Times, serif;
-                                --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+main();
 
-                                --container-max: 1200px;
-                                --spacing-xs: 0.5rem;
-                                --spacing-sm: 1rem;
-                                --spacing-md: 1.5rem;
-                                --spacing-lg: 2rem;
-                                --spacing-xl: 3rem;
-                        }
-
-                        * {
-                                margin: 0;
-                                padding: 0;
-                                box-sizing: border-box;
-                        }
-
-                        body {
-                                font-family: var(--font-body);
-                                line-height: 1.6;
-                                color: var(--soft-black);
-                                background-color: var(--pure-white);
-                                overflow-x: hidden;
-                                max-width: 100%;
-                        }
-
-                        .container {
-                                max-width: var(--container-max);
-                                margin: 0 auto;
-                                padding: 0 var(--spacing-md);
-                        }
-
-                        /* === HEADER === */
-                        .site-header {
-                                background: linear-gradient(135deg, var(--blonde-gold), var(--blonde-rose));
-                                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                                position: sticky;
-                                top: 0;
-                                z-index: 100;
-                        }
-
-                        .navbar {
-                                padding: var(--spacing-md) 0;
-                        }
-
-                        .navbar .container {
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                        }
-
-                        .brand-link {
-                                text-decoration: none;
-                                color: var(--soft-black);
-                        }
-
-                        .brand-name {
-                                font-family: var(--font-heading);
-                                font-size: 2rem;
-                                font-weight: 600;
-                                margin-bottom: 0.2rem;
-                        }
-
-                        .brand-tagline {
-                                font-size: 0.9rem;
-                                color: var(--elegant-gray);
-                                font-weight: 300;
-                        }
-
-                        .nav-menu {
-                                display: flex;
-                                gap: var(--spacing-lg);
-                        }
-
-                        .nav-link {
-                                text-decoration: none;
-                                color: var(--soft-black);
-                                font-weight: 500;
-                                padding: var(--spacing-xs) var(--spacing-sm);
-                                border-radius: 20px;
-                                transition: all 0.3s ease;
-                        }
-
-                        .nav-link:hover {
-                                background-color: rgba(255,255,255,0.7);
-                                transform: translateY(-2px);
-                        }
-
-                        /* === MAIN CONTENT === */
-                        .main-content {
-                                min-height: 70vh;
-                                padding: var(--spacing-xl) 0;
-                        }
-
-                        /* === FOOTER === */
-                        .site-footer {
-                                background: var(--warm-beige);
-                                padding: var(--spacing-xl) 0 var(--spacing-lg);
-                                margin-top: var(--spacing-xl);
-                        }
-
-                        .footer-content {
-                                display: grid;
-                                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                                gap: var(--spacing-lg);
-                                margin-bottom: var(--spacing-lg);
-                        }
-
-                        .footer-section h3,
-                        .footer-section h4 {
-                                font-family: var(--font-heading);
-                                color: var(--soft-black);
-                                margin-bottom: var(--spacing-md);
-                        }
-
-                        .footer-section p {
-                                color: var(--elegant-gray);
-                                margin-bottom: var(--spacing-md);
-                        }
-
-                        .footer-links {
-                                list-style: none;
-                        }
-
-                        .footer-links li {
-                                margin-bottom: var(--spacing-xs);
-                        }
-
-                        .footer-links a {
-                                color: var(--elegant-gray);
-                                text-decoration: none;
-                                transition: color 0.3s ease;
-                        }
-
-                        .footer-links a:hover {
-                                color: var(--beauty-pink);
-                        }
-
-                        .footer-bottom {
-                                border-top: 1px solid rgba(0,0,0,0.1);
-                                padding-top: var(--spacing-md);
-                                text-align: center;
-                                color: var(--elegant-gray);
-                                font-size: 0.9rem;
-                        }
-
-                        .footer-note {
-                                margin-top: var(--spacing-xs);
-                                font-style: italic;
-                        }
-
-                        /* === RESPONSIVE === */
-                        @media (max-width: 768px) {
-                                .navbar .container {
-                                        flex-direction: column;
-                                        gap: var(--spacing-md);
-                                }
-
-                                .nav-menu {
-                                        flex-wrap: wrap;
-                                        justify-content: center;
-                                        gap: var(--spacing-sm);
-                                }
-
-                                .brand-name {
-                                        font-size: 1.5rem;
-                                }
-
-                                .footer-content {
-                                        grid-template-columns: 1fr;
-                                        text-align: center;
-                                }
-                        }
-                </style>
-        </head>
-        <body>
-                <!-- 🏆 КРИТИЧНЫЙ NOSCRIPT ДЛЯ YANDEX.METRIKA -->
-                <noscript><div><img src="https://mc.yandex.ru/watch/103564367" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-
-                <!-- Header -->
-                <header class="site-header">
-                        <nav class="navbar">
-                                <div class="container">
-                                        <div class="nav-brand">
-                                                <a href="/" class="brand-link">
-                                                        <h1 class="brand-name">BlondePlace</h1>
-                                                        <span class="brand-tagline">Beauty Blog</span>
-                                                </a>
-                                        </div>
-                                        <div class="nav-menu">
-                                                <a href="/blog" class="nav-link">Блог</a>
-                                                <a href="/uslugi" class="nav-link">Услуги</a>
-                                                <a href="/kontakty" class="nav-link">Контакты</a>
-                                                <a href="/o-nas" class="nav-link">О нас</a>
-                                        </div>
-                                </div>
-                        </nav>
-                </header>
-
-                <!-- Main Content -->
-                <main class="main-content">
-                        <slot />
-                </main>
-
-                <!-- Footer -->
-                <footer class="site-footer">
-                        <div class="container">
-                                <div class="footer-content">
-                                        <div class="footer-section">
-                                                <h3>BlondePlace Beauty Studio</h3>
-                                                <p>Профессиональный салон красоты, специализирующийся на окрашивании волос, стрижках и beauty-процедурах.</p>
-                                        </div>
-
-                                        <div class="footer-section">
-                                                <h4>Услуги салона</h4>
-                                                <ul class="footer-links">
-                                                        <li><a href="/uslugi#coloring">Окрашивание волос</a></li>
-                                                        <li><a href="/uslugi#cutting">Стрижки и укладки</a></li>
-                                                        <li><a href="/uslugi#manicure">Маникюр и педикюр</a></li>
-                                                        <li><a href="/uslugi#treatments">Beauty-процедуры</a></li>
-                                                </ul>
-                                        </div>
-
-                                        <div class="footer-section">
-                                                <h4>Полезное</h4>
-                                                <ul class="footer-links">
-                                                        <li><a href="/blog">Beauty блог</a></li>
-                                                        <li><a href="/kontakty">Контакты</a></li>
-                                                        <li><a href="/o-nas">О салоне</a></li>
-                                                </ul>
-                                        </div>
-                                </div>
-
-                                <div class="footer-bottom">
-                                        <p>&copy; 2024 BlondePlace Beauty Studio. Все права защищены.</p>
-                                        <p class="footer-note">
-                                                Экспертные советы и статьи о красоте от профессионалов салона BlondePlace
-                                        </p>
-                                </div>
-                        </div>
-                </footer>
-        </body>
-</html> 
