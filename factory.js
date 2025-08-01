@@ -1,4 +1,4 @@
-// Файл: factory.js (BlondePlace версия - ИСПРАВЛЕННАЯ ДЛЯ 100%)
+// Файл: factory.js (BlondePlace версия - С ФАЙЛОВОЙ РОТАЦИЕЙ КАК В BUTLER FACTORY)
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
@@ -18,57 +18,62 @@ const TARGET_URL_MAIN = "https://blondeplace.ru";
 const TOPICS_FILE = 'topics.txt';
 const POSTS_DIR = 'src/content/posts';
 
+// --- ФАЙЛ С ПУЛОМ API КЛЮЧЕЙ (КАК В BUTLER FACTORY) ---
+const GEMINI_API_KEYS_POOL_FILE = 'GEMINI_API_KEYS_POOL';
+
 // --- НАСТРОЙКИ МОДЕЛЕЙ ---
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
-const GEMINI_MODEL_NAME = "gemini-2.5-flash"; // ИСПРАВЛЕНО: Flash вместо Pro
-
-// --- 🔑 РОТАЦИЯ API КЛЮЧЕЙ ---
-const GEMINI_API_KEYS = [
-    process.env.GEMINI_API_KEY_1,
-    process.env.GEMINI_API_KEY_2,
-    process.env.GEMINI_API_KEY_3,
-    process.env.GEMINI_API_KEY_4,
-    process.env.GEMINI_API_KEY_5,
-    process.env.GEMINI_API_KEY_6,
-    process.env.GEMINI_API_KEY_7,
-    process.env.GEMINI_API_KEY_8,
-    process.env.GEMINI_API_KEY_9,
-    process.env.GEMINI_API_KEY_10,
-    process.env.GEMINI_API_KEY_CURRENT // Резервный ключ
-].filter(Boolean);
-
-const OPENROUTER_API_KEYS = [
-    process.env.OPENROUTER_API_KEY_1,
-    process.env.OPENROUTER_API_KEY_2,
-    process.env.OPENROUTER_API_KEY_3,
-    process.env.OPENROUTER_API_KEY_CURRENT
-].filter(Boolean);
+const GEMINI_MODEL_NAME = "gemini-1.5-flash"; // ИСПРАВЛЕНО: Flash вместо Pro
 
 // --- ИНИЦИАЛИЗАЦИЯ ПОТОКА ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
 
-// 🎯 ВЫБОР API КЛЮЧА ПО ПОТОКУ
+// 🔑 РОТАЦИЯ API КЛЮЧЕЙ ЧЕРЕЗ ФАЙЛ (КАК В BUTLER FACTORY)
 let apiKey;
 let keyInfo;
 
+async function loadApiKeysFromPool() {
+    try {
+        // Проверяем есть ли файл с пулом ключей
+        const poolContent = await fs.readFile(GEMINI_API_KEYS_POOL_FILE, 'utf-8');
+        const apiKeys = poolContent.split('\n')
+            .map(key => key.trim())
+            .filter(key => key.length > 0);
+
+        if (apiKeys.length === 0) {
+            throw new Error('Файл GEMINI_API_KEYS_POOL пуст или не содержит валидных ключей');
+        }
+
+        // Ротация ключей по номеру потока (как в Butler Factory)
+        const keyIndex = (threadId - 1) % apiKeys.length;
+        apiKey = apiKeys[keyIndex];
+        keyInfo = `Pool KEY_${keyIndex + 1}/${apiKeys.length} (...${apiKey.slice(-4)})`;
+
+        console.log(`[🔑] [Поток #${threadId}] Загружен пул из ${apiKeys.length} ключей, использую ${keyInfo}`);
+        
+    } catch (error) {
+        // Фоллбэк на переменную окружения если нет файла
+        console.warn(`[!] [Поток #${threadId}] Файл ${GEMINI_API_KEYS_POOL_FILE} не найден, использую API_KEY_CURRENT`);
+        apiKey = process.env.API_KEY_CURRENT;
+        keyInfo = `ENV (...${apiKey ? apiKey.slice(-4) : 'NULL'})`;
+    }
+
+    if (!apiKey) {
+        throw new Error(`[Поток #${threadId}] Не удалось получить API-ключ ни из файла, ни из переменной окружения!`);
+    }
+}
+
+// Загружаем ключи при старте
+await loadApiKeysFromPool();
+
+// 🏆 ЛОГИРОВАНИЕ КАК В BUTLER FACTORY
 if (modelChoice === 'deepseek') {
-    const keyIndex = (threadId - 1) % OPENROUTER_API_KEYS.length;
-    apiKey = OPENROUTER_API_KEYS[keyIndex];
-    keyInfo = `OpenRouter KEY_${keyIndex + 1} (...${apiKey ? apiKey.slice(-4) : 'NULL'})`;
+    console.log(`🚀 [Поток #${threadId}] Использую модель DeepSeek через OpenRouter с ключом ${keyInfo}`);
 } else {
-    const keyIndex = (threadId - 1) % GEMINI_API_KEYS.length;
-    apiKey = GEMINI_API_KEYS[keyIndex];
-    keyInfo = `Gemini KEY_${keyIndex + 1} (...${apiKey ? apiKey.slice(-4) : 'NULL'})`;
+    console.log(`✨ [Поток #${threadId}] Использую модель Gemini с ключом ${keyInfo}`);
 }
-
-if (!apiKey) {
-    throw new Error(`[Поток #${threadId}] Не был предоставлен API-ключ для ${modelChoice}!`);
-}
-
-// 🏆 ЛОГИРОВАНИЕ API КЛЮЧА
-console.log(`[🔑] [Поток #${threadId}] Использую ${keyInfo} для модели ${GEMINI_MODEL_NAME}`);
 
 function slugify(text) {
     const cleanedText = text.toString().replace(/[\x00-\x1F\x7F-\x9F]/g, "").trim();
@@ -109,7 +114,7 @@ async function generateWithRetry(prompt, maxRetries = 4) {
                 if (!data.choices || data.choices.length === 0) throw new Error("Ответ от API OpenRouter не содержит поля 'choices'.");
 
                 return data.choices[0].message.content;
-            } else {
+            } else { // Логика для Gemini (КАК В BUTLER)
                 const genAI = new GoogleGenerativeAI(apiKey);
                 const model = genAI.getGenerativeModel({ model: GEMINI_MODEL_NAME });
                 const result = await model.generateContent(prompt);
@@ -220,7 +225,7 @@ ${articleText}
 
     const seoPrompt = `Для статьи на тему "${topic}" сгенерируй JSON-объект.
 
-КРИТИЧНО ВАЖНО: ответ ТОЛЬКО валидный JSON.
+КРИТИЧЕСКИ ВАЖНО: ответ ТОЛЬКО валидный JSON.
 
 JSON должен содержать:
 - "title" (длиной 40-45 символов, включи основное ключевое слово)
@@ -247,7 +252,7 @@ JSON должен содержать:
 
     const finalHeroImage = FALLBACK_IMAGE_URL;
 
-    // 🎯 ИСПРАВЛЕННАЯ СХЕМА БЕЗ aggregateRating (как у Butler)
+    // 🎯 ИСПРАВЛЕННАЯ СХЕМА (как у Butler)
     const fullSchema = {
         "@context": "https://schema.org",
         "@type": "HowTo",
