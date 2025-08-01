@@ -49,6 +49,25 @@ function slugify(text) {
     return newText.replace(/\s+/g, '-').replace(/[^\w-]+/g, '').replace(/--+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
 }
 
+// ФУНКЦИЯ ПРОВЕРКИ ЦЕЛОСТНОСТИ СЛОВ
+function ensureCompleteWords(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    
+    // Обрезаем по максимальной длине
+    let trimmed = text.slice(0, maxLength);
+    
+    // Если последний символ не пробел, ищем последний пробел
+    if (text[maxLength] && text[maxLength] !== ' ') {
+        const lastSpaceIndex = trimmed.lastIndexOf(' ');
+        if (lastSpaceIndex > maxLength * 0.7) { // Не укорачиваем слишком сильно
+            trimmed = trimmed.slice(0, lastSpaceIndex);
+        }
+    }
+    
+    // Убираем лишние пробелы и знаки препинания в конце
+    return trimmed.trim().replace(/[,:;!?\-\.]+$/, '');
+}
+
 async function generateWithRetry(prompt, maxRetries = 4) {
     let delay = 5000;
 
@@ -134,12 +153,21 @@ async function generatePost(topic, slug, interlinks) {
 
     const plan = await generateWithRetry(planPrompt);
 
-    // BUTLER-СТИЛЬ: ТРЕБОВАНИЯ К ДЛИНЕ И ЭКСПЕРТНОСТИ
-    const articlePrompt = `Напиши исчерпывающую, экспертную статью объемом МИНИМУМ 10000 символов по этому плану:
+    // BUTLER-СТИЛЬ: ТРЕБОВАНИЯ К ДЛИНЕ И ЭКСПЕРТНОСТИ + ЖЁСТКАЯ БОРЬБА С ТОШНОТОЙ
+    const articlePrompt = `Напиши исчерпывающую, экспертную статью объемом МИНИМУМ 15000 символов по этому плану:
 
 ${plan}
 
-КРИТИЧЕСКИЕ ТРЕБОВАНИЯ:
+КРИТИЧЕСКИЕ ТРЕБОВАНИЯ ДЛЯ СНИЖЕНИЯ ТОШНОТЫ:
+- МАКСИМАЛЬНОЕ РАЗНООБРАЗИЕ ЛЕКСИКИ! Каждый абзац - уникальные слова!
+- Используй синонимы, перифразы, профессиональные термины
+- Избегай повторений одинаковых слов в соседних предложениях
+- Варьируй структуру предложений (короткие, длинные, вопросительные)
+- Включи технические термины, научные названия процедур
+- Добавь множество примеров с разными названиями техник
+- ЦЕЛЬ: тошнота СТРОГО ниже 3.5!
+
+СТРУКТУРНЫЕ ТРЕБОВАНИЯ:
 - Статья должна быть МАКСИМАЛЬНО подробной и экспертной
 - Включи множество конкретных примеров, практических советов, кейсов
 - Добавь списки, таблицы сравнения, пошаговые инструкции
@@ -149,24 +177,24 @@ ${plan}
 - Строго следуй плану и используй правильные Markdown заголовки (# ## ###)
 - НЕ добавляй изображения ![...], ссылки, URL-адреса
 - Начинай сразу с заголовка H1
-- КРИТИЧНО: ЗАПРЕЩЕНО повторять слова! Тошнота СТРОГО до 3.5! Каждое предложение - уникальные слова, синонимы, перифразы. Абзацы максимально разнообразные!
 
-ОБЪЕМ: минимум 10000 символов для снижения тошноты!`;
+ОБЪЕМ: минимум 15000 символов для максимального разнообразия лексики!`;
 
     let articleText = await generateWithRetry(articlePrompt);
 
     // ПРОВЕРКА ДЛИНЫ И ДОПОЛНЕНИЕ ЕСЛИ НУЖНО
-    if (articleText.length < 8000) {
+    if (articleText.length < 12000) {
         const extensionPrompt = `Дополни и расширь статью на тему "${topic}". Добавь больше деталей:
-- Практические примеры и кейсы
-- Детальные пошаговые инструкции  
-- Советы от экспертов салона
+- Практические примеры и кейсы с уникальными названиями
+- Детальные пошаговые инструкции с профессиональной терминологией
+- Советы от экспертов салона с разнообразной лексикой
 - Частые ошибки и способы их избежать
-- Дополнительные подразделы
+- Дополнительные подразделы с синонимами
+- Технические термины и научные названия процедур
 
 Текущая статья: ${articleText}
 
-Увеличь объем минимум в 1.3 раза, сохраняя экспертность и структуру. КРИТИЧНО: Используй уникальную лексику для снижения тошноты до 3.5!`;
+КРИТИЧНО: Увеличь объем минимум в 1.5 раза. Используй МАКСИМАЛЬНО уникальную лексику, синонимы, профессиональные термины для снижения тошноты до 3.0!`;
 
         articleText = await generateWithRetry(extensionPrompt);
     }
@@ -193,14 +221,20 @@ ${plan}
         articleText += interlinkingBlock;
     }
 
+    // УЛУЧШЕННЫЙ SEO ПРОМПТ С ТОЧНЫМ КОНТРОЛЕМ ДЛИНЫ
     const seoPrompt = `Для статьи на тему "${topic}" сгенерируй JSON-объект.
 
 КРИТИЧЕСКИ ВАЖНО: ответ ТОЛЬКО валидный JSON без дополнительного текста, комментариев, markdown форматирования. Начинай ответ сразу с { и заканчивай }. Никакого текста до или после JSON!
 
 JSON должен содержать:
-- "title" (СТРОГО 40-45 символов, включи основное ключевое слово)
-- "description" (СТРОГО 150-164 символа, продающий, с призывом к действию)
+- "title" (СТРОГО 35-42 символа, полные слова без обрезки, включи основное ключевое слово)
+- "description" (СТРОГО 140-160 символов, полные слова без обрезки, продающий, с призывом к действию)
 - "keywords" (СТРОГО строка: 3-5 ключевых слов через запятую, БЕЗ общих слов)
+
+ТРЕБОВАНИЯ К ДЛИНЕ:
+- Title: ОБЯЗАТЕЛЬНО проверь, что последнее слово полностью помещается!
+- Description: ОБЯЗАТЕЛЬНО проверь, что последнее слово полностью помещается!
+- НЕ используй сокращения, НЕ обрезай слова!
 
 КРИТИЧЕСКИЕ требования к keywords:
 - Используй ТОЛЬКО термины ИЗ ТЕМЫ статьи
@@ -225,10 +259,10 @@ JSON должен содержать:
     if (!match) {
         console.warn(`[!] [Поток #${threadId}] JSON не найден в ответе модели. Создаю fallback SEO данные.`);
         
-        // ПРАВИЛЬНЫЕ FALLBACK SEO ДАННЫЕ (БЕЗ ОБРЕЗАНИЯ)
-        const fallbackTitle = topic.length <= 45 ? topic : topic.slice(0, 45);
-        const fallbackDesc = `Экспертная статья о ${topic.toLowerCase()} от салона BlondePlace. Узнайте секреты профессионалов и получите идеальный результат. Записывайтесь!`;
-        const trimmedDesc = fallbackDesc.length <= 164 ? fallbackDesc : fallbackDesc.slice(0, 164);
+        // ПРАВИЛЬНЫЕ FALLBACK SEO ДАННЫЕ С ПРОВЕРКОЙ ЦЕЛОСТНОСТИ СЛОВ
+        const fallbackTitle = ensureCompleteWords(topic, 42);
+        const fallbackDesc = `Экспертная помощь по ${topic.toLowerCase()} от салона BlondePlace. Профессиональные услуги с гарантией качества. Записывайтесь!`;
+        const trimmedDesc = ensureCompleteWords(fallbackDesc, 160);
         
         seoData = {
             title: fallbackTitle,
@@ -241,24 +275,30 @@ JSON должен содержать:
         try {
             seoData = JSON.parse(match[0]);
             
-            // ТОЛЬКО МЯГКАЯ ПРОВЕРКА БЕЗ АГРЕССИВНОЙ ОБРЕЗКИ
-            if (seoData.title && seoData.title.length > 45) {
-                seoData.title = seoData.title.slice(0, 45);
-                console.warn(`[!] [Поток #${threadId}] Title обрезан до ${seoData.title.length} символов`);
+            // ПРОВЕРКА ЦЕЛОСТНОСТИ СЛОВ БЕЗ ОБРЕЗКИ
+            if (seoData.title) {
+                const originalTitle = seoData.title;
+                seoData.title = ensureCompleteWords(seoData.title, 42);
+                if (seoData.title !== originalTitle) {
+                    console.warn(`[!] [Поток #${threadId}] Title скорректирован для целостности слов: ${seoData.title.length} символов`);
+                }
             }
             
-            if (seoData.description && seoData.description.length > 164) {
-                seoData.description = seoData.description.slice(0, 164);
-                console.warn(`[!] [Поток #${threadId}] Description обрезан до ${seoData.description.length} символов`);
+            if (seoData.description) {
+                const originalDesc = seoData.description;
+                seoData.description = ensureCompleteWords(seoData.description, 160);
+                if (seoData.description !== originalDesc) {
+                    console.warn(`[!] [Поток #${threadId}] Description скорректирован для целостности слов: ${seoData.description.length} символов`);
+                }
             }
             
         } catch (parseError) {
             console.warn(`[!] [Поток #${threadId}] Ошибка парсинга JSON: ${parseError.message}. Создаю fallback SEO данные.`);
             
-            // ПРАВИЛЬНЫЕ FALLBACK SEO ДАННЫЕ (БЕЗ ОБРЕЗАНИЯ)
-            const fallbackTitle = topic.length <= 45 ? topic : topic.slice(0, 45);
-            const fallbackDesc = `Экспертная статья о ${topic.toLowerCase()} от салона BlondePlace. Узнайте секреты профессионалов и получите идеальный результат. Записывайтесь!`;
-            const trimmedDesc = fallbackDesc.length <= 164 ? fallbackDesc : fallbackDesc.slice(0, 164);
+            // ПРАВИЛЬНЫЕ FALLBACK SEO ДАННЫЕ С ПРОВЕРКОЙ ЦЕЛОСТНОСТИ СЛОВ
+            const fallbackTitle = ensureCompleteWords(topic, 42);
+            const fallbackDesc = `Экспертная помощь по ${topic.toLowerCase()} от салона BlondePlace. Профессиональные услуги с гарантией качества. Записывайтесь!`;
+            const trimmedDesc = ensureCompleteWords(fallbackDesc, 160);
             
             seoData = {
                 title: fallbackTitle,
@@ -330,6 +370,10 @@ schema: ${JSON.stringify(fullSchema)}
 
 ${articleText}`;
 
+    // ФИНАЛЬНАЯ ПРОВЕРКА И ЛОГИРОВАНИЕ
+    console.log(`[✔] [Поток #${threadId}] SEO проверка: Title="${seoData.title}" (${seoData.title.length} символов)`);
+    console.log(`[✔] [Поток #${threadId}] SEO проверка: Description="${seoData.description}" (${seoData.description.length} символов)`);
+    
     return frontmatter;
 }
 
