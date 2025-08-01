@@ -1,0 +1,171 @@
+name: 🔍 DEBUG: API Keys Extraction Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      model_choice:
+        description: 'Какую модель использовать для генерации?'
+        required: true
+        default: 'gemini'
+        type: choice
+        options:
+        - gemini
+        - deepseek
+      batch_size_per_thread:
+        description: 'Сколько статей генерировать КАЖДЫМ потоком?'
+        required: true
+        default: '1'
+      threads:
+        description: 'Сколько потоков запустить ОДНОВРЕМЕННО?'
+        required: true
+        default: '20'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set_matrix.outputs.matrix }}
+    steps:
+      - name: Create thread matrix
+        id: set_matrix
+        run: |
+          MAX_THREADS=30
+          REQUESTED_THREADS=${{ github.event.inputs.threads || 20 }}
+
+          if (( REQUESTED_THREADS > MAX_THREADS )); then
+            echo "::warning::Запрошено больше потоков (${REQUESTED_THREADS}), чем доступно ключей (${MAX_THREADS}). Будет использовано ${MAX_THREADS}."
+            REQUESTED_THREADS=$MAX_THREADS
+          fi
+
+          threads=$(seq 1 $REQUESTED_THREADS)
+          echo "matrix=[$(echo $threads | tr ' ' ',')]" >> $GITHUB_OUTPUT
+
+  generate_and_publish:
+    needs: prepare
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        thread: ${{ fromJson(needs.prepare.outputs.matrix) }}
+
+    steps:
+      - name: ⬇️ Checkout repo (Thread ${{ matrix.thread }})
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ⚙️ Setup Node.js (Thread ${{ matrix.thread }})
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install dependencies (Thread ${{ matrix.thread }})
+        run: npm install
+
+      - name: 🔍 DEBUG: Check secrets availability (Thread ${{ matrix.thread }})
+        run: |
+          echo "🔍 [Поток #${{ matrix.thread }}] === ОТЛАДКА СЕКРЕТОВ ==="
+          
+          # Проверяем наличие секретов
+          if [[ -n "${{ secrets.GEMINI_API_KEYS_POOL }}" ]]; then
+            echo "✅ [Поток #${{ matrix.thread }}] GEMINI_API_KEYS_POOL найден"
+            echo "📏 [Поток #${{ matrix.thread }}] Длина GEMINI_API_KEYS_POOL: $(echo '${{ secrets.GEMINI_API_KEYS_POOL }}' | wc -c) символов"
+            echo "📄 [Поток #${{ matrix.thread }}] Количество строк в GEMINI_API_KEYS_POOL: $(echo '${{ secrets.GEMINI_API_KEYS_POOL }}' | wc -l)"
+            echo "🔤 [Поток #${{ matrix.thread }}] Первые 20 символов: $(echo '${{ secrets.GEMINI_API_KEYS_POOL }}' | head -c 20)..."
+          else
+            echo "❌ [Поток #${{ matrix.thread }}] GEMINI_API_KEYS_POOL НЕ НАЙДЕН!"
+          fi
+          
+          if [[ -n "${{ secrets.OPENROUTER_API_KEYS_POOL }}" ]]; then
+            echo "✅ [Поток #${{ matrix.thread }}] OPENROUTER_API_KEYS_POOL найден"
+          else
+            echo "❌ [Поток #${{ matrix.thread }}] OPENROUTER_API_KEYS_POOL НЕ НАЙДЕН!"
+          fi
+
+      - name: 🔑 DEBUG: Set API Key for Thread ${{ matrix.thread }}
+        id: set_key
+        run: |
+          echo "🔍 [Поток #${{ matrix.thread }}] === ИЗВЛЕЧЕНИЕ КЛЮЧА ==="
+          
+          MODEL_CHOICE="${{ github.event.inputs.model_choice || 'gemini' }}"
+          echo "🎯 [Поток #${{ matrix.thread }}] Выбранная модель: $MODEL_CHOICE"
+          
+          if [ "$MODEL_CHOICE" == "deepseek" ]; then
+            API_KEYS="${{ secrets.OPENROUTER_API_KEYS_POOL }}"
+            echo "🔄 [Поток #${{ matrix.thread }}] Используем OPENROUTER_API_KEYS_POOL"
+          else
+            API_KEYS="${{ secrets.GEMINI_API_KEYS_POOL }}"
+            echo "🔄 [Поток #${{ matrix.thread }}] Используем GEMINI_API_KEYS_POOL"
+          fi
+
+          echo "📊 [Поток #${{ matrix.thread }}] Общее количество ключей в пуле: $(echo "$API_KEYS" | wc -l)"
+          echo "📍 [Поток #${{ matrix.thread }}] Извлекаю ключ на позиции: ${{ matrix.thread }}"
+
+          CURRENT_KEY=$(echo "$API_KEYS" | sed -n '${{ matrix.thread }}p' | tr -d '\r')
+          
+          echo "🔍 [Поток #${{ matrix.thread }}] Результат извлечения:"
+          if [[ -z "$CURRENT_KEY" ]]; then
+            echo "❌ [Поток #${{ matrix.thread }}] КЛЮЧ НЕ НАЙДЕН на позиции ${{ matrix.thread }}!"
+            echo "📋 [Поток #${{ matrix.thread }}] Все доступные строки в пуле:"
+            echo "$API_KEYS" | nl -nln
+            echo "::error::Не удалось извлечь API-ключ для потока #${{ matrix.thread }} для модели ${MODEL_CHOICE}."
+            exit 1
+          else
+            echo "✅ [Поток #${{ matrix.thread }}] Ключ успешно извлечен"
+            echo "🔤 [Поток #${{ matrix.thread }}] Длина ключа: ${#CURRENT_KEY} символов"
+            echo "🔤 [Поток #${{ matrix.thread }}] Первые 10 символов: ${CURRENT_KEY:0:10}..."
+            echo "🔤 [Поток #${{ matrix.thread }}] Последние 4 символа: ...${CURRENT_KEY: -4}"
+          fi
+          
+          echo "key=$CURRENT_KEY" >> $GITHUB_OUTPUT
+
+      - name: 🔍 DEBUG: Test API_KEY_CURRENT availability
+        env:
+          MODEL_CHOICE: ${{ github.event.inputs.model_choice || 'gemini' }}
+          API_KEY_CURRENT: ${{ steps.set_key.outputs.key }}
+          BATCH_SIZE: ${{ github.event.inputs.batch_size_per_thread || 1 }}
+          TOTAL_THREADS: ${{ github.event.inputs.threads || 20 }}
+          THREAD_ID: ${{ matrix.thread }}
+        run: |
+          echo "🔍 [Поток #${{ matrix.thread }}] === ПРОВЕРКА ПЕРЕМЕННЫХ ОКРУЖЕНИЯ ==="
+          
+          echo "🎯 [Поток #${{ matrix.thread }}] MODEL_CHOICE: $MODEL_CHOICE"
+          echo "🎯 [Поток #${{ matrix.thread }}] THREAD_ID: $THREAD_ID"
+          echo "🎯 [Поток #${{ matrix.thread }}] BATCH_SIZE: $BATCH_SIZE"
+          echo "🎯 [Поток #${{ matrix.thread }}] TOTAL_THREADS: $TOTAL_THREADS"
+          
+          if [[ -n "$API_KEY_CURRENT" ]]; then
+            echo "✅ [Поток #${{ matrix.thread }}] API_KEY_CURRENT установлен"
+            echo "🔤 [Поток #${{ matrix.thread }}] Длина API_KEY_CURRENT: ${#API_KEY_CURRENT} символов"
+            echo "🔤 [Поток #${{ matrix.thread }}] Первые 10 символов: ${API_KEY_CURRENT:0:10}..."
+            echo "🔤 [Поток #${{ matrix.thread }}] Последние 4 символа: ...${API_KEY_CURRENT: -4}"
+          else
+            echo "❌ [Поток #${{ matrix.thread }}] API_KEY_CURRENT НЕ УСТАНОВЛЕН!"
+            echo "🔍 [Поток #${{ matrix.thread }}] Все доступные переменные окружения с 'API' в названии:"
+            env | grep -i api || echo "Не найдено переменных с 'API'"
+            exit 1
+          fi
+
+      - name: 🧪 TEST: Run Factory.js with debug (Thread ${{ matrix.thread }})
+        env:
+          MODEL_CHOICE: ${{ github.event.inputs.model_choice || 'gemini' }}
+          API_KEY_CURRENT: ${{ steps.set_key.outputs.key }}
+          BATCH_SIZE: ${{ github.event.inputs.batch_size_per_thread || 1 }}
+          TOTAL_THREADS: ${{ github.event.inputs.threads || 20 }}
+          THREAD_ID: ${{ matrix.thread }}
+        run: |
+          echo "🧪 [Поток #${{ matrix.thread }}] === ТЕСТ ЗАПУСКА FACTORY.JS ==="
+          
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions-bot@github.com'
+          git config --global pull.rebase false
+
+          echo "--- ЭСКАДРОН #${{ matrix.thread }}: Начинаю генерацию (DEBUG РЕЖИМ) ---"
+
+          npm run factory
+
+          echo "✅ [Поток #${{ matrix.thread }}] Factory.js выполнен успешно!" 
