@@ -15,11 +15,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <html lang="ru">
         <head>
                 <meta charset="UTF-8" />
-                <meta name="description" content={description} />
-                <meta name="keywords" content={keywords || "салон красоты BlondePlace, beauty процедуры, профессиональный уход"} />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <meta name="robots" content="index, follow" />
-                <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+                <meta name="description" content={description} /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="icon" type="image/svg+xml" href="/favicon.svg" />
                 <meta name="generator" content={Astro.generator} />
                 <title>{title}</title>
 
@@ -46,11 +42,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
                 <meta property="twitter:description" content={description} />
                 {heroImage && <meta property="twitter:image" content={new URL(heroImage, Astro.url)} />}
 
-                <!-- Beauty-специфичные мета-теги -->
-                <meta name="author" content="BlondePlace Beauty Expert" />
-                <meta name="theme-color" content="#f8d7da" />
-
-                <!-- 🏆 КРИТИЧНЫЕ SEO ЭЛЕМЕНТЫ ДЛЯ 100% ОПТИМИЗАЦИИ -->
+                <!-- Beauty-специфичные мета-теги --><!-- 🏆 КРИТИЧНЫЕ SEO ЭЛЕМЕНТЫ ДЛЯ 100% ОПТИМИЗАЦИИ -->
                 <meta name="google-site-verification" content="W6kVbKYlVQFr7mF44C1iCiQ4uIYm13e1FIdPBRWZ8Kc" />`n<!-- Yandex.Metrika counter -->
                 <script type="text/javascript">
                     (function(m,e,t,r,i,k,a){
