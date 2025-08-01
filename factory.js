@@ -1,4 +1,4 @@
-// Файл: factory.js (BlondePlace версия - ТОЧНАЯ ЛОГИКА BUTLER FACTORY)
+// Файл: factory.js (BlondePlace версия - ИСПРАВЛЕНЫ КРИТИЧЕСКИЕ ОШИБКИ!)
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
@@ -21,7 +21,7 @@ const POSTS_DIR = 'src/content/posts';
 // --- НАСТРОЙКИ МОДЕЛЕЙ ---
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
-const GEMINI_MODEL_NAME = "gemini-2.5-flash"; // ИСПРАВЛЕНО: Flash вместо Pro
+const GEMINI_MODEL_NAME = "gemini-1.5-flash"; // 🔧 ИСПРАВЛЕНО: gemini-1.5-flash (НЕ 2.5!)
 
 // --- ИНИЦИАЛИЗАЦИЯ ПОТОКА ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
@@ -38,10 +38,27 @@ const usedKeys = new Set(); // Отслеживаем использованны
 
 function loadApiKeysFromSecrets() {
     try {
+        // 🔍 ОТЛАДКА: Проверяем все переменные окружения
+        console.log(`[🔍] [Поток #${threadId}] Отладка переменных окружения:`);
+        console.log(`[🔍] [Поток #${threadId}] NODE_ENV: ${process.env.NODE_ENV || 'не установлено'}`);
+        console.log(`[🔍] [Поток #${threadId}] GITHUB_ACTIONS: ${process.env.GITHUB_ACTIONS || 'не установлено'}`);
+        console.log(`[🔍] [Поток #${threadId}] RUNNER_OS: ${process.env.RUNNER_OS || 'не установлено'}`);
+        
         // Читаем GitHub Secret с пулом ключей
         const poolSecret = process.env.GEMINI_API_KEYS_POOL;
         
+        console.log(`[🔍] [Поток #${threadId}] GEMINI_API_KEYS_POOL существует: ${!!poolSecret}`);
+        if (poolSecret) {
+            console.log(`[🔍] [Поток #${threadId}] GEMINI_API_KEYS_POOL длина: ${poolSecret.length} символов`);
+            console.log(`[🔍] [Поток #${threadId}] GEMINI_API_KEYS_POOL первые 20 символов: ${poolSecret.substring(0, 20)}...`);
+        }
+
         if (!poolSecret) {
+            console.error(`[!] [Поток #${threadId}] GitHub Secret GEMINI_API_KEYS_POOL не найден!`);
+            console.error(`[!] [Поток #${threadId}] Доступные переменные окружения с 'API' в названии:`);
+            Object.keys(process.env).filter(key => key.includes('API')).forEach(key => {
+                console.error(`[!] [Поток #${threadId}] - ${key}: ${process.env[key] ? 'установлено' : 'не установлено'}`);
+            });
             throw new Error('GitHub Secret GEMINI_API_KEYS_POOL не найден!');
         }
 
@@ -49,6 +66,12 @@ function loadApiKeysFromSecrets() {
         availableApiKeys = poolSecret.split('\n')
             .map(key => key.trim())
             .filter(key => key.length > 0);
+
+        console.log(`[🔍] [Поток #${threadId}] Обработано ключей: ${availableApiKeys.length}`);
+        if (availableApiKeys.length > 0) {
+            console.log(`[🔍] [Поток #${threadId}] Первый ключ начинается с: ${availableApiKeys[0].substring(0, 20)}...`);
+            console.log(`[🔍] [Поток #${threadId}] Последний ключ начинается с: ${availableApiKeys[availableApiKeys.length - 1].substring(0, 20)}...`);
+        }
 
         if (availableApiKeys.length === 0) {
             throw new Error('GitHub Secret GEMINI_API_KEYS_POOL пуст или не содержит валидных ключей');
@@ -118,7 +141,7 @@ loadApiKeysFromSecrets();
 if (modelChoice === 'deepseek') {
     console.log(`🚀 [Поток #${threadId}] Использую модель DeepSeek через OpenRouter с ключом ${keyInfo}`);
 } else {
-    console.log(`✨ [Поток #${threadId}] Использую модель Gemini с ключом ${keyInfo}`);
+    console.log(`✨ [Поток #${threadId}] Использую модель Gemini ${GEMINI_MODEL_NAME} с ключом ${keyInfo}`);
 }
 
 function slugify(text) {
