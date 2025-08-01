@@ -1,4 +1,4 @@
-// Файл: factory.js (BlondePlace версия - С ФАЙЛОВОЙ РОТАЦИЕЙ КАК В BUTLER FACTORY)
+// Файл: factory.js (BlondePlace версия - С GITHUB SECRETS КАК В BUTLER FACTORY)
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
@@ -18,9 +18,6 @@ const TARGET_URL_MAIN = "https://blondeplace.ru";
 const TOPICS_FILE = 'topics.txt';
 const POSTS_DIR = 'src/content/posts';
 
-// --- ФАЙЛ С ПУЛОМ API КЛЮЧЕЙ (КАК В BUTLER FACTORY) ---
-const GEMINI_API_KEYS_POOL_FILE = 'GEMINI_API_KEYS_POOL';
-
 // --- НАСТРОЙКИ МОДЕЛЕЙ ---
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
@@ -30,43 +27,58 @@ const GEMINI_MODEL_NAME = "gemini-1.5-flash"; // ИСПРАВЛЕНО: Flash в�
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
 
-// 🔑 РОТАЦИЯ API КЛЮЧЕЙ ЧЕРЕЗ ФАЙЛ (КАК В BUTLER FACTORY)
+// 🔑 РОТАЦИЯ API КЛЮЧЕЙ ЧЕРЕЗ GITHUB SECRETS (КАК В BUTLER FACTORY)
 let apiKey;
 let keyInfo;
 
-async function loadApiKeysFromPool() {
+function loadApiKeysFromSecrets() {
     try {
-        // Проверяем есть ли файл с пулом ключей
-        const poolContent = await fs.readFile(GEMINI_API_KEYS_POOL_FILE, 'utf-8');
-        const apiKeys = poolContent.split('\n')
-            .map(key => key.trim())
-            .filter(key => key.length > 0);
+        // Читаем GitHub Secret с пулом ключей
+        const poolSecret = process.env.GEMINI_API_KEYS_POOL;
+        
+        if (poolSecret) {
+            // Парсим ключи из секрета (разделенные переносами)
+            const apiKeys = poolSecret.split('\n')
+                .map(key => key.trim())
+                .filter(key => key.length > 0);
 
-        if (apiKeys.length === 0) {
-            throw new Error('Файл GEMINI_API_KEYS_POOL пуст или не содержит валидных ключей');
+            if (apiKeys.length === 0) {
+                throw new Error('GitHub Secret GEMINI_API_KEYS_POOL пуст или не содержит валидных ключей');
+            }
+
+            // Ротация ключей по номеру потока (как в Butler Factory)
+            const keyIndex = (threadId - 1) % apiKeys.length;
+            apiKey = apiKeys[keyIndex];
+            keyInfo = `Pool KEY_${keyIndex + 1}/${apiKeys.length} (...${apiKey.slice(-4)})`;
+
+            console.log(`[🔑] [Поток #${threadId}] Загружен пул из ${apiKeys.length} ключей из GitHub Secrets, использую ${keyInfo}`);
+            
+        } else {
+            // Фоллбэк на переменную окружения если нет секрета
+            console.warn(`[!] [Поток #${threadId}] GitHub Secret GEMINI_API_KEYS_POOL не найден, использую API_KEY_CURRENT`);
+            apiKey = process.env.API_KEY_CURRENT;
+            keyInfo = `ENV (...${apiKey ? apiKey.slice(-4) : 'NULL'})`;
         }
 
-        // Ротация ключей по номеру потока (как в Butler Factory)
-        const keyIndex = (threadId - 1) % apiKeys.length;
-        apiKey = apiKeys[keyIndex];
-        keyInfo = `Pool KEY_${keyIndex + 1}/${apiKeys.length} (...${apiKey.slice(-4)})`;
+        if (!apiKey) {
+            throw new Error(`[Поток #${threadId}] Не удалось получить API-ключ ни из GitHub Secrets, ни из переменной окружения!`);
+        }
 
-        console.log(`[🔑] [Поток #${threadId}] Загружен пул из ${apiKeys.length} ключей, использую ${keyInfo}`);
-        
     } catch (error) {
-        // Фоллбэк на переменную окружения если нет файла
-        console.warn(`[!] [Поток #${threadId}] Файл ${GEMINI_API_KEYS_POOL_FILE} не найден, использую API_KEY_CURRENT`);
+        console.error(`[!] [Поток #${threadId}] Ошибка при загрузке ключей: ${error.message}`);
+        
+        // Последний фоллбэк
         apiKey = process.env.API_KEY_CURRENT;
-        keyInfo = `ENV (...${apiKey ? apiKey.slice(-4) : 'NULL'})`;
-    }
-
-    if (!apiKey) {
-        throw new Error(`[Поток #${threadId}] Не удалось получить API-ключ ни из файла, ни из переменной окружения!`);
+        keyInfo = `FALLBACK (...${apiKey ? apiKey.slice(-4) : 'NULL'})`;
+        
+        if (!apiKey) {
+            throw new Error(`[Поток #${threadId}] Критическая ошибка: не удалось получить ни один API ключ!`);
+        }
     }
 }
 
 // Загружаем ключи при старте
-await loadApiKeysFromPool();
+loadApiKeysFromSecrets();
 
 // 🏆 ЛОГИРОВАНИЕ КАК В BUTLER FACTORY
 if (modelChoice === 'deepseek') {
