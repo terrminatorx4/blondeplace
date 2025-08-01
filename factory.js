@@ -10,7 +10,7 @@ const SITE_URL = 'https://blondeplace.netlify.app';
 const BRAND_NAME = 'BlondePlace';
 const BRAND_BLOG_NAME = 'Блог BlondePlace';
 const BRAND_AUTHOR_NAME = 'Эксперт BlondePlace';
-const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop';
+const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 const INDEXNOW_API_KEY = 'df39150ca56f896546628ae3c923dd4a';
 
 // --- НАСТРОЙКИ ОПЕРАЦИИ ---
