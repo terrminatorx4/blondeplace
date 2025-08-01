@@ -255,7 +255,7 @@ JSON должен содержать:
     const frontmatter = `---
 title: ${JSON.stringify(seoData.title)}
 description: ${JSON.stringify(seoData.description)}
-keywords: ${JSON.stringify(seoData.keywords || topic)}
+keywords: ${typeof seoData.keywords === "string" ? JSON.stringify(seoData.keywords) : JSON.stringify(Array.isArray(seoData.keywords) ? seoData.keywords.join(", ") : topic)}
 pubDate: ${JSON.stringify(new Date().toISOString())}
 author: ${JSON.stringify(BRAND_AUTHOR_NAME)}
 heroImage: ${JSON.stringify(finalHeroImage)}
