@@ -1,4 +1,4 @@
-name: 🔍 DEBUG: API Keys Extraction Test
+﻿name: 'DEBUG API Keys Extraction Test'
 
 on:
   workflow_dispatch:
