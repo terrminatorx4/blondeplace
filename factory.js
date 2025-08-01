@@ -219,9 +219,9 @@ JSON должен содержать:
         console.warn(`[!] [Поток #${threadId}] JSON не найден в ответе модели. Создаю fallback SEO данные.`);
         
         // УЛЬТРА-СТРОГИЕ FALLBACK SEO ДАННЫЕ
-        const fallbackTitle = topic.length <= 44 ? topic : topic.slice(0, 41) + "...";
+        const fallbackTitle = topic.length <= 44 ? topic : topic.length <= 45 ? topic : topic.slice(0, 45);
         const fallbackDesc = `Экспертный гайд о ${topic.toLowerCase()} от BlondePlace. Секреты профи!`;
-        const trimmedDesc = fallbackDesc.length <= 158 ? fallbackDesc : fallbackDesc.slice(0, 155) + "...";
+        const trimmedDesc = fallbackDesc.length <= 158 ? fallbackDesc : fallbackDesc.length <= 164 ? fallbackDesc : fallbackDesc.slice(0, 164);
         
         seoData = {
             title: fallbackTitle,
@@ -249,9 +249,9 @@ JSON должен содержать:
             console.warn(`[!] [Поток #${threadId}] Ошибка парсинга JSON: ${parseError.message}. Создаю fallback SEO данные.`);
             
             // УЛЬТРА-СТРОГИЕ FALLBACK SEO ДАННЫЕ
-            const fallbackTitle = topic.length <= 44 ? topic : topic.slice(0, 41) + "...";
+            const fallbackTitle = topic.length <= 44 ? topic : topic.length <= 45 ? topic : topic.slice(0, 45);
             const fallbackDesc = `Экспертный гайд о ${topic.toLowerCase()} от BlondePlace. Секреты профи!`;
-            const trimmedDesc = fallbackDesc.length <= 158 ? fallbackDesc : fallbackDesc.slice(0, 155) + "...";
+            const trimmedDesc = fallbackDesc.length <= 158 ? fallbackDesc : fallbackDesc.length <= 164 ? fallbackDesc : fallbackDesc.slice(0, 164);
             
             seoData = {
                 title: fallbackTitle,
