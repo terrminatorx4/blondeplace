@@ -149,7 +149,7 @@ ${plan}
 - Строго следуй плану и используй правильные Markdown заголовки (# ## ###)
 - НЕ добавляй изображения ![...], ссылки, URL-адреса
 - Начинай сразу с заголовка H1
-- КРИТИЧНО: ЗАПРЕЩЕНО повторять слова! Тошнота СТРОГО до 3.0! Каждое предложение - ПОЛНОСТЬЮ уникальные слова, синонимы, перифразы. Абзацы максимально разнообразные! НИ ОДНОГО ПОВТОРА!
+- КРИТИЧНО: ЗАПРЕЩЕНО повторять слова! Тошнота СТРОГО до 3.5! Каждое предложение - уникальные слова, синонимы, перифразы. Абзацы максимально разнообразные!
 
 ОБЪЕМ: минимум 10000 символов для снижения тошноты!`;
 
@@ -166,7 +166,7 @@ ${plan}
 
 Текущая статья: ${articleText}
 
-Увеличь объем минимум в 1.3 раза, сохраняя экспертность и структуру. КРИТИЧНО: Используй ТОЛЬКО уникальную лексику для снижения тошноты до 3.0!`;
+Увеличь объем минимум в 1.3 раза, сохраняя экспертность и структуру. КРИТИЧНО: Используй уникальную лексику для снижения тошноты до 3.5!`;
 
         articleText = await generateWithRetry(extensionPrompt);
     }
@@ -191,8 +191,8 @@ ${plan}
 КРИТИЧЕСКИ ВАЖНО: ответ ТОЛЬКО валидный JSON без дополнительного текста, комментариев, markdown форматирования. Начинай ответ сразу с { и заканчивай }. Никакого текста до или после JSON!
 
 JSON должен содержать:
-- "title" (СТРОГО 40-44 символа, включи основное ключевое слово)
-- "description" (СТРОГО 150-158 символов, продающий, с призывом к действию)
+- "title" (СТРОГО 40-45 символов, включи основное ключевое слово)
+- "description" (СТРОГО 150-164 символа, продающий, с призывом к действию)
 - "keywords" (СТРОГО строка: 3-5 ключевых слов через запятую, БЕЗ общих слов)
 
 КРИТИЧЕСКИЕ требования к keywords:
@@ -218,10 +218,10 @@ JSON должен содержать:
     if (!match) {
         console.warn(`[!] [Поток #${threadId}] JSON не найден в ответе модели. Создаю fallback SEO данные.`);
         
-        // УЛЬТРА-СТРОГИЕ FALLBACK SEO ДАННЫЕ
-        const fallbackTitle = topic.length <= 44 ? topic : topic.length <= 45 ? topic : topic.slice(0, 45);
-        const fallbackDesc = `Экспертный гайд о ${topic.toLowerCase()} от BlondePlace. Секреты профи!`;
-        const trimmedDesc = fallbackDesc.length <= 158 ? fallbackDesc : fallbackDesc.length <= 164 ? fallbackDesc : fallbackDesc.slice(0, 164);
+        // ПРАВИЛЬНЫЕ FALLBACK SEO ДАННЫЕ (БЕЗ ОБРЕЗАНИЯ)
+        const fallbackTitle = topic.length <= 45 ? topic : topic.slice(0, 45);
+        const fallbackDesc = `Экспертная статья о ${topic.toLowerCase()} от салона BlondePlace. Узнайте секреты профессионалов и получите идеальный результат. Записывайтесь!`;
+        const trimmedDesc = fallbackDesc.length <= 164 ? fallbackDesc : fallbackDesc.slice(0, 164);
         
         seoData = {
             title: fallbackTitle,
@@ -234,24 +234,24 @@ JSON должен содержать:
         try {
             seoData = JSON.parse(match[0]);
             
-            // ПРОВЕРКА И ОБРЕЗКА ЕСЛИ ПРЕВЫШЕНЫ ЛИМИТЫ
-            if (seoData.title && seoData.title.length > 44) {
-                seoData.title = seoData.title.slice(0, 41) + "...";
+            // ТОЛЬКО МЯГКАЯ ПРОВЕРКА БЕЗ АГРЕССИВНОЙ ОБРЕЗКИ
+            if (seoData.title && seoData.title.length > 45) {
+                seoData.title = seoData.title.slice(0, 45);
                 console.warn(`[!] [Поток #${threadId}] Title обрезан до ${seoData.title.length} символов`);
             }
             
-            if (seoData.description && seoData.description.length > 158) {
-                seoData.description = seoData.description.slice(0, 155) + "...";
+            if (seoData.description && seoData.description.length > 164) {
+                seoData.description = seoData.description.slice(0, 164);
                 console.warn(`[!] [Поток #${threadId}] Description обрезан до ${seoData.description.length} символов`);
             }
             
         } catch (parseError) {
             console.warn(`[!] [Поток #${threadId}] Ошибка парсинга JSON: ${parseError.message}. Создаю fallback SEO данные.`);
             
-            // УЛЬТРА-СТРОГИЕ FALLBACK SEO ДАННЫЕ
-            const fallbackTitle = topic.length <= 44 ? topic : topic.length <= 45 ? topic : topic.slice(0, 45);
-            const fallbackDesc = `Экспертный гайд о ${topic.toLowerCase()} от BlondePlace. Секреты профи!`;
-            const trimmedDesc = fallbackDesc.length <= 158 ? fallbackDesc : fallbackDesc.length <= 164 ? fallbackDesc : fallbackDesc.slice(0, 164);
+            // ПРАВИЛЬНЫЕ FALLBACK SEO ДАННЫЕ (БЕЗ ОБРЕЗАНИЯ)
+            const fallbackTitle = topic.length <= 45 ? topic : topic.slice(0, 45);
+            const fallbackDesc = `Экспертная статья о ${topic.toLowerCase()} от салона BlondePlace. Узнайте секреты профессионалов и получите идеальный результат. Записывайтесь!`;
+            const trimmedDesc = fallbackDesc.length <= 164 ? fallbackDesc : fallbackDesc.slice(0, 164);
             
             seoData = {
                 title: fallbackTitle,
