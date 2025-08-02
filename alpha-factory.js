@@ -1,8 +1,8 @@
-// ===== ALPHA-FACTORY v5.6 - ES MODULES FIX =====
-// Исправления:
-// 1. Переписан на ES modules (import/export)
-// 2. Совместимость с package.json "type": "module"
-// 3. Все остальные исправления v5.5 сохранены
+// ===== ALPHA-FACTORY v5.7 - UNIQUE NUMBERS FIX =====
+// КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ:
+// 1. Функция getNextAvailablePostNumber() теперь учитывает threadId
+// 2. Каждый поток получает уникальный диапазон номеров
+// 3. Нет перезаписи статей между потоками
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
@@ -41,20 +41,21 @@ const TARGET_URLS = [
     `${MAIN_SITE_URL}/#location`
 ];
 
-// ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОЛУЧЕНИЯ СЛЕДУЮЩЕГО НОМЕРА =====
-async function getNextAvailablePostNumber() {
+// ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ УНИКАЛЬНОЙ НУМЕРАЦИИ =====
+async function getNextAvailablePostNumber(threadId) {
     try {
-        console.log('[NUMBERS] Получаю последний номер поста из GitHub API...');
+        console.log(`[NUMBERS] Thread #${threadId}: Получаю последний номер поста из GitHub API...`);
         
         const response = await fetch('https://api.github.com/repos/terrminatorx4/blondeplace/contents/src/content/posts', {
             headers: {
-                'User-Agent': 'Alpha-Factory-v5.6'
+                'User-Agent': 'Alpha-Factory-v5.7'
             }
         });
         
         if (!response.ok) {
-            console.log('[NUMBERS] ⚠️ GitHub API недоступен, использую случайный номер');
-            return Math.floor(Math.random() * 90000) + 10000; // 10000-99999
+            console.log(`[NUMBERS] Thread #${threadId}: ⚠️ GitHub API недоступен, использую базовый номер`);
+            // Fallback: базовый номер + уникальный сдвиг для каждого потока
+            return 30000 + (threadId * 1000); // Thread 1: 31000, Thread 2: 32000, etc.
         }
         
         const files = await response.json();
@@ -74,14 +75,19 @@ async function getNextAvailablePostNumber() {
             }
         }
         
-        const nextNumber = maxNumber + 1000; // Прибавляем 1000 для избежания коллизий
-        console.log(`[NUMBERS] Найден максимальный номер: ${maxNumber}, следующий: ${nextNumber}`);
+        // ИСПРАВЛЕНИЕ: Каждый поток получает уникальный диапазон
+        const baseNumber = maxNumber + 1000;
+        const uniqueStartNumber = baseNumber + (threadId * 100); // Thread 1: +100, Thread 2: +200, etc.
         
-        return nextNumber;
+        console.log(`[NUMBERS] Thread #${threadId}: Найден максимальный номер: ${maxNumber}`);
+        console.log(`[NUMBERS] Thread #${threadId}: Уникальный стартовый номер: ${uniqueStartNumber}`);
+        
+        return uniqueStartNumber;
         
     } catch (error) {
-        console.log(`[NUMBERS] ⚠️ Ошибка при получении номера: ${error.message}`);
-        return Math.floor(Math.random() * 90000) + 10000; // Fallback
+        console.log(`[NUMBERS] Thread #${threadId}: ⚠️ Ошибка при получении номера: ${error.message}`);
+        // Fallback с уникальным номером для каждого потока
+        return 30000 + (threadId * 1000);
     }
 }
 
@@ -143,7 +149,7 @@ function generateProperHeroImage(keyword) {
 // ===== ГЕНЕРАЦИЯ КОНТЕНТА С УЛУЧШЕННОЙ ОЧИСТКОЙ =====
 async function generatePost(keyword, postNumber, threadId) {
     try {
-        console.log(`[TASK] Генерирую уникальную статью #${postNumber} по ключу: ${keyword}`);
+        console.log(`[TASK] Thread #${threadId}: Генерирую уникальную статью #${postNumber} по ключу: ${keyword}`);
         
         const geoContext = getGeoContext(threadId);
         
@@ -217,7 +223,7 @@ ${JSON.stringify(schema, null, 2)}
         const filePath = path.join('src/content/posts', fileName);
         await fs.writeFile(filePath, fullContent, 'utf8');
         
-        console.log(`[DONE] Статья #${postNumber} создана: "${seoData.title}"`);
+        console.log(`[DONE] Thread #${threadId}: Статья #${postNumber} создана: "${seoData.title}"`);
         console.log(`[META] Title: ${seoData.title.length} символов, Description: ${description.length} символов`);
         console.log(`[IMAGE] Изображение: ${heroImage}`);
         
@@ -232,7 +238,7 @@ ${JSON.stringify(schema, null, 2)}
         };
         
     } catch (error) {
-        console.error(`[ERROR] Ошибка генерации поста #${postNumber}:`, error.message);
+        console.error(`[ERROR] Thread #${threadId}: Ошибка генерации поста #${postNumber}:`, error.message);
         throw error;
     }
 }
@@ -410,15 +416,15 @@ async function main() {
         const modelChoice = process.env.MODEL_CHOICE || 'gemini';
         
         console.log(`[KEY] [ALPHA-STRIKE #${threadId}] Модель: ${modelChoice}, ключ: ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.6 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.6 ===`);
+        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.7 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.7 ===`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Цель: ${targetArticles} уникальных статей`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Ключевые слова: ${ALPHA_KEYWORDS.length} шт`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Правильные ключи: ${ALPHA_KEYWORDS.join(', ')}`);
         
-        // ИСПРАВЛЕНО: Получаем стартовый номер правильно
-        const startNumber = await getNextAvailablePostNumber();
-        console.log(`[NUMBERS] Начинаю нумерацию с: ${startNumber}`);
+        // ИСПРАВЛЕНО: Получаем уникальный стартовый номер для каждого потока
+        const startNumber = await getNextAvailablePostNumber(threadId);
+        console.log(`[NUMBERS] Thread #${threadId}: Начинаю нумерацию с: ${startNumber}`);
         
         const results = [];
         
@@ -435,7 +441,7 @@ async function main() {
             await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.6 ЗАВЕРШЕНА ===`);
+        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.7 ЗАВЕРШЕНА ===`);
         console.log(`[STATS] Создано статей: ${results.length}`);
         console.log(`[STATS] Общее количество ссылок на основной сайт: ~${results.length * 85}`);
         console.log(`[STATS] Финальная скорость: 500мс`);
