@@ -333,7 +333,7 @@ ${finalContent}
     await fs.writeFile(filePath, frontmatter, 'utf-8');
     console.log(`[DONE] [ALPHA-STRIKE #${threadId}] Статья #${postNumber} создана: "${seoData.title}"`);
     console.log(`[META] Title: ${seoData.title.length} символов, Description: ${seoData.description.length} символов`);
-    console.log(`[SCHEMA] Schema.org HowTo с рейтингом ${ratingValue} (${reviewCount} отзывов)`);
+    // Schema.org добавлен (лог скрыт)
     console.log(`[IMAGE] зображение: ${finalHeroImage}`);
     
     // IndexNow уведомление
