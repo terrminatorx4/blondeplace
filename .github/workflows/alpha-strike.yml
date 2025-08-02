@@ -1,276 +1,191 @@
-name: 🚀💥 ПЛАН "АЛЬФА-УДАР" v2.0 - УЛУЧШЕННАЯ ВЕРСИЯ
+name: 🚀💥 ПЛАН "АЛЬФА-УДАР" v4.0 - ИНФОРМАЦИОННЫЙ ЦЕНТР
 
 on:
   workflow_dispatch:
     inputs:
       target_articles:
-        description: 'Общее количество статей'
-        required: false
+        description: 'Общее количество статей для генерации'
+        required: true
         default: '600'
         type: choice
         options:
-        - '600'    # Тестовый режим: 20 потоков × 30 статей
-        - '1000'   # Средний режим: 20 потоков × 50 статей  
-        - '2000'   # Большой режим: 20 потоков × 100 статей
-        - '5000'   # Полный режим: 20 потоков × 250 статей
+          - '600'
+          - '1000'
+          - '2000'
+          - '5000'
       threads:
-        description: 'Количество потоков'
-        required: false
+        description: 'Количество параллельных потоков (1-20)'
+        required: true
         default: '20'
         type: choice
         options:
-        - '5'
-        - '10'
-        - '20'
+          - '5'
+          - '10'
+          - '20'
       model_choice:
-        description: 'Модель AI'
-        required: false
+        description: 'Выбор AI модели'
+        required: true
         default: 'gemini'
         type: choice
         options:
-        - gemini
-        - deepseek
+          - 'gemini'
+          - 'deepseek'
       start_from_thread:
         description: 'Начать с потока (для частичных запусков)'
         required: false
         default: '1'
 
-env:
-  NODE_VERSION: '18'
-
 jobs:
   alpha-strike-preparation:
-    name: 🎯 Подготовка к боевой операции v2.0
+    name: 🎯 ПОДГОТОВКА К ОПЕРАЦИИ "АЛЬФА-УДАР"
     runs-on: ubuntu-latest
     outputs:
-      articles-per-thread: ${{ steps.calc.outputs.articles-per-thread }}
-      thread-matrix: ${{ steps.calc.outputs.thread-matrix }}
-      expected-links: ${{ steps.calc.outputs.expected-links }}
-    
+      articles-per-thread: ${{ steps.calculate.outputs.articles-per-thread }}
+      expected-links: ${{ steps.calculate.outputs.expected-links }}
+      thread-matrix: ${{ steps.calculate.outputs.thread-matrix }}
+      
     steps:
-    - name: 📊 Расчет параметров атаки
-      id: calc
+    - name: 📊 РАСЧЕТ ПАРАМЕТРОВ ОПЕРАЦИИ
+      id: calculate
       run: |
-        TOTAL_ARTICLES=${{ github.event.inputs.target_articles || '600' }}
-        TOTAL_THREADS=${{ github.event.inputs.threads || '20' }}
+        TARGET_ARTICLES=${{ github.event.inputs.target_articles || '600' }}
+        THREADS=${{ github.event.inputs.threads || '20' }}
         START_FROM=${{ github.event.inputs.start_from_thread || '1' }}
         
-        ARTICLES_PER_THREAD=$((TOTAL_ARTICLES / TOTAL_THREADS))
-        EXPECTED_LINKS=$((TOTAL_ARTICLES * 80))
+        # Расчет статей на поток
+        ARTICLES_PER_THREAD=$(( TARGET_ARTICLES / THREADS ))
+        if [ $(( TARGET_ARTICLES % THREADS )) -ne 0 ]; then
+          ARTICLES_PER_THREAD=$(( ARTICLES_PER_THREAD + 1 ))
+        fi
+        
+        # Создаем матрицу потоков начиная с указанного
+        THREAD_LIST=""
+        for i in $(seq $START_FROM $THREADS); do
+          if [ -z "$THREAD_LIST" ]; then
+            THREAD_LIST="$i"
+          else
+            THREAD_LIST="$THREAD_LIST,$i"
+          fi
+        done
+        
+        # Ожидаемое количество ссылок (85 ссылок на статью)
+        EXPECTED_LINKS=$(( TARGET_ARTICLES * 85 ))
         
         echo "articles-per-thread=$ARTICLES_PER_THREAD" >> $GITHUB_OUTPUT
         echo "expected-links=$EXPECTED_LINKS" >> $GITHUB_OUTPUT
+        echo "thread-matrix=[$THREAD_LIST]" >> $GITHUB_OUTPUT
         
-        # Создаем матрицу потоков с учетом start_from
-        THREAD_ARRAY="["
-        FIRST=true
-        for i in $(seq $START_FROM $TOTAL_THREADS); do
-          if [ "$FIRST" = true ]; then
-            FIRST=false
-          else
-            THREAD_ARRAY="$THREAD_ARRAY,"
-          fi
-          THREAD_ARRAY="$THREAD_ARRAY$i"
-        done
-        THREAD_ARRAY="$THREAD_ARRAY]"
-        
-        echo "thread-matrix=$THREAD_ARRAY" >> $GITHUB_OUTPUT
-        
-        echo "🎯 ПЛАН АЛЬФА-УДАР v2.0 ИНИЦИАЛИЗИРОВАН:"
-        echo "📊 Общее количество статей: $TOTAL_ARTICLES"
-        echo "⚡ Количество потоков: $TOTAL_THREADS"
-        echo "🚀 Начать с потока: $START_FROM" 
-        echo "📝 Статей на поток: $ARTICLES_PER_THREAD"
-        echo "🔗 Ожидаемое количество ссылок: $EXPECTED_LINKS"
-        echo "🎯 Целевой сайт: https://blondeplace.ru"
+        echo "🎯 ПЛАН ОПЕРАЦИИ:"
+        echo "   📰 Общее количество статей: $TARGET_ARTICLES"
+        echo "   🔗 Ожидаемое количество ссылок: $EXPECTED_LINKS"
+        echo "   ⚡ Потоков: $THREADS (начиная с $START_FROM)"
+        echo "   📊 Статей на поток: $ARTICLES_PER_THREAD"
+        echo "   🎮 Модель AI: ${{ github.event.inputs.model_choice || 'gemini' }}"
 
   alpha-strike-attack:
-    name: 💥 Боевой поток #${{ matrix.thread-id }}
+    name: 🚀💥 АЛЬФА-УДАР #${{ matrix.thread-id }}
     runs-on: ubuntu-latest
     needs: alpha-strike-preparation
-    
     strategy:
-      fail-fast: false
       max-parallel: 20
       matrix:
         thread-id: ${{ fromJson(needs.alpha-strike-preparation.outputs.thread-matrix) }}
     
     steps:
-    - name: 🔄 Checkout репозитория
+    - name: 📥 ПОЛУЧЕНИЕ КОДА ОПЕРАЦИИ
       uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: ⚡ Настройка Node.js ${{ env.NODE_VERSION }}
+      
+    - name: ⚙️ УСТАНОВКА Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-
-    - name: 📦 Установка зависимостей
+        node-version: '20'
+        
+    - name: 📦 УСТАНОВКА ЗАВИСИМОСТЕЙ
       run: |
-        npm ci
-        echo "🔧 Зависимости установлены для потока #${{ matrix.thread-id }}"
-
-    - name: 📁 Создание структуры проекта
-      run: |
-        mkdir -p src/content/posts
-        echo "📂 Директория создана: src/content/posts"
-
-    - name: 🚀💥 ЗАПУСК АЛЬФА-УДАРА v2.0 #${{ matrix.thread-id }}
+        npm install @google/generative-ai
+        npm install node-fetch
+        npm install execa
+        
+    - name: 🚀💥 ЗАПУСК АЛЬФА-УДАРА v4.0 #${{ matrix.thread-id }}
       env:
         THREAD_ID: ${{ matrix.thread-id }}
         ALPHA_ARTICLES: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }}
         MODEL_CHOICE: ${{ github.event.inputs.model_choice || 'gemini' }}
-        API_KEY_CURRENT: ${{ secrets.GEMINI_API_KEY_1 }}
+        API_KEY_CURRENT: ${{ secrets.GEMINI_API_KEY }}
+        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
       run: |
-        echo "🚀💥 [ПОТОК #${{ matrix.thread-id }}] НАЧАЛО БОЕВОЙ ОПЕРАЦИИ v2.0"
-        echo "🎯 Цель: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }} статей"
-        echo "🤖 Модель: ${{ github.event.inputs.model_choice || 'gemini' }}"
-        echo "🔑 API ключ: ...$(echo $API_KEY_CURRENT | tail -c 5)"
-        echo "📊 Диапазон номеров постов: $(( (${{ matrix.thread-id }} - 1) * 1000 + 1 ))-$(( ${{ matrix.thread-id }} * 1000 ))"
+        echo "🚀💥 [АЛЬФА-УДАР #${{ matrix.thread-id }}] === НАЧАЛО АТАКИ v4.0 ==="
+        echo "📊 Параметры потока:"
+        echo "   🆔 ID потока: ${{ matrix.thread-id }}"
+        echo "   📰 Статей для генерации: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }}"
+        echo "   🤖 Модель AI: ${{ github.event.inputs.model_choice || 'gemini' }}"
+        echo "   🔑 API ключ: ...${API_KEY_CURRENT: -4}"
         
-        # Запуск улучшенного боевого скрипта
-        node alpha-factory-fixed.js
+        # Запуск супер-улучшенной фабрики контента
+        node alpha-factory.js
         
-        echo "✅ [ПОТОК #${{ matrix.thread-id }}] МИССИЯ ЗАВЕРШЕНА"
-
-    - name: 📊 Детальная статистика потока #${{ matrix.thread-id }}
-      run: |
-        echo "📈 ОТЧЕТ ПО ПОТОКУ #${{ matrix.thread-id }}:"
-        
-        # Подсчет локально созданных файлов
-        if [ -d "src/content/posts" ]; then
-          CREATED_FILES=$(find src/content/posts -name "*.md" | wc -l)
-          echo "📝 Создано файлов локально: $CREATED_FILES"
-          
-          # Проверка размеров файлов
-          if [ $CREATED_FILES -gt 0 ]; then
-            echo "📋 Размеры последних созданных статей:"
-            find src/content/posts -name "*.md" -exec wc -c {} + | tail -5
-            
-            echo "📏 Проверка качества мета-тегов:"
-            find src/content/posts -name "*.md" -exec grep -l "title:" {} + | head -3 | while read file; do
-              echo "=== $file ==="
-              grep "title:" "$file" | head -1
-              grep "description:" "$file" | head -1
-            done
-          fi
-        else
-          echo "❌ Директория src/content/posts не найдена"
-        fi
+        echo "✅ [АЛЬФА-УДАР #${{ matrix.thread-id }}] === ПОТОК ЗАВЕРШЕН ==="
 
   alpha-strike-quality-control:
-    name: 🔍 Контроль качества
+    name: 🔍 КОНТРОЛЬ КАЧЕСТВА
     runs-on: ubuntu-latest
     needs: [alpha-strike-preparation, alpha-strike-attack]
+    if: always()
     
     steps:
-    - name: 🔄 Checkout репозитория
+    - name: 📥 ПОЛУЧЕНИЕ КОДА
       uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: 🔍 Анализ качества созданного контента
+      
+    - name: 📊 АНАЛИЗ СОЗДАННОГО КОНТЕНТА
       run: |
-        echo "🔍 АНАЛИЗ КАЧЕСТВА КОНТЕНТА:"
-        echo "================================"
+        echo "🔍 === КОНТРОЛЬ КАЧЕСТВА ОПЕРАЦИИ ==="
         
-        # Проверка через GitHub API (файлы сохранены через commitToGithub)
-        GITHUB_FILES=$(find src/content/posts -name "*.md" 2>/dev/null | wc -l)
-        echo "📁 Файлов в локальной директории: $GITHUB_FILES"
-        
-        if [ $GITHUB_FILES -gt 0 ]; then
-          echo "✅ Файлы найдены, анализируем качество..."
+        # Подсчет созданных файлов
+        if [ -d "src/content/posts" ]; then
+          POST_COUNT=$(find src/content/posts -name "post*.md" | wc -l)
+          echo "📰 Найдено статей: $POST_COUNT"
           
           # Проверка уникальности заголовков
-          echo "🔍 Проверка уникальности заголовков:"
-          find src/content/posts -name "*.md" -exec grep "title:" {} \; | sort | uniq -d | wc -l | {
-            read DUPLICATES
-            if [ $DUPLICATES -eq 0 ]; then
-              echo "✅ Дубликатов заголовков не найдено"
-            else
-              echo "❌ Найдено $DUPLICATES дубликатов заголовков"
-            fi
-          }
+          UNIQUE_TITLES=$(find src/content/posts -name "post*.md" -exec grep -h "^title:" {} \; | sort | uniq | wc -l)
+          TOTAL_TITLES=$(find src/content/posts -name "post*.md" -exec grep -h "^title:" {} \; | wc -l)
+          echo "📋 Уникальные заголовки: $UNIQUE_TITLES из $TOTAL_TITLES"
           
-          # Проверка длины заголовков и описаний
-          echo "📏 Анализ длины мета-тегов:"
-          find src/content/posts -name "*.md" | head -10 | while read file; do
-            title_length=$(grep "title:" "$file" | sed 's/title: "//' | sed 's/".*//' | wc -c)
-            desc_length=$(grep "description:" "$file" | sed 's/description: "//' | sed 's/".*//' | wc -c)
-            echo "📄 $(basename $file): Title=${title_length}chars, Desc=${desc_length}chars"
+          # Проверка длины мета-тегов (первые 5 файлов)
+          echo "📏 Проверка длины мета-тегов (образцы):"
+          find src/content/posts -name "post*.md" | head -5 | while read file; do
+            TITLE=$(grep "^title:" "$file" | sed 's/title: "//g' | sed 's/"$//g')
+            DESC=$(grep "^description:" "$file" | sed 's/description: "//g' | sed 's/"$//g')
+            echo "   📄 $(basename "$file"): Title ${#TITLE} символов, Description ${#DESC} символов"
           done
           
-          # Проверка наличия ссылок
-          echo "🔗 Проверка ссылок на основной сайт:"
-          LINKS_COUNT=$(find src/content/posts -name "*.md" -exec grep -c "blondeplace.ru" {} \; | awk '{sum+=$1} END {print sum}')
-          echo "🔗 Общее количество ссылок на blondeplace.ru: $LINKS_COUNT"
-          
+          # Проверка количества ссылок (первые 3 файла)
+          echo "🔗 Проверка ссылок (образцы):"
+          find src/content/posts -name "post*.md" | head -3 | while read file; do
+            LINKS=$(grep -o '<a href=' "$file" | wc -l)
+            echo "   📄 $(basename "$file"): $LINKS ссылок"
+          done
         else
-          echo "❌ Файлы не найдены в локальной директории"
+          echo "⚠️ Директория src/content/posts не найдена"
         fi
+        
+        echo "✅ Контроль качества завершен"
 
   alpha-strike-final-report:
-    name: 🏆 Финальный отчет операции
+    name: 📋 ФИНАЛЬНЫЙ ОТЧЕТ
     runs-on: ubuntu-latest
     needs: [alpha-strike-preparation, alpha-strike-attack, alpha-strike-quality-control]
+    if: always()
     
     steps:
-    - name: 🔄 Checkout репозитория
+    - name: 📥 ПОЛУЧЕНИЕ КОДА
       uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: 🏆 Генерация финального отчета
-      run: |
-        echo "🏆 ПЛАН 'АЛЬФА-УДАР' v2.0 ЗАВЕРШЕН!"
-        echo "=================================="
-        
-        TARGET_ARTICLES=${{ github.event.inputs.target_articles || '600' }}
-        EXPECTED_LINKS=${{ needs.alpha-strike-preparation.outputs.expected-links }}
-        
-        echo "📊 СТАТИСТИКА ОПЕРАЦИИ:"
-        echo "🎯 Запланировано статей: $TARGET_ARTICLES"
-        echo "⚡ Использовано потоков: ${{ github.event.inputs.threads || '20' }}"
-        echo "🤖 Модель AI: ${{ github.event.inputs.model_choice || 'gemini' }}"
-        echo "🔗 Ожидаемо ссылок: $EXPECTED_LINKS"
-        
-        echo ""
-        echo "🎯 ЦЕЛИ ОПЕРАЦИИ:"
-        echo "✅ Продвижение blondeplace.ru по 8 ключевым фразам:"
-        echo "   • бьюти коворкинг"
-        echo "   • аренда парикмахерского кресла"
-        echo "   • коворкинг для мастера"
-        echo "   • места в аренду"
-        echo "   • кресло для мастера"
-        echo "   • салон красоты"
-        echo "   • мелирование"
-        echo "   • тотал блонд"
-        
-        echo ""
-        echo "📈 ОЖИДАЕМЫЕ РЕЗУЛЬТАТЫ:"
-        echo "⏰ Индексация сателлита: 1-2 дня"
-        echo "📈 Рост позиций основного сайта: 4-7 дней"
-        echo "🏆 Достижение топ-10: 1-2 недели"
-        echo "🎯 Цель: ТОП-1 по всем ключевым фразам"
-        
-        echo ""
-        echo "⚠️  ВАЖНЫЕ НАПОМИНАНИЯ:"
-        echo "📊 Мониторьте позиции blondeplace.ru ежедневно"
-        echo "📱 Следите за индексацией в Яндекс.Вебмастер"
-        echo "🔄 При необходимости запускайте повторные атаки"
-        echo "🛡️  Готовьтесь к возможной блокировке сателлита"
-        
-        echo ""
-        echo "🎊 ОПЕРАЦИЯ 'АЛЬФА-УДАР' v2.0 УСПЕШНО ЗАВЕРШЕНА!"
-
-    - name: 📱 Создание файла отчета
+      
+    - name: 📋 СОЗДАНИЕ ОТЧЕТА ОПЕРАЦИИ
       run: |
         cat > ALPHA_STRIKE_REPORT.md << 'EOF'
-# 🚀💥 ОТЧЕТ ПО ОПЕРАЦИИ "АЛЬФА-УДАР" v2.0
+# 🚀💥 ОТЧЕТ ПО ОПЕРАЦИИ "АЛЬФА-УДАР" v4.0
 
 ## 📊 Параметры операции
 - **Статей создано**: ${{ github.event.inputs.target_articles || '600' }}
@@ -279,30 +194,44 @@ jobs:
 - **Ожидаемо ссылок**: ${{ needs.alpha-strike-preparation.outputs.expected-links }}
 - **Дата операции**: $(date)
 
-## 🎯 Целевые ключевые фразы
-1. бьюти коворкинг
-2. аренда парикмахерского кресла
-3. коворкинг для мастера
-4. места в аренду
-5. кресло для мастера
-6. салон красоты
-7. мелирование
-8. тотал блонд
+## 🎯 Статус операции
+- **Подготовка**: ${{ needs.alpha-strike-preparation.result }}
+- **Выполнение**: ${{ needs.alpha-strike-attack.result }}
+- **Контроль качества**: ${{ needs.alpha-strike-quality-control.result }}
 
-## 📈 План мониторинга
-- **День 1-2**: Отслеживание индексации сателлита
-- **День 4-7**: Мониторинг роста позиций основного сайта
-- **Неделя 1-2**: Контроль достижения топ-10
-- **Цель**: ТОП-1 по всем ключевым фразам
+## 📈 Ожидаемые результаты
+- **Начало индексации**: 24-48 часов
+- **Рост позиций**: 3-7 дней
+- **ТОП-10 по ключам**: 1-2 недели
+- **ТОП-1 по ключам**: 2-4 недели
 
-## ⚠️ Статус сателлита
-- **Домен**: blondeplace.netlify.app
-- **Статус**: Расходный материал
-- **Риск блокировки**: Высокий (планируемый)
-- **Основной сайт**: blondeplace.ru (защищен)
+## 🔗 Ссылочная агрессия
+- **Ссылок на статью**: 85
+- **Общее количество**: ${{ needs.alpha-strike-preparation.outputs.expected-links }}
+- **Целевые URL**: 10 различных разделов blondeplace.ru
+
+## 📱 Мониторинг
+1. Отслеживайте индексацию в Яндекс.Вебмастер
+2. Проверяйте позиции по ключевым фразам
+3. Анализируйте трафик на основной сайт
+4. Контролируйте ссылочную массу
+
+## 🚀 Следующие шаги
+- Дождитесь индексации (24-48 часов)
+- При необходимости запустите дополнительные потоки
+- Рассмотрите масштабирование до 10,000 статей
 
 ---
-*Отчет сгенерирован автоматически системой АЛЬФА-УДАР v2.0*
+*Отчет создан автоматически системой "Альфа-Удар" v4.0*
 EOF
         
-        echo "📄 Отчет сохранен в ALPHA_STRIKE_REPORT.md" 
+        echo "📋 Отчет создан: ALPHA_STRIKE_REPORT.md"
+        cat ALPHA_STRIKE_REPORT.md
+        
+    - name: 💾 СОХРАНЕНИЕ ОТЧЕТА
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add ALPHA_STRIKE_REPORT.md
+        git commit -m "📋 Отчет операции Альфа-Удар v4.0 - $(date)" || exit 0
+        git push || exit 0 
