@@ -93,42 +93,24 @@ const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
 const GEMINI_MODEL_NAME = "gemini-2.5-flash";
 
 // --- ПРАВИЛЬНАЯ ИНИЦИАЛИЗАЦИЯ API КЛЮЧЕЙ (КАК В ОРИГИНАЛЬНОМ FACTORY.JS) ---
+// --- Я API  (ЩЯ   FACTORY.JS) ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
-
-// Получаем правильные переменные окружения
 const GEMINI_API_KEY_CURRENT = process.env.GEMINI_API_KEY_CURRENT;
 const OPENROUTER_API_KEY_CURRENT = process.env.OPENROUTER_API_KEY_CURRENT;
 
-// Определяем какой API ключ использовать в зависимости от модели
-let rawApiKey;
-if (modelChoice === 'deepseek') {
-    rawApiKey = OPENROUTER_API_KEY_CURRENT;
-    if (!rawApiKey) {
-        throw new Error(`[АЛЬФА-УДАР #${threadId}] Не найден OPENROUTER_API_KEY_CURRENT для модели DeepSeek!`);
-    }
-} else {
-    rawApiKey = GEMINI_API_KEY_CURRENT;
-    if (!rawApiKey) {
-        throw new Error(`[АЛЬФА-УДАР #${threadId}] Не найден GEMINI_API_KEY_CURRENT для модели Gemini!`);
-    }
-}
-
-// Обрабатываем пул ключей (если это пул, разделенный запятыми)
-const apiKeysArray = rawApiKey.split(',').map(key => key.trim()).filter(key => key.length > 0);
-
-console.log(`[🔍] [АЛЬФА-УДАР #${threadId}] Модель: ${modelChoice}, найдено ключей: ${apiKeysArray.length}`);
-
-// Распределяем ключи между потоками
 let apiKey;
-if (apiKeysArray.length === 1) {
-    apiKey = apiKeysArray[0];
-    console.log(`[⚠️] [АЛЬФА-УДАР #${threadId}] ВНИМАНИЕ: Использую единственный ключ с задержкой`);
+if (modelChoice === 'deepseek') {
+    apiKey = OPENROUTER_API_KEY_CURRENT;
 } else {
-    apiKey = apiKeysArray[threadId % apiKeysArray.length];
-    console.log(`[🔑] [АЛЬФА-УДАР #${threadId}] Использую ключ #${(threadId % apiKeysArray.length) + 1} из ${apiKeysArray.length}`);
+    apiKey = GEMINI_API_KEY_CURRENT;
 }
 
+if (!apiKey) {
+    throw new Error(`[Ь- #${threadId}] е был предоставлен API-ключ!`);
+}
+
+console.log(`[🔑] [Ь- #${threadId}] одель: ${modelChoice}, ключ: ...${apiKey.slice(-4)}`);
 const targetArticles = parseInt(process.env.ALPHA_ARTICLES, 10) || 30;
 
 console.log(`🚀💥 [АЛЬФА-УДАР #${threadId}] Инициализация боевой системы v4.0 с ключом ...${apiKey.slice(-4)}`);
