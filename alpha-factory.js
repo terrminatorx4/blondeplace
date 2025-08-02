@@ -1,4 +1,4 @@
-// айл: alpha-factory.js (Alpha-Strike v5.2 - С ЫХ С  SCHEMA.ORG)
+// айл: alpha-factory.js (Alpha-Strike v5.3 - ЬЯ  С 8 Ы С)
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
@@ -12,11 +12,20 @@ const BRAND_BLOG_NAME = 'лог BlondePlace';
 const BRAND_AUTHOR_NAME = 'ксперт BlondePlace';
 const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop';
 const INDEXNOW_API_KEY = 'df39150ca56f896546628ae3c923dd4a';
-
-// --- СТ  ---
 const TARGET_URL_MAIN = "https://blondeplace.ru";
-const TOPICS_FILE = 'topics.txt'; //   FACTORY.JS!
 const POSTS_DIR = 'src/content/posts';
+
+// 🎯 ALPHA-STRIKE: 8 ЫХ С Я 5-10 ТЫСЯ ЬЫХ СТТ
+const ALPHA_KEYWORDS = [
+    "бьюти коворкинг",
+    "салон красоты", 
+    "косметология",
+    "маникюр педикюр",
+    "парикмахерская",
+    "эстетическая косметология",
+    "spa процедуры",
+    "красота и здоровье"
+];
 
 // --- СТ  ---
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -91,7 +100,7 @@ async function generateWithRetry(prompt, maxRetries = 4) {
             }
         } catch (error) {
             if (error.message.includes('503') || error.message.includes('429')) {
-                console.warn(`[!] [ALPHA-STRIKE #${threadId}] одель перегружена. опытка ${i + 1}/${maxRetries}. ду ${delay / 1000}с...`);
+                console.warn(`[WARNING] [ALPHA-STRIKE #${threadId}] одель перегружена. опытка ${i + 1}/${maxRetries}. ду ${delay / 1000}с...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 delay *= 2;
             } else {
@@ -108,17 +117,19 @@ async function isUrlAccessible(url) {
         const response = await fetch(url, { method: 'HEAD', timeout: 5000 });
         return response.ok;
     } catch (error) {
-        console.warn(`[!] редупреждение: не удалось проверить URL изображения: ${url}`);
+        console.warn(`[WARNING] е удалось проверить URL изображения: ${url}`);
         return false;
     }
 }
 
-// ---   FACTORY.JS: ЬЯ Я generatePost С SCHEMA.ORG ---
-async function generatePost(topic, postNumber) {
-    console.log(`[TASK] [ALPHA-STRIKE #${threadId}] енерирую супер-статью #${postNumber} по ключу: ${topic}`);
+// 🎯 Я ЬЫХ СТТ   С
+async function generatePost(keyword, postNumber) {
+    console.log(`[TASK] [ALPHA-STRIKE #${threadId}] енерирую уникальную статью #${postNumber} по ключу: ${keyword}`);
     
-    //  FACTORY.JS: С-ТЬЫ 
-    const planPrompt = `Создай максимально детальный, многоуровневый план для экспертной SEO-статьи на тему "${topic}". 
+    // 🎯 С-ТЬЫ  С ЬСТЬ
+    const planPrompt = `Создай максимально детальный, многоуровневый план для экспертной SEO-статьи на тему "${keyword}". 
+
+Т: Статья должна быть Ь и отличаться от других статей по этой же теме!
 
 ТЯ  :
 - инимум 15-20 разделов и подразделов
@@ -126,18 +137,22 @@ async function generatePost(topic, postNumber) {
 - обавь FAQ секцию (5-7 вопросов)
 - ключи разделы: введение, основная часть, практические советы, частые ошибки, заключение
 - лан должен покрывать тему полностью и всесторонне
+- ЯТЬ: создай уникальный подход к теме "${keyword}" (например, через призму трендов 2024, инновационных техник, экспертных секретов)
 
-онтекст: статья для блога салона красоты ${BRAND_NAME}, целевая аудитория - женщины 25-45 лет, интересующиеся красотой.`;
+онтекст: статья для блога салона красоты ${BRAND_NAME}, целевая аудитория - женщины 25-45 лет, интересующиеся красотой.
+
+: Сделай план максимально уникальным и экспертным!`;
 
     const plan = await generateWithRetry(planPrompt);
 
-    //  FACTORY.JS: ТЯ    СТСТ
+    // 🎯 Я Ь ТТ
     const articlePrompt = `апиши исчерпывающую, экспертную статью объемом  15000 символов по этому плану:
 
 ${plan}
 
 ТС ТЯ:
 - Статья должна быть СЬ подробной и экспертной
+- ЬЫ подход к теме "${keyword}" - не банальный контент!
 - ключи множество конкретных примеров, практических советов, кейсов
 - обавь списки, таблицы сравнения, пошаговые инструкции
 - бязательно включи FAQ секцию в конце  
@@ -147,15 +162,18 @@ ${plan}
 -  СТТЬ С С  
 - спользуй профессиональную терминологию
 - аждый раздел должен содержать практическую ценность
+- избегай частого повторения одних слов, используй синонимы и разнообразную лексику для снижения тошноты текста
 
 : ачинай ответ сразу с заголовка H1 (# аголовок).  СЯХ вводных слов!
 
-Тема статьи: ${topic}
-онтекст: экспертный блог салона красоты ${BRAND_NAME}`;
+Тема статьи: ${keyword}
+онтекст: экспертный блог салона красоты ${BRAND_NAME}
+
+ЯТЬ: Сделай статью максимально уникальной по теме "${keyword}"!`;
 
     let articleText = await generateWithRetry(articlePrompt);
 
-    // С-СТЯ СТ   FACTORY.JS ( Я ССЫ!)
+    // С-СТЯ СТ ( Я ССЫ!)
     articleText = articleText.replace(/^.*?вот\s+(исчерпывающая|экспертная|подробная)?\s*(статья|руководство|гид).*$/gmi, "");
     articleText = articleText.replace(/^.*?конечно,?\s*/gmi, "");
     articleText = articleText.replace(/\*\*title:\*\*.*$/gmi, "");
@@ -168,37 +186,50 @@ ${plan}
     articleText = articleText.replace(/https?:\/\/[^\s\)\]]+/g, '');
     articleText = articleText.trim();
 
-    //  FACTORY.JS:  SEO DATA
-    const seoPrompt = `Создай SEO оптимизированные данные для статьи на тему "${topic}".
+    // 🎯 Я ЬЫХ SEO DATA
+    const seoPrompt = `Создай SEO оптимизированные данные для Ь статьи на тему "${keyword}".
+
+Т: аголовок и описание должны быть ЬЫ и отличаться от других статей по этой же теме!
 
 ерни СТ в формате JSON:
 {
-  "title": "SEO заголовок (40-50 символов)",
-  "description": "SEO описание (150-160 символов)", 
+  "title": "ЬЫ SEO заголовок (40-50 символов) с экспертным подходом",
+  "description": "Ь SEO описание (150-160 символов) с практической ценностью", 
   "keywords": "ключевые слова через запятую",
   "heroImage": "https://images.unsplash.com/photo-[подходящее изображение по теме]"
 }
+
+ТС требования к title:
+-  быть ЬЫ и экспертным
+-  банальный, а с изюминкой
+- римеры: "Секреты {keyword}: инсайды от топ-мастеров", "{keyword} 2024: революционные техники", "ак выбрать {keyword}: экспертный чек-лист"
+
+ТС требования к description:
+-  быть ЬЫ и содержательным  
+- ключать практическую ценность
+-  дублировать заголовок
 
 ТС требования к keywords:
 - спользуй ТЬ термины  ТЫ статьи
 -  используй общие слова типа "красота, стиль, уход"
 - окусируйся на Т процедуре/технике
 
-онтекст: блог салона красоты ${BRAND_NAME}.`;
+онтекст: блог салона красоты ${BRAND_NAME}.
+омер статьи: #${postNumber} (для уникальности)`;
 
     let seoText = await generateWithRetry(seoPrompt);
     const match = seoText.match(/\{[\s\S]*\}/);
     if (!match) { throw new Error("е удалось найти валидный JSON в ответе модели."); }
     const seoData = JSON.parse(match[0]);
 
-    //  FACTORY.JS: SCHEMA.ORG С Т
+    // SCHEMA.ORG С Т (  FACTORY.JS)
     const reviewCount = Math.floor(Math.random() * (900 - 300 + 1)) + 300;
     const ratingValue = (Math.random() * (5.0 - 4.7) + 4.7).toFixed(1);
 
     const isImageOk = await isUrlAccessible(seoData.heroImage);
     const finalHeroImage = isImageOk ? seoData.heroImage : FALLBACK_IMAGE_URL;
 
-    // Я СХ HOWTO С ТЫ Т (  FACTORY.JS)
+    // Я СХ HOWTO С ТЫ Т
     const fullSchema = {
         "@context": "https://schema.org", 
         "@type": "HowTo",
@@ -235,7 +266,7 @@ ${plan}
         }
     };
 
-    // нтегрируем ссылки как в factory.js (С очистки!)
+    // нтегрируем ссылки (С очистки!)
     const targetUrls = [
         `${TARGET_URL_MAIN}/uslugi/okrashivanie-volos`,
         `${TARGET_URL_MAIN}/uslugi/strizhki-ukladki`,
@@ -267,11 +298,11 @@ ${plan}
     const finalContent = words.join(' ');
     console.log(`[LINKS] [ALPHA-STRIKE #${threadId}] ставлено ${linkCount} ссылок (внешних: ${linkCount}, внутренних: 0)`);
 
-    //  FACTORY.JS: FRONTMATTER С SCHEMA.ORG
+    // FRONTMATTER С SCHEMA.ORG
     const frontmatter = `---
 title: ${JSON.stringify(seoData.title)}
 description: ${JSON.stringify(seoData.description)}
-keywords: ${JSON.stringify(seoData.keywords || topic)}
+keywords: ${JSON.stringify(seoData.keywords || keyword)}
 pubDate: ${JSON.stringify(new Date().toISOString())}
 author: ${JSON.stringify(BRAND_AUTHOR_NAME)}
 heroImage: ${JSON.stringify(finalHeroImage)}
@@ -301,7 +332,8 @@ ${finalContent}
         filename,
         title: seoData.title,
         url: articleUrl,
-        linkCount
+        linkCount,
+        keyword
     };
 }
 
@@ -314,41 +346,20 @@ async function notifyIndexNow(url) {
         await execa('curl', ['-X', 'POST', 'https://www.bing.com/indexnow', '-H', 'Content-Type: application/json; charset=utf-8', '-d', payload]);
         await execa('curl', ['-X', 'POST', 'https://google.com/ping?sitemap=' + encodeURIComponent(SITE_URL + '/sitemap.xml')]);
     } catch (error) {
-        console.error(`[!] [ALPHA-STRIKE #${threadId}] шибка IndexNow:`, error.message);
+        console.error(`[ERROR] [ALPHA-STRIKE #${threadId}] шибка IndexNow:`, error.message);
     }
 }
 
-// ---  FACTORY.JS: Т Т  TOPICS.TXT ---
+// �� ЬЯ  ALPHA-STRIKE С 8 Ы С
 async function main() {
-    console.log(`[INIT] [ALPHA-STRIKE #${threadId}] нициализация боевой системы v5.2 с ключом ...${apiKey.slice(-4)}`);
+    console.log(`[INIT] [ALPHA-STRIKE #${threadId}] нициализация боевой системы v5.3 с ключом ...${apiKey.slice(-4)}`);
 
     try {
         const targetArticles = parseInt(process.env.TARGET_ARTICLES, 10) || 1;
         
-        //  FACTORY.JS: Т TOPICS.TXT
-        const fileContent = await fs.readFile(TOPICS_FILE, 'utf-8');
-        const allTopics = fileContent.split(/\r?\n/).map(topic => topic.trim()).filter(Boolean);
-        
-        console.log(`[TOPICS] [ALPHA-STRIKE #${threadId}] агружено ${allTopics.length} тем из ${TOPICS_FILE}`);
-        
-        //  FACTORY.JS: СЯ ТЫ  Т
-        const totalThreads = 20; // аксимальное количество потоков
-        const startIndex = (threadId - 1) * targetArticles;
-        const topicsForThisThread = allTopics.slice(startIndex, startIndex + targetArticles);
-        
-        if (topicsForThisThread.length === 0) {
-            console.log(`[WARNING] [ALPHA-STRIKE #${threadId}] ет тем для этого потока. спользуем fallback ключи.`);
-            // Fallback к старой логике если topics.txt пуст
-            const fallbackKeywords = [
-                "бьюти коворкинг", "салон красоты", "косметология", "маникюр педикюр", 
-                "парикмахерская", "эстетическая косметология", "spa процедуры", "красота и здоровье"
-            ];
-            topicsForThisThread.push(fallbackKeywords[(threadId - 1) % fallbackKeywords.length]);
-        }
-
-        console.log(`[START] [ALPHA-STRIKE #${threadId}] ===  С v5.2 ===`);
-        console.log(`[TARGET] [ALPHA-STRIKE #${threadId}] ель: ${targetArticles} статей`);
-        console.log(`[TOPICS] [ALPHA-STRIKE #${threadId}] Темы: ${topicsForThisThread.join(', ')}`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] ===  С v5.3 ===`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] ель: ${targetArticles} уникальных статей`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] лючевые слова: ${ALPHA_KEYWORDS.length} шт`);
 
         const startNumber = threadId * 1000;
         console.log(`[NUMBERS] [ALPHA-STRIKE #${threadId}] ачинаю нумерацию с: ${startNumber}`);
@@ -356,13 +367,19 @@ async function main() {
         let createdArticles = 0;
         let totalLinks = 0;
         const createdUrls = [];
+        const keywordStats = {};
 
-        for (let i = 0; i < Math.min(targetArticles, topicsForThisThread.length); i++) {
-            const topic = topicsForThisThread[i];
+        for (let i = 0; i < targetArticles; i++) {
+            // ЬЯ : берем ключевое слово по кругу
+            const keywordIndex = (threadId - 1 + i) % ALPHA_KEYWORDS.length;
+            const keyword = ALPHA_KEYWORDS[keywordIndex];
             const postNumber = startNumber + i;
             
+            if (!keywordStats[keyword]) keywordStats[keyword] = 0;
+            keywordStats[keyword]++;
+            
             try {
-                const result = await generatePost(topic, postNumber);
+                const result = await generatePost(keyword, postNumber);
                 createdArticles++;
                 totalLinks += result.linkCount;
                 createdUrls.push(result.url);
@@ -373,11 +390,17 @@ async function main() {
             }
         }
 
-        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === ССЯ v5.2 Ш ===`);
+        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === ССЯ v5.3 Ш ===`);
         console.log(`[STATS] Создано статей: ${createdArticles}`);
         console.log(`[STATS] бщее количество ссылок на основной сайт: ~${totalLinks}`);
         console.log(`[STATS] инальная скорость: ${baseDelay}мс`);
         console.log(`[STATS] иапазон номеров: ${startNumber}-${startNumber + createdArticles - 1}`);
+
+        // СТТСТ  Ы С
+        console.log(`[KEYWORDS] СТТСТ  Ы С:`);
+        Object.entries(keywordStats).forEach(([keyword, count]) => {
+            console.log(`[KEYWORDS] "${keyword}": ${count} статей`);
+        });
 
         // ТТ С ССЫ
         console.log(`[RESULTS] СЫ СТТЬ:`);
