@@ -87,32 +87,44 @@ const ARTICLE_TEMPLATES = [
     "полное руководство", "экспертное мнение", "профессиональные советы"
 ];
 
-// --- ИСПРАВЛЕННАЯ ИНИЦИАЛИЗАЦИЯ API КЛЮЧЕЙ ---
+// --- НАСТРОЙКИ МОДЕЛЕЙ (АДАПТИВНЫЕ v4.0) ---
+const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
+const GEMINI_MODEL_NAME = "gemini-2.5-flash";
+
+// --- ПРАВИЛЬНАЯ ИНИЦИАЛИЗАЦИЯ API КЛЮЧЕЙ (КАК В ОРИГИНАЛЬНОМ FACTORY.JS) ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
 
-// ИСПРАВЛЕНИЕ #1: Правильная обработка пула ключей с распределением
-const apiKeysPool = process.env.API_KEY_CURRENT || '';
+// Получаем правильные переменные окружения
+const GEMINI_API_KEY_CURRENT = process.env.GEMINI_API_KEY_CURRENT;
+const OPENROUTER_API_KEY_CURRENT = process.env.OPENROUTER_API_KEY_CURRENT;
 
-if (!apiKeysPool) {
-    throw new Error(`[АЛЬФА-УДАР #${threadId}] Пул API ключей пустой!`);
+// Определяем какой API ключ использовать в зависимости от модели
+let rawApiKey;
+if (modelChoice === 'deepseek') {
+    rawApiKey = OPENROUTER_API_KEY_CURRENT;
+    if (!rawApiKey) {
+        throw new Error(`[АЛЬФА-УДАР #${threadId}] Не найден OPENROUTER_API_KEY_CURRENT для модели DeepSeek!`);
+    }
+} else {
+    rawApiKey = GEMINI_API_KEY_CURRENT;
+    if (!rawApiKey) {
+        throw new Error(`[АЛЬФА-УДАР #${threadId}] Не найден GEMINI_API_KEY_CURRENT для модели Gemini!`);
+    }
 }
 
-// Разделяем ключи и убираем пустые элементы
-const apiKeysArray = apiKeysPool.split(',').map(key => key.trim()).filter(key => key.length > 0);
+// Обрабатываем пул ключей (если это пул, разделенный запятыми)
+const apiKeysArray = rawApiKey.split(',').map(key => key.trim()).filter(key => key.length > 0);
 
-if (apiKeysArray.length === 0) {
-    throw new Error(`[АЛЬФА-УДАР #${threadId}] В пуле нет валидных API ключей!`);
-}
+console.log(`[🔍] [АЛЬФА-УДАР #${threadId}] Модель: ${modelChoice}, найдено ключей: ${apiKeysArray.length}`);
 
-// ИСПРАВЛЕНИЕ #2: Гарантированное распределение ключей между потоками
+// Распределяем ключи между потоками
 let apiKey;
 if (apiKeysArray.length === 1) {
-    // Если только один ключ - добавляем задержку между потоками
     apiKey = apiKeysArray[0];
     console.log(`[⚠️] [АЛЬФА-УДАР #${threadId}] ВНИМАНИЕ: Использую единственный ключ с задержкой`);
 } else {
-    // Равномерное распределение ключей
     apiKey = apiKeysArray[threadId % apiKeysArray.length];
     console.log(`[🔑] [АЛЬФА-УДАР #${threadId}] Использую ключ #${(threadId % apiKeysArray.length) + 1} из ${apiKeysArray.length}`);
 }
@@ -121,11 +133,6 @@ const targetArticles = parseInt(process.env.ALPHA_ARTICLES, 10) || 30;
 
 console.log(`🚀💥 [АЛЬФА-УДАР #${threadId}] Инициализация боевой системы v4.0 с ключом ...${apiKey.slice(-4)}`);
 console.log(`🎯 [АЛЬФА-УДАР #${threadId}] Цель: ${targetArticles} статей с 85+ ссылками каждая`);
-
-// --- НАСТРОЙКИ МОДЕЛЕЙ (АДАПТИВНЫЕ v4.0) ---
-const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
-const GEMINI_MODEL_NAME = "gemini-2.5-flash";
 
 // --- АДАПТИВНАЯ СИСТЕМА СКОРОСТИ v4.0 ---
 class AdaptiveSpeedController {
@@ -311,14 +318,13 @@ function createSmartUniqueDescription(keyword, postNumber) {
     return result || `${keyword} в BlondePlace! Запись: ${postNumber}.`;
 }
 
-// --- ИСПРАВЛЕННАЯ ГЕНЕРАЦИЯ С ПОВТОРАМИ v4.0 ---
+// --- ГЕНЕРАЦИЯ С АДАПТИВНЫМИ ПОВТОРАМИ v4.0 ---
 async function generateWithAdaptiveRetry(prompt, maxRetries = 3) {
     let delay = speedController.getDelay();
     
     for (let i = 0; i < maxRetries; i++) {
         try {
             if (modelChoice === 'deepseek') {
-                // ИСПРАВЛЕНИЕ #3: Чистые HTTP заголовки без проблемных символов
                 const response = await fetch(OPENROUTER_API_URL, {
                     method: 'POST',
                     headers: {
