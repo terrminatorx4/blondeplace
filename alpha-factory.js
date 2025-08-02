@@ -90,7 +90,10 @@ const ARTICLE_TEMPLATES = [
 // --- ИНИЦИАЛИЗАЦИЯ ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
-const apiKey = process.env.API_KEY_CURRENT;
+// олучаем ключ из пула
+const apiKeysPool = process.env.API_KEY_CURRENT || '';
+const apiKeysArray = apiKeysPool.includes(',') ? apiKeysPool.split(',') : [apiKeysPool];
+const apiKey = apiKeysArray[threadId % apiKeysArray.length].trim();
 const targetArticles = parseInt(process.env.ALPHA_ARTICLES, 10) || 30;
 
 if (!apiKey) {
