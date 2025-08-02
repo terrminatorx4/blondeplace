@@ -1,4 +1,4 @@
-// айл: alpha-factory.js (Alpha-Strike v5.0 - СЯ   FACTORY.JS)
+// айл: alpha-factory.js (Alpha-Strike v5.1 - С СХ )
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
@@ -22,7 +22,7 @@ const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
 const GEMINI_MODEL_NAME = "gemini-2.5-pro";
 
-// --- Я API  (ЩЯ   FACTORY.JS) ---
+// --- Я API  (  FACTORY.JS) ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
 const GEMINI_API_KEY_CURRENT = process.env.GEMINI_API_KEY_CURRENT;
@@ -36,15 +36,15 @@ if (modelChoice === 'deepseek') {
 }
 
 if (!apiKey) {
-    throw new Error(`[Ь- #${threadId}] е был предоставлен API-ключ!`);
+    throw new Error(`[ALPHA-STRIKE #${threadId}] е был предоставлен API-ключ!`);
 }
-console.log(`[🔑] [Ь- #${threadId}] одель: ${modelChoice}, ключ: ...${apiKey.slice(-4)}`);
+console.log(`[KEY] [ALPHA-STRIKE #${threadId}] одель: ${modelChoice}, ключ: ...${apiKey.slice(-4)}`);
 
-// --- СТЯ  ( Т ) ---
+// --- СТЯ  ---
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-const baseDelay = 500; // азовая задержка
+const baseDelay = 500;
 
 function slugify(text) {
     const cleanedText = text.toString().replace(/[\x00-\x1F\x7F-\x9F]/g, "").trim();
@@ -90,7 +90,7 @@ async function generateWithRetry(prompt, maxRetries = 4) {
             }
         } catch (error) {
             if (error.message.includes('503') || error.message.includes('429')) {
-                console.warn(`[!] [Ь- #${threadId}] одель перегружена. опытка ${i + 1}/${maxRetries}. ду ${delay / 1000}с...`);
+                console.warn(`[!] [ALPHA-STRIKE #${threadId}] одель перегружена. опытка ${i + 1}/${maxRetries}. ду ${delay / 1000}с...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 delay *= 2;
             } else {
@@ -98,14 +98,14 @@ async function generateWithRetry(prompt, maxRetries = 4) {
             }
         }
     }
-    throw new Error(`[Ь- #${threadId}] е удалось получить ответ от модели ${modelChoice} после ${maxRetries} попыток.`);
+    throw new Error(`[ALPHA-STRIKE #${threadId}] е удалось получить ответ от модели ${modelChoice} после ${maxRetries} попыток.`);
 }
 
 // ---   FACTORY.JS: ЬЯ Я generatePost ---
 async function generatePost(topic, postNumber) {
-    console.log(`[💥] [Ь- #${threadId}] енерирую супер-статью #${postNumber} по ключу: ${topic}`);
+    console.log(`[TASK] [ALPHA-STRIKE #${threadId}] енерирую супер-статью #${postNumber} по ключу: ${topic}`);
     
-    // 🎯  FACTORY.JS: С-ТЬЫ 
+    //  FACTORY.JS: С-ТЬЫ 
     const planPrompt = `Создай максимально детальный, многоуровневый план для экспертной SEO-статьи на тему "${topic}". 
 
 ТЯ  :
@@ -119,7 +119,7 @@ async function generatePost(topic, postNumber) {
 
     const plan = await generateWithRetry(planPrompt);
 
-    // 🎯  FACTORY.JS: ТЯ    СТСТ
+    //  FACTORY.JS: ТЯ    СТСТ + ТС Т
     const articlePrompt = `апиши исчерпывающую, экспертную статью объемом  15000 символов по этому плану:
 
 ${plan}
@@ -132,33 +132,35 @@ ${plan}
 - иши от лица экспертов салона красоты ${BRAND_NAME}
 -  используй слова типа "конечно", "вот статья" и другие вводные фразы
 -  дублируй TITLE и DESCRIPTION в тексте
-- ачинай статью сразу с содержательного введения
+-  СТТЬ С С  
 - спользуй профессиональную терминологию
 - аждый раздел должен содержать практическую ценность
-- ключи реальные примеры и кейсы из практики
-- бязательно добавь схемы действий и чек-листы
+
+: ачинай ответ сразу с заголовка H1 (# аголовок).  СЯХ вводных слов!
 
 Тема статьи: ${topic}
 онтекст: экспертный блог салона красоты ${BRAND_NAME}`;
 
-    const rawContent = await generateWithRetry(articlePrompt);
+    let articleText = await generateWithRetry(articlePrompt);
 
-    // 🚨  FACTORY.JS: СТ Т Т 
-    let cleanedContent = rawContent
-        .replace(/^.*?вот\s+(экспертная\s+)?статья.*?$/gmi, "")
-        .replace(/^title:\s*.*/gmi, "")
-        .replace(/^description:\s*.*/gmi, "")
-        .replace(/^content:\s*.*/gmi, "")
-        .replace(/^\s*конечно,?\s*/gmi, "")
-        .replace(/\*\*title:\*\*.*$/gmi, "")
-        .replace(/\*\*description:\*\*.*$/gmi, "")
-        .trim();
+    // С-СТЯ СТ   FACTORY.JS ( Я ССЫ!)
+    articleText = articleText.replace(/^.*?вот\s+(исчерпывающая|экспертная|подробная)?\s*(статья|руководство|гид).*$/gmi, "");
+    articleText = articleText.replace(/^.*?конечно,?\s*/gmi, "");
+    articleText = articleText.replace(/\*\*title:\*\*.*$/gmi, "");
+    articleText = articleText.replace(/\*\*description:\*\*.*$/gmi, "");
+    articleText = articleText.replace(/\*\*заголовок\s*\([^)]*\)\s*:\*\*.*$/gmi, "");
+    articleText = articleText.replace(/^title:\s*.*/gmi, "");
+    articleText = articleText.replace(/^description:\s*.*/gmi, "");
+    articleText = articleText.replace(/^content:\s*.*/gmi, "");
+    articleText = articleText.replace(/!\[.*?\]\(.*?\)/g, '');
+    articleText = articleText.replace(/https?:\/\/[^\s\)\]]+/g, '');
+    articleText = articleText.trim();
 
     // Создаем title  номера (как должно быть)
     const title = `${topic} - экспертные советы от BlondePlace`;
     const description = `рофессиональные советы по ${topic} от экспертов салона красоты BlondePlace. рактические рекомендации и секреты мастеров.`;
 
-    // нтегрируем ссылки как в factory.js
+    // нтегрируем ссылки как в factory.js (С очистки!)
     const targetUrls = [
         `${TARGET_URL_MAIN}/uslugi/okrashivanie-volos`,
         `${TARGET_URL_MAIN}/uslugi/strizhki-ukladki`,
@@ -173,7 +175,7 @@ ${plan}
     ];
 
     // ставляем 85 ссылок
-    const words = cleanedContent.split(' ');
+    const words = articleText.split(' ');
     let linkCount = 0;
     const targetLinkCount = 85;
     const linkInterval = Math.floor(words.length / targetLinkCount);
@@ -181,12 +183,14 @@ ${plan}
     for (let i = linkInterval; i < words.length && linkCount < targetLinkCount; i += linkInterval) {
         const targetUrl = targetUrls[linkCount % targetUrls.length];
         const anchorText = words[i];
-        words[i] = `[${anchorText}](${targetUrl})`;
-        linkCount++;
+        if (anchorText && anchorText.length > 2) {
+            words[i] = `[${anchorText}](${targetUrl})`;
+            linkCount++;
+        }
     }
 
     const finalContent = words.join(' ');
-    console.log(`[🔗] [Ь- #${threadId}] ставлено ${linkCount} ссылок (внешних: ${linkCount}, внутренних: 0)`);
+    console.log(`[LINKS] [ALPHA-STRIKE #${threadId}] ставлено ${linkCount} ссылок (внешних: ${linkCount}, внутренних: 0)`);
 
     // Создаем frontmatter
     const frontmatter = `---
@@ -207,13 +211,13 @@ slug: "post${postNumber}"
     const filePath = path.join(POSTS_DIR, filename);
     
     await fs.writeFile(filePath, fullArticle, 'utf-8');
-    console.log(`[✅] [Ь- #${threadId}] Статья #${postNumber} создана: "${title}"`);
-    console.log(`[📏] Title: ${title.length} символов, Description: ${description.length} символов`);
+    console.log(`[DONE] [ALPHA-STRIKE #${threadId}] Статья #${postNumber} создана: "${title}"`);
+    console.log(`[META] Title: ${title.length} символов, Description: ${description.length} символов`);
     
     // IndexNow уведомление
     const articleUrl = `${SITE_URL}/blog/post${postNumber}`;
     await notifyIndexNow(articleUrl);
-    console.log(`[📢] [Ь- #${threadId}] Турбо-индексация: 3/3 сервисов уведомлены`);
+    console.log(`[INDEXNOW] [ALPHA-STRIKE #${threadId}] Турбо-индексация: 3/3 сервисов уведомлены`);
     
     return {
         filename,
@@ -232,7 +236,7 @@ async function notifyIndexNow(url) {
         await execa('curl', ['-X', 'POST', 'https://www.bing.com/indexnow', '-H', 'Content-Type: application/json; charset=utf-8', '-d', payload]);
         await execa('curl', ['-X', 'POST', 'https://google.com/ping?sitemap=' + encodeURIComponent(SITE_URL + '/sitemap.xml')]);
     } catch (error) {
-        console.error(`[!] [Ь- #${threadId}] шибка IndexNow:`, error.message);
+        console.error(`[!] [ALPHA-STRIKE #${threadId}] шибка IndexNow:`, error.message);
     }
 }
 
@@ -243,14 +247,14 @@ const keywords = [
     "парикмахерская", "эстетическая косметология", "spa процедуры", "красота и здоровье"
 ];
 
-console.log(`🚀💥 [Ь- #${threadId}] нициализация боевой системы v5.0 с ключом ...${apiKey.slice(-4)}`);
-console.log(`🎯 [Ь- #${threadId}] ель: ${targetArticles} статей с 85+ ссылками каждая`);
+console.log(`[INIT] [ALPHA-STRIKE #${threadId}] нициализация боевой системы v5.1 с ключом ...${apiKey.slice(-4)}`);
+console.log(`[TARGET] [ALPHA-STRIKE #${threadId}] ель: ${targetArticles} статей с 85+ ссылками каждая`);
 
-console.log(`🚀💥 [Ь- #${threadId}] ===  С v5.0 ===`);
-console.log(`[🎯] [Ь- #${threadId}] ель: ${targetArticles} статей по ${keywords.length} ключам`);
+console.log(`[START] [ALPHA-STRIKE #${threadId}] ===  С v5.1 ===`);
+console.log(`[TARGET] [ALPHA-STRIKE #${threadId}] ель: ${targetArticles} статей по ${keywords.length} ключам`);
 
 const startNumber = threadId * 1000;
-console.log(`[🔢] [Ь- #${threadId}] ачинаю нумерацию с: ${startNumber}`);
+console.log(`[NUMBERS] [ALPHA-STRIKE #${threadId}] ачинаю нумерацию с: ${startNumber}`);
 
 let createdArticles = 0;
 let totalLinks = 0;
@@ -268,23 +272,23 @@ for (let i = 0; i < targetArticles; i++) {
         
         await delay(baseDelay);
     } catch (error) {
-        console.error(`[💥] [Ь- #${threadId}] шибка статьи #${postNumber}: ${error.message}`);
+        console.error(`[ERROR] [ALPHA-STRIKE #${threadId}] шибка статьи #${postNumber}: ${error.message}`);
     }
 }
 
-console.log(`[🏆] [Ь- #${threadId}] === ССЯ v5.0 Ш ===`);
-console.log(`[📊] Создано статей: ${createdArticles}`);
-console.log(`[🔗] бщее количество ссылок на основной сайт: ~${totalLinks}`);
-console.log(`[⚡] инальная скорость: ${baseDelay}мс`);
-console.log(`[🔢] иапазон номеров: ${startNumber}-${startNumber + targetArticles - 1}`);
+console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === ССЯ v5.1 Ш ===`);
+console.log(`[STATS] Создано статей: ${createdArticles}`);
+console.log(`[STATS] бщее количество ссылок на основной сайт: ~${totalLinks}`);
+console.log(`[STATS] инальная скорость: ${baseDelay}мс`);
+console.log(`[STATS] иапазон номеров: ${startNumber}-${startNumber + targetArticles - 1}`);
 
-// 🎯 ТТ С ССЫ ( С ЬТЬ)
-console.log(`[🌐] СЫ СТТЬ:`);
+// ТТ С ССЫ ( С ЬТЬ)
+console.log(`[RESULTS] СЫ СТТЬ:`);
 createdUrls.forEach((url, index) => {
-    console.log(`[📝] Статья ${index + 1}: ${url}`);
+    console.log(`[ARTICLE] Статья ${index + 1}: ${url}`);
 });
 
-console.log(`[📢] INDEXNOW ТТ:`);
-console.log(`[✅] Yandex IndexNow: ${createdArticles} URLs отправлено`);
-console.log(`[✅] Bing IndexNow: ${createdArticles} URLs отправлено`);
-console.log(`[✅] Google Sitemap Ping: ${createdArticles} URLs отправлено`);
+console.log(`[INDEXNOW] INDEXNOW ТТ:`);
+console.log(`[INDEXNOW] Yandex IndexNow: ${createdArticles} URLs отправлено`);
+console.log(`[INDEXNOW] Bing IndexNow: ${createdArticles} URLs отправлено`);
+console.log(`[INDEXNOW] Google Sitemap Ping: ${createdArticles} URLs отправлено`);
