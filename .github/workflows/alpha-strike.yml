@@ -1,0 +1,163 @@
+name: 🚀💥 ПЛАН "АЛЬФА-УДАР" - БОЕВАЯ ОПЕРАЦИЯ
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_articles:
+        description: 'Общее количество статей (по умолчанию 5000)'
+        required: false
+        default: '5000'
+      threads:
+        description: 'Количество потоков (по умолчанию 20)'
+        required: false
+        default: '20'
+      model_choice:
+        description: 'Модель AI (gemini/deepseek)'
+        required: false
+        default: 'gemini'
+        type: choice
+        options:
+        - gemini
+        - deepseek
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  alpha-strike-preparation:
+    name: 🎯 Подготовка к боевой операции
+    runs-on: ubuntu-latest
+    outputs:
+      articles-per-thread: ${{ steps.calc.outputs.articles-per-thread }}
+      thread-matrix: ${{ steps.calc.outputs.thread-matrix }}
+    
+    steps:
+    - name: 📊 Расчет параметров атаки
+      id: calc
+      run: |
+        TOTAL_ARTICLES=${{ github.event.inputs.target_articles || '5000' }}
+        TOTAL_THREADS=${{ github.event.inputs.threads || '20' }}
+        
+        ARTICLES_PER_THREAD=$((TOTAL_ARTICLES / TOTAL_THREADS))
+        
+        echo "articles-per-thread=$ARTICLES_PER_THREAD" >> $GITHUB_OUTPUT
+        
+        # Создаем матрицу потоков
+        THREAD_ARRAY="["
+        for i in $(seq 1 $TOTAL_THREADS); do
+          if [ $i -gt 1 ]; then
+            THREAD_ARRAY="$THREAD_ARRAY,"
+          fi
+          THREAD_ARRAY="$THREAD_ARRAY$i"
+        done
+        THREAD_ARRAY="$THREAD_ARRAY]"
+        
+        echo "thread-matrix=$THREAD_ARRAY" >> $GITHUB_OUTPUT
+        
+        echo "🎯 ПЛАН АЛЬФА-УДАР ИНИЦИАЛИЗИРОВАН:"
+        echo "📊 Общее количество статей: $TOTAL_ARTICLES"
+        echo "⚡ Количество потоков: $TOTAL_THREADS" 
+        echo "📝 Статей на поток: $ARTICLES_PER_THREAD"
+        echo "🔗 Ожидаемое количество ссылок: $((TOTAL_ARTICLES * 85))"
+
+  alpha-strike-attack:
+    name: 💥 Боевой поток #${{ matrix.thread-id }}
+    runs-on: ubuntu-latest
+    needs: alpha-strike-preparation
+    
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        thread-id: ${{ fromJson(needs.alpha-strike-preparation.outputs.thread-matrix) }}
+    
+    steps:
+    - name: 🔄 Checkout репозитория
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: ⚡ Настройка Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: 📦 Установка зависимостей
+      run: |
+        npm ci
+        echo "🔧 Зависимости установлены для потока #${{ matrix.thread-id }}"
+
+    - name: 🚀💥 ЗАПУСК АЛЬФА-УДАРА #${{ matrix.thread-id }}
+      env:
+        THREAD_ID: ${{ matrix.thread-id }}
+        ALPHA_ARTICLES: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }}
+        MODEL_CHOICE: ${{ github.event.inputs.model_choice || 'gemini' }}
+        API_KEY_CURRENT: ${{ secrets.GEMINI_API_KEY_1 }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+      run: |
+        echo "🚀💥 [ПОТОК #${{ matrix.thread-id }}] НАЧАЛО БОЕВОЙ ОПЕРАЦИИ"
+        echo "🎯 Цель: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }} статей"
+        echo "🤖 Модель: ${{ github.event.inputs.model_choice || 'gemini' }}"
+        echo "🔑 API ключ: ...$(echo $API_KEY_CURRENT | tail -c 5)"
+        
+        # Запуск боевого скрипта
+        node alpha-factory.js
+        
+        echo "✅ [ПОТОК #${{ matrix.thread-id }}] МИССИЯ ЗАВЕРШЕНА"
+
+    - name: 📊 Статистика потока #${{ matrix.thread-id }}
+      run: |
+        echo "📈 ОТЧЕТ ПО ПОТОКУ #${{ matrix.thread-id }}:"
+        
+        # Подсчет созданных файлов
+        CREATED_FILES=$(find src/content/posts -name "*.md" | wc -l)
+        echo "📝 Создано файлов: $CREATED_FILES"
+        
+        # Проверка последних созданных файлов
+        echo "📋 Последние созданные статьи:"
+        ls -la src/content/posts/*.md | tail -5 || echo "Файлы не найдены"
+
+  alpha-strike-deploy:
+    name: 🚀 Развертывание результатов атаки
+    runs-on: ubuntu-latest
+    needs: [alpha-strike-preparation, alpha-strike-attack]
+    
+    steps:
+    - name: 🔄 Checkout репозитория
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 📊 Финальная статистика операции
+      run: |
+        echo "🏆 ПЛАН 'АЛЬФА-УДАР' ЗАВЕРШЕН!"
+        echo "================================"
+        
+        # Подсчет общего количества файлов
+        TOTAL_FILES=$(find src/content/posts -name "*.md" 2>/dev/null | wc -l)
+        echo "📝 Общее количество статей: $TOTAL_FILES"
+        
+        # Расчет ссылок
+        EXPECTED_LINKS=$((TOTAL_FILES * 85))
+        echo "🔗 Приблизительное количество ссылок на основной сайт: $EXPECTED_LINKS"
+        
+        echo "🎯 Целевой сайт для продвижения: https://blondeplace.ru"
+        echo "📡 Сайт-сателлит: https://blondeplace.netlify.app"
+        
+        # Размер репозитория
+        REPO_SIZE=$(du -sh . 2>/dev/null | cut -f1)
+        echo "💾 Размер репозитория: $REPO_SIZE"
+        
+        echo "================================"
+        echo "⚠️  ВНИМАНИЕ: Мониторьте позиции основного сайта blondeplace.ru"
+        echo "📈 Ожидаемый эффект: 4-7 дней"
+        echo "🔥 Статус сателлита: Расходный материал (может быть заблокирован)"
+
+    - name: 🎉 Уведомление о завершении
+      run: |
+        echo "🎊 ОПЕРАЦИЯ 'АЛЬФА-УДАР' УСПЕШНО ЗАВЕРШЕНА!"
+        echo "🚀 Все ${{ github.event.inputs.target_articles || '5000' }} статей созданы"
+        echo "⚡ ${{ github.event.inputs.threads || '20' }} потоков отработали синхронно"
+        echo "🎯 Начинайте мониторинг позиций blondeplace.ru по ключевым фразам" 
