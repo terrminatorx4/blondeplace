@@ -11,7 +11,8 @@ const DIST_DIR = path.join(__dirname, 'dist');
 
 async function scanHtmlFiles(dir) {
     const urls = [];
-    const entries = await fs.readdir(dir, { withFileTypes: true });
+    try {
+        const entries = await fs.readdir(dir, { withFileTypes: true });
     
     for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
@@ -42,18 +43,18 @@ async function scanHtmlFiles(dir) {
             );
             
             if (shouldExclude) {
-                return; // Пропускаем этот URL
-            }
-            
-            // Формируем правильный URL
-            let url;
-            if (urlPath === '.' || urlPath === '') {
-                url = SITE_URL;
+                // Пропускаем этот URL, не добавляем в массив
             } else {
-                url = `${SITE_URL}/${urlPath}/`;
+                // Формируем правильный URL только если не исключён
+                let url;
+                if (urlPath === '.' || urlPath === '') {
+                    url = SITE_URL;
+                } else {
+                    url = `${SITE_URL}/${urlPath}/`;
+                }
+                
+                urls.push(url);
             }
-            
-            urls.push(url);
         } else if (entry.name.endsWith('.html') && !entry.name.startsWith('google') && !entry.name.startsWith('yandex') && !entry.name.includes('verification')) {
             // ОБРАБАТЫВАЕМ ДРУГИЕ HTML ФАЙЛЫ (исключая верификации)
             const relativePath = path.relative(DIST_DIR, fullPath);
@@ -65,6 +66,10 @@ async function scanHtmlFiles(dir) {
                 urls.push(url);
             }
         }
+    }
+    } catch (error) {
+        console.log(`⚠️ Ошибка при сканировании директории ${dir}: ${error.message}`);
+        return []; // Возвращаем пустой массив в случае ошибки
     }
     
     return urls;
