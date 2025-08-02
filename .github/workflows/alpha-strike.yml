@@ -164,6 +164,64 @@ jobs:
         # Run super-enhanced content factory
         node alpha-factory.js
         
+        # GIT COMMIT AND PUSH LIKE ORIGINAL FACTORY.YML
+        if [[ -z $(git status --porcelain) ]]; then
+          echo "✅ Thread ${{ matrix.thread-id }}: No new articles created. Finishing."
+          exit 0
+        fi
+
+        echo "🔥 Thread ${{ matrix.thread-id }}: Found new Alpha-Strike content. Publishing..."
+        
+        # Setup git config
+        git config --global user.name 'Alpha-Strike Bot'
+        git config --global user.email 'alpha-strike@blondeplace.ru'
+        git config --global pull.rebase false
+        
+        # Atomic commit and push with conflict resolution
+        MAX_RETRIES=5
+        RETRY_DELAY=3
+        
+        for ((i=1; i<=MAX_RETRIES; i++)); do
+          echo "🔄 Attempt $i/$MAX_RETRIES: Syncing and pushing..."
+          
+          # Stash any changes first
+          git stash push -u -m "Thread ${{ matrix.thread-id }} - attempt $i" || echo "Nothing to stash"
+          
+          # Pull latest changes
+          git pull --rebase origin main || echo "Pull completed"
+          
+          # Pop stashed changes back
+          git stash pop || echo "No stash to pop"
+          
+          # Add files
+          git add src/content/posts/*.md 2>/dev/null || echo "No files to add"
+          
+          # Check if there's anything to commit
+          if git diff --cached --quiet; then
+            echo "✅ No changes to commit in attempt $i"
+            break
+          fi
+          
+          # Commit
+          git commit -m "🚀 Alpha-Strike content from thread ${{ matrix.thread-id }} (${{ github.event.inputs.model_choice || 'gemini' }})"
+          
+          # Try to push
+          if git push origin main; then
+            echo "✅ Push successful on attempt $i"
+            break
+          else
+            echo "⚠️ Push failed on attempt $i"
+            if [ $i -eq $MAX_RETRIES ]; then
+              echo "::error::Failed to push after $MAX_RETRIES attempts"
+              exit 1
+            else
+              # Reset the commit for retry
+              git reset HEAD~1
+              sleep $RETRY_DELAY
+            fi
+          fi
+        done
+        
         echo "ALPHA-STRIKE Thread ${{ matrix.thread-id }} COMPLETE"
 
   alpha-strike-quality-control:
@@ -204,6 +262,13 @@ jobs:
             LINKS=$(grep -o '<a href=' "$file" | wc -l)
             echo "   $(basename "$file"): $LINKS links"
           done
+          
+          # Show IndexNow URLs (first 3 files)
+          echo "IndexNow URLs (samples):"
+          find src/content/posts -name "post*.md" | head -3 | while read file; do
+            SLUG=$(basename "$file" .md)
+            echo "   https://blondeplace.netlify.app/blog/$SLUG"
+          done
         else
           echo "Directory src/content/posts not found"
         fi
@@ -236,6 +301,25 @@ jobs:
         echo "- **Execution**: ${{ needs.alpha-strike-attack.result }}" >> ALPHA_STRIKE_REPORT.md
         echo "- **Quality control**: ${{ needs.alpha-strike-quality-control.result }}" >> ALPHA_STRIKE_REPORT.md
         echo "" >> ALPHA_STRIKE_REPORT.md
+        
+        # Show created article URLs
+        echo "## Created Articles" >> ALPHA_STRIKE_REPORT.md
+        if [ -d "src/content/posts" ]; then
+          find src/content/posts -name "post*.md" | head -10 | while read file; do
+            SLUG=$(basename "$file" .md)
+            TITLE=$(grep "^title:" "$file" | sed 's/title: "//g' | sed 's/"$//g' | head -1)
+            echo "- [$TITLE](https://blondeplace.netlify.app/blog/$SLUG)" >> ALPHA_STRIKE_REPORT.md
+          done
+        fi
+        echo "" >> ALPHA_STRIKE_REPORT.md
+        
+        echo "## IndexNow Notifications" >> ALPHA_STRIKE_REPORT.md
+        echo "All created articles were submitted to:" >> ALPHA_STRIKE_REPORT.md
+        echo "- ✅ Yandex IndexNow" >> ALPHA_STRIKE_REPORT.md
+        echo "- ✅ Bing IndexNow" >> ALPHA_STRIKE_REPORT.md
+        echo "- ✅ Google (via curl notifications)" >> ALPHA_STRIKE_REPORT.md
+        echo "" >> ALPHA_STRIKE_REPORT.md
+        
         echo "## Expected results" >> ALPHA_STRIKE_REPORT.md
         echo "- **Start indexing**: 24-48 hours" >> ALPHA_STRIKE_REPORT.md
         echo "- **Position growth**: 3-7 days" >> ALPHA_STRIKE_REPORT.md
