@@ -85,6 +85,11 @@ jobs:
 
           echo "Thread ${{ matrix.thread-id }}: Found new Alpha-Strike content. Publishing..."
           
+          # СЯ  Я Я GIT RACE CONDITIONS
+          RANDOM_DELAY=$((RANDOM % 30 + 5))
+          echo "Thread ${{ matrix.thread-id }}: Waiting ${RANDOM_DELAY}s to avoid git conflicts..."
+          sleep ${RANDOM_DELAY}
+          
           # Setup git config
           git config --global user.name 'Alpha-Strike Bot'
           git config --global user.email 'alpha-strike@blondeplace.ru'
