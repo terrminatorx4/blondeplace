@@ -87,18 +87,37 @@ const ARTICLE_TEMPLATES = [
     "полное руководство", "экспертное мнение", "профессиональные советы"
 ];
 
-// --- ИНИЦИАЛИЗАЦИЯ ---
+// --- ИСПРАВЛЕННАЯ ИНИЦИАЛИЗАЦИЯ API КЛЮЧЕЙ ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
-// олучаем ключ из пула
-const apiKeysPool = process.env.API_KEY_CURRENT || '';
-const apiKeysArray = apiKeysPool.includes(',') ? apiKeysPool.split(',') : [apiKeysPool];
-const apiKey = apiKeysArray[threadId % apiKeysArray.length].trim();
-const targetArticles = parseInt(process.env.ALPHA_ARTICLES, 10) || 30;
 
-if (!apiKey) {
-    throw new Error(`[АЛЬФА-УДАР #${threadId}] Не был предоставлен API-ключ!`);
+// ИСПРАВЛЕНИЕ #1: Правильная обработка пула ключей с распределением
+const apiKeysPool = process.env.API_KEY_CURRENT || '';
+
+if (!apiKeysPool) {
+    throw new Error(`[АЛЬФА-УДАР #${threadId}] Пул API ключей пустой!`);
 }
+
+// Разделяем ключи и убираем пустые элементы
+const apiKeysArray = apiKeysPool.split(',').map(key => key.trim()).filter(key => key.length > 0);
+
+if (apiKeysArray.length === 0) {
+    throw new Error(`[АЛЬФА-УДАР #${threadId}] В пуле нет валидных API ключей!`);
+}
+
+// ИСПРАВЛЕНИЕ #2: Гарантированное распределение ключей между потоками
+let apiKey;
+if (apiKeysArray.length === 1) {
+    // Если только один ключ - добавляем задержку между потоками
+    apiKey = apiKeysArray[0];
+    console.log(`[⚠️] [АЛЬФА-УДАР #${threadId}] ВНИМАНИЕ: Использую единственный ключ с задержкой`);
+} else {
+    // Равномерное распределение ключей
+    apiKey = apiKeysArray[threadId % apiKeysArray.length];
+    console.log(`[🔑] [АЛЬФА-УДАР #${threadId}] Использую ключ #${(threadId % apiKeysArray.length) + 1} из ${apiKeysArray.length}`);
+}
+
+const targetArticles = parseInt(process.env.ALPHA_ARTICLES, 10) || 30;
 
 console.log(`🚀💥 [АЛЬФА-УДАР #${threadId}] Инициализация боевой системы v4.0 с ключом ...${apiKey.slice(-4)}`);
 console.log(`🎯 [АЛЬФА-УДАР #${threadId}] Цель: ${targetArticles} статей с 85+ ссылками каждая`);
@@ -111,7 +130,7 @@ const GEMINI_MODEL_NAME = "gemini-2.5-flash";
 // --- АДАПТИВНАЯ СИСТЕМА СКОРОСТИ v4.0 ---
 class AdaptiveSpeedController {
     constructor() {
-        this.baseDelay = 100;
+        this.baseDelay = apiKeysArray.length === 1 ? 1000 : 100; // Больше задержка для одного ключа
         this.currentDelay = this.baseDelay;
         this.errorCount = 0;
         this.successCount = 0;
@@ -122,8 +141,8 @@ class AdaptiveSpeedController {
         this.successCount++;
         this.errorCount = Math.max(0, this.errorCount - 1);
         
-        // Ускоряемся при успехах
-        if (this.successCount % 5 === 0 && this.currentDelay > 50) {
+        // Ускоряемся при успехах (только если несколько ключей)
+        if (apiKeysArray.length > 1 && this.successCount % 5 === 0 && this.currentDelay > 50) {
             this.currentDelay = Math.max(50, this.currentDelay * 0.9);
             console.log(`[⚡] [АЛЬФА-УДАР #${threadId}] Ускорение: ${this.currentDelay}мс`);
         }
@@ -134,7 +153,7 @@ class AdaptiveSpeedController {
         this.lastErrorTime = Date.now();
         
         // Замедляемся при ошибках
-        this.currentDelay = Math.min(2000, this.currentDelay * 1.5);
+        this.currentDelay = Math.min(5000, this.currentDelay * 1.5);
         console.log(`[🐌] [АЛЬФА-УДАР #${threadId}] Замедление: ${this.currentDelay}мс`);
     }
 
@@ -292,13 +311,14 @@ function createSmartUniqueDescription(keyword, postNumber) {
     return result || `${keyword} в BlondePlace! Запись: ${postNumber}.`;
 }
 
-// --- АДАПТИВНАЯ ГЕНЕРАЦИЯ С ПОВТОРАМИ v4.0 ---
+// --- ИСПРАВЛЕННАЯ ГЕНЕРАЦИЯ С ПОВТОРАМИ v4.0 ---
 async function generateWithAdaptiveRetry(prompt, maxRetries = 3) {
     let delay = speedController.getDelay();
     
     for (let i = 0; i < maxRetries; i++) {
         try {
             if (modelChoice === 'deepseek') {
+                // ИСПРАВЛЕНИЕ #3: Чистые HTTP заголовки без проблемных символов
                 const response = await fetch(OPENROUTER_API_URL, {
                     method: 'POST',
                     headers: {
