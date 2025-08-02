@@ -1,4 +1,4 @@
-name: ALPHA-STRIKE v5.9-PERFECT-SEO
+name: ALPHA-STRIKE v5.10-BUTLER-STRATEGY
 
 on:
   workflow_dispatch:
@@ -106,64 +106,78 @@ jobs:
           echo "MODEL_CHOICE=openrouter" >> $GITHUB_ENV
         fi
 
-    - name: ALPHA-STRIKE GENERATION v5.9
+    - name: ALPHA-STRIKE GENERATION v5.10
       run: |
         echo "🎯 ЭСКАДРОН #${{ matrix.thread-id }}: Начинаю Alpha-Strike атаку!"
         echo "📊 Статей на поток: ${{ needs.prepare-matrix.outputs.articles-per-thread }}"
         echo "🤖 Модель: ${{ github.event.inputs.model_choice }}"
         echo "🎯 SEO: PERFECT (Title: 40-45, Description: 150-164, Keywords: ✅)"
+        echo "🤖 Git стратегия: BUTLER STASH (БЕЗ случайных задержек!)"
         export THREAD_ID=${{ matrix.thread-id }}
         export TARGET_ARTICLES=${{ needs.prepare-matrix.outputs.articles-per-thread }}
         node alpha-factory.js
 
-    - name: SMART GIT OPERATIONS (УПРОЩЁННЫЕ)
+    - name: BUTLER GIT STRATEGY (БЕЗ RACE PROTECTION!)
       run: |
-        # Настройка Git
-        git config --local user.email "action@github.com"
-        git config --local user.name "Alpha-Strike Bot v5.9"
+        # Настройка Git как в Butler
+        git config --global user.name 'Alpha-Strike Bot v5.10'
+        git config --global user.email 'actions-bot@github.com'
+        git config --global pull.rebase false
         
-        # УПРОЩЁННАЯ ЗАЩИТА ОТ RACE CONDITIONS (БЕЗ АГРЕССИВНЫХ ЗАДЕРЖЕК)
-        RANDOM_DELAY=$((RANDOM % 15 + 5))  # 5-20 секунд вместо 30-120
-        echo "🛡️ Thread ${{ matrix.thread-id }}: Простая защита от race - ждём ${RANDOM_DELAY}s..."
-        sleep ${RANDOM_DELAY}
+        echo "🤖 Thread ${{ matrix.thread-id }}: Использую BUTLER git стратегию..."
         
-        # SMART-RETRY МЕХАНИЗМ (5 попыток вместо 10)
-        for attempt in {1..5}; do
-          echo "🔄 Thread ${{ matrix.thread-id }}: Git push попытка $attempt/5"
+        # Проверяем есть ли изменения
+        if [[ -z $(git status --porcelain) ]]; then
+          echo "✅ Thread ${{ matrix.thread-id }}: Нет изменений для commit"
+          exit 0
+        fi
+        
+        echo "🔥 Thread ${{ matrix.thread-id }}: Обнаружены новые файлы. BUTLER стратегия..."
+        
+        # BUTLER GIT STRATEGY (ATOMIC LOCK)
+        MAX_RETRIES=5
+        RETRY_DELAY=5  # Фиксированная задержка как в Butler
+        
+        for ((i=1; i<=MAX_RETRIES; i++)); do
+          echo "🔄 Thread ${{ matrix.thread-id }}: Butler git попытка $i/$MAX_RETRIES"
           
-          # Простая стратегия push
-          git pull --rebase origin main || true
+          # 1. Добавляем файлы в staging (КАК В BUTLER)
+          git add src/content/posts/*.md
           
-          # Добавляем изменения
-          git add src/content/posts/ || true
+          # 2. Stash изменения для чистого pull (КЛЮЧЕВАЯ BUTLER СТРАТЕГИЯ!)
+          git stash push -m "Thread ${{ matrix.thread-id }} - attempt $i"
           
-          # Проверяем есть ли что коммитить
-          if git diff --staged --quiet; then
-            echo "✅ Thread ${{ matrix.thread-id }}: Нет изменений для commit"
-            break
-          fi
+          # 3. Делаем pull БЕЗ rebase (КАК В BUTLER)
+          git pull origin main
           
-          # Коммит с уникальным сообщением
-          git commit -m "🎯 Alpha-Strike v5.9 PERFECT-SEO: Thread ${{ matrix.thread-id }} - $(date)" || true
+          # 4. Возвращаем изменения (КАК В BUTLER)
+          git stash pop || echo "Stash already applied"
           
-          # Пробуем push
-          if git push origin main; then
-            echo "✅ Thread ${{ matrix.thread-id }}: Git push успешен на попытке $attempt!"
+          # 5. Добавляем файлы снова на случай конфликтов (КАК В BUTLER)
+          git add src/content/posts/*.md
+          
+          # 6. Коммитим (КАК В BUTLER)
+          git commit -m "🎯 Alpha-Strike v5.10 BUTLER: Thread ${{ matrix.thread-id }} - $(date)" || echo "Nothing to commit"
+          
+          # 7. Push (КАК В BUTLER)
+          if git push; then
+            echo "✅ Thread ${{ matrix.thread-id }}: Butler git push успешен на попытке $i!"
             break
           else
-            echo "⚠️ Thread ${{ matrix.thread-id }}: Git push неудачен, попытка $attempt"
-            if [ $attempt -eq 5 ]; then
-              echo "❌ Thread ${{ matrix.thread-id }}: Все 5 попыток исчерпаны"
+            if [ "$i" -eq "$MAX_RETRIES" ]; then
+              echo "❌ Thread ${{ matrix.thread-id }}: Все $MAX_RETRIES Butler попыток исчерпаны"
               exit 1
             fi
-            # Короткая задержка между попытками
-            sleep $((RANDOM % 10 + 5))
+            echo "⚠️ Thread ${{ matrix.thread-id }}: Butler git push неудачен, попытка $i"
+            # 8. Откат коммита и retry (КАК В BUTLER!)
+            git reset --hard HEAD~1
+            sleep $RETRY_DELAY
           fi
         done
 
     - name: REPORT GENERATION  
       run: |
-        echo "✅ ЭСКАДРОН #${{ matrix.thread-id }}: Alpha-Strike v5.9 миссия завершена!"
+        echo "✅ ЭСКАДРОН #${{ matrix.thread-id }}: Alpha-Strike v5.10 BUTLER миссия завершена!"
         echo "🎯 Model: ${{ github.event.inputs.model_choice }}"
         echo "📊 Target articles: ${{ needs.prepare-matrix.outputs.articles-per-thread }}"
         echo "🎯 SEO: PERFECT OPTIMIZATION"
