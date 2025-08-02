@@ -1,4 +1,4 @@
-// айл: alpha-factory.js (Alpha-Strike v5.3 - ЬЯ  С 8 Ы С)
+// айл: alpha-factory.js (Alpha-Strike v5.4 - ЬЫ 8  +  С)
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
@@ -15,16 +15,16 @@ const INDEXNOW_API_KEY = 'df39150ca56f896546628ae3c923dd4a';
 const TARGET_URL_MAIN = "https://blondeplace.ru";
 const POSTS_DIR = 'src/content/posts';
 
-// 🎯 ALPHA-STRIKE: 8 ЫХ С Я 5-10 ТЫСЯ ЬЫХ СТТ
+// 🎯 ЬЫ 8 ЫХ С   Ь-
 const ALPHA_KEYWORDS = [
     "бьюти коворкинг",
-    "салон красоты", 
-    "косметология",
-    "маникюр педикюр",
-    "парикмахерская",
-    "эстетическая косметология",
-    "spa процедуры",
-    "красота и здоровье"
+    "аренда парикмахерского кресла",
+    "коворкинг для мастера",
+    "места в аренду",
+    "кресло для мастера",
+    "салон красоты",
+    "мелирование",
+    "тотал блонд"
 ];
 
 // --- СТ  ---
@@ -122,11 +122,11 @@ async function isUrlAccessible(url) {
     }
 }
 
-// 🎯 Я ЬЫХ СТТ   С
+// 🎯 Я ЬЫХ СТТ   С (СЯ СЯ)
 async function generatePost(keyword, postNumber) {
     console.log(`[TASK] [ALPHA-STRIKE #${threadId}] енерирую уникальную статью #${postNumber} по ключу: ${keyword}`);
     
-    // 🎯 С-ТЬЫ  С ЬСТЬ
+    //  FACTORY.JS: ХТЯ Я - С 
     const planPrompt = `Создай максимально детальный, многоуровневый план для экспертной SEO-статьи на тему "${keyword}". 
 
 Т: Статья должна быть Ь и отличаться от других статей по этой же теме!
@@ -145,7 +145,7 @@ async function generatePost(keyword, postNumber) {
 
     const plan = await generateWithRetry(planPrompt);
 
-    // 🎯 Я Ь ТТ
+    //  FACTORY.JS: Я  СТТЬ    
     const articlePrompt = `апиши исчерпывающую, экспертную статью объемом  15000 символов по этому плану:
 
 ${plan}
@@ -157,14 +157,13 @@ ${plan}
 - обавь списки, таблицы сравнения, пошаговые инструкции
 - бязательно включи FAQ секцию в конце  
 - иши от лица экспертов салона красоты ${BRAND_NAME}
--  используй слова типа "конечно", "вот статья" и другие вводные фразы
--  дублируй TITLE и DESCRIPTION в тексте
--  СТТЬ С С  
-- спользуй профессиональную терминологию
-- аждый раздел должен содержать практическую ценность
-- избегай частого повторения одних слов, используй синонимы и разнообразную лексику для снижения тошноты текста
+- спользуй профессиональную терминологию, но объясняй сложные понятия
+- Строго следуй плану и используй правильные Markdown заголовки (# ## ###)
+-  добавляй изображения ![...], ссылки, URL-адреса
+- ачинай сразу с заголовка H1
+- : избегай частого повторения одних слов, используй синонимы и разнообразную лексику для снижения тошноты текста
 
-: ачинай ответ сразу с заголовка H1 (# аголовок).  СЯХ вводных слов!
+Ъ: минимум 15000 символов - это критически важно!
 
 Тема статьи: ${keyword}
 онтекст: экспертный блог салона красоты ${BRAND_NAME}
@@ -173,7 +172,24 @@ ${plan}
 
     let articleText = await generateWithRetry(articlePrompt);
 
-    // С-СТЯ СТ ( Я ССЫ!)
+    //  Ы   С  (  FACTORY.JS)
+    if (articleText.length < 12000) {
+        const extensionPrompt = `асширь статью "${keyword}". обавь:
+        - ольше практических примеров
+        - етальные пошаговые инструкции  
+        - Советы от экспертов
+        - астые ошибки и как их избежать
+        - ополнительные подразделы
+        
+        Текущая статья:
+        ${articleText}
+        
+        величь объем минимум в 1.5 раза, сохраняя экспертность и структуру.`;
+        
+        articleText = await generateWithRetry(extensionPrompt);
+    }
+
+    // 🔥 С-СТЯ СТ   FACTORY.JS ( Я ССЫ!)
     articleText = articleText.replace(/^.*?вот\s+(исчерпывающая|экспертная|подробная)?\s*(статья|руководство|гид).*$/gmi, "");
     articleText = articleText.replace(/^.*?конечно,?\s*/gmi, "");
     articleText = articleText.replace(/\*\*title:\*\*.*$/gmi, "");
@@ -183,26 +199,25 @@ ${plan}
     articleText = articleText.replace(/^description:\s*.*/gmi, "");
     articleText = articleText.replace(/^content:\s*.*/gmi, "");
     articleText = articleText.replace(/!\[.*?\]\(.*?\)/g, '');
+    articleText = articleText.replace(/\[.*?\]\([^\)]*\)/g, '');
     articleText = articleText.replace(/https?:\/\/[^\s\)\]]+/g, '');
+    articleText = articleText.replace(/www\.[^\s]+/g, '');
     articleText = articleText.trim();
 
-    // 🎯 Я ЬЫХ SEO DATA
-    const seoPrompt = `Создай SEO оптимизированные данные для Ь статьи на тему "${keyword}".
+    // 🎯 Я ЬЫХ SEO DATA  
+    const seoPrompt = `ля статьи на тему "${keyword}" сгенерируй JSON-объект. ТС : ответ ТЬ валидный JSON.
 
-Т: аголовок и описание должны быть ЬЫ и отличаться от других статей по этой же теме!
-
-ерни СТ в формате JSON:
-{
-  "title": "ЬЫ SEO заголовок (40-50 символов) с экспертным подходом",
-  "description": "Ь SEO описание (150-160 символов) с практической ценностью", 
-  "keywords": "ключевые слова через запятую",
-  "heroImage": "https://images.unsplash.com/photo-[подходящее изображение по теме]"
-}
+JSON должен содержать: 
+- "title" (длиной 40-45 символов, включи основное ключевое слово,  )
+- "description" (длиной 150-164 символа, продающий, с призывом к действию) 
+- "keywords" (СТ 5-7 ключевых слов через запятую, СЬ релевантных теме)
+- "heroImage" (URL изображения с Unsplash подходящего по теме)
 
 ТС требования к title:
 -  быть ЬЫ и экспертным
 -  банальный, а с изюминкой
-- римеры: "Секреты {keyword}: инсайды от топ-мастеров", "{keyword} 2024: революционные техники", "ак выбрать {keyword}: экспертный чек-лист"
+-    !
+- римеры: "Секреты ${keyword}: инсайды от топ-мастеров", "${keyword} 2024: революционные техники", "ак выбрать ${keyword}: экспертный чек-лист"
 
 ТС требования к description:
 -  быть ЬЫ и содержательным  
@@ -215,7 +230,7 @@ ${plan}
 - окусируйся на Т процедуре/технике
 
 онтекст: блог салона красоты ${BRAND_NAME}.
-омер статьи: #${postNumber} (для уникальности)`;
+омер статьи: #${postNumber} (для уникальности, но  включай в title)`;
 
     let seoText = await generateWithRetry(seoPrompt);
     const match = seoText.match(/\{[\s\S]*\}/);
@@ -229,7 +244,7 @@ ${plan}
     const isImageOk = await isUrlAccessible(seoData.heroImage);
     const finalHeroImage = isImageOk ? seoData.heroImage : FALLBACK_IMAGE_URL;
 
-    // Я СХ HOWTO С ТЫ Т
+    // Я СХ HOWTO С ТЫ Т (  FACTORY.JS)
     const fullSchema = {
         "@context": "https://schema.org", 
         "@type": "HowTo",
@@ -266,21 +281,21 @@ ${plan}
         }
     };
 
-    // нтегрируем ссылки (С очистки!)
+    // 🔗 ЬЫ URL   Ь-
     const targetUrls = [
-        `${TARGET_URL_MAIN}/uslugi/okrashivanie-volos`,
-        `${TARGET_URL_MAIN}/uslugi/strizhki-ukladki`,
-        `${TARGET_URL_MAIN}/uslugi/manicure-pedicure`,
-        `${TARGET_URL_MAIN}/uslugi/kosmetologia`,
-        `${TARGET_URL_MAIN}/about`,
-        `${TARGET_URL_MAIN}/contacts`,
-        `${TARGET_URL_MAIN}/portfolio`,
-        `${TARGET_URL_MAIN}/ceny`,
-        `${TARGET_URL_MAIN}/akcii`,
-        `${TARGET_URL_MAIN}/blog`
+        `${TARGET_URL_MAIN}/#about`,
+        `${TARGET_URL_MAIN}/#services`,
+        `${TARGET_URL_MAIN}/#discount`,
+        `${TARGET_URL_MAIN}/#why`,
+        `${TARGET_URL_MAIN}/#coworking`,
+        `${TARGET_URL_MAIN}/#masters`,
+        `${TARGET_URL_MAIN}/#comments`,
+        `${TARGET_URL_MAIN}/#brands`,
+        `${TARGET_URL_MAIN}/#news`,
+        `${TARGET_URL_MAIN}`
     ];
 
-    // ставляем 85 ссылок
+    // СТЯ 85 ССЫ (С СТ!)
     const words = articleText.split(' ');
     let linkCount = 0;
     const targetLinkCount = 85;
@@ -298,7 +313,7 @@ ${plan}
     const finalContent = words.join(' ');
     console.log(`[LINKS] [ALPHA-STRIKE #${threadId}] ставлено ${linkCount} ссылок (внешних: ${linkCount}, внутренних: 0)`);
 
-    // FRONTMATTER С SCHEMA.ORG
+    // FRONTMATTER С SCHEMA.ORG (  FACTORY.JS)
     const frontmatter = `---
 title: ${JSON.stringify(seoData.title)}
 description: ${JSON.stringify(seoData.description)}
@@ -307,9 +322,6 @@ pubDate: ${JSON.stringify(new Date().toISOString())}
 author: ${JSON.stringify(BRAND_AUTHOR_NAME)}
 heroImage: ${JSON.stringify(finalHeroImage)}
 schema: ${JSON.stringify(fullSchema)}
-tags: ["beauty-tips"]
-category: "beauty-tips"
-slug: "post${postNumber}"
 ---
 ${finalContent}
 `;
@@ -322,6 +334,7 @@ ${finalContent}
     console.log(`[DONE] [ALPHA-STRIKE #${threadId}] Статья #${postNumber} создана: "${seoData.title}"`);
     console.log(`[META] Title: ${seoData.title.length} символов, Description: ${seoData.description.length} символов`);
     console.log(`[SCHEMA] Schema.org HowTo с рейтингом ${ratingValue} (${reviewCount} отзывов)`);
+    console.log(`[IMAGE] зображение: ${finalHeroImage}`);
     
     // IndexNow уведомление
     const articleUrl = `${SITE_URL}/blog/post${postNumber}`;
@@ -350,16 +363,17 @@ async function notifyIndexNow(url) {
     }
 }
 
-// �� ЬЯ  ALPHA-STRIKE С 8 Ы С
+// 🎯 ЬЯ  ALPHA-STRIKE С ЬЫ 8 Ы С
 async function main() {
-    console.log(`[INIT] [ALPHA-STRIKE #${threadId}] нициализация боевой системы v5.3 с ключом ...${apiKey.slice(-4)}`);
+    console.log(`[INIT] [ALPHA-STRIKE #${threadId}] нициализация боевой системы v5.4 с ключом ...${apiKey.slice(-4)}`);
 
     try {
         const targetArticles = parseInt(process.env.TARGET_ARTICLES, 10) || 1;
         
-        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] ===  С v5.3 ===`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] ===  С v5.4 ===`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] ель: ${targetArticles} уникальных статей`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] лючевые слова: ${ALPHA_KEYWORDS.length} шт`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] равильные ключи: ${ALPHA_KEYWORDS.join(', ')}`);
 
         const startNumber = threadId * 1000;
         console.log(`[NUMBERS] [ALPHA-STRIKE #${threadId}] ачинаю нумерацию с: ${startNumber}`);
@@ -390,7 +404,7 @@ async function main() {
             }
         }
 
-        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === ССЯ v5.3 Ш ===`);
+        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === ССЯ v5.4 Ш ===`);
         console.log(`[STATS] Создано статей: ${createdArticles}`);
         console.log(`[STATS] бщее количество ссылок на основной сайт: ~${totalLinks}`);
         console.log(`[STATS] инальная скорость: ${baseDelay}мс`);
