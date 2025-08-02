@@ -26,23 +26,24 @@ const ALPHA_KEYWORDS = [
     "тотал блонд"
 ];
 
-// --- СИНОНИМЫ ДЛЯ УНИКАЛИЗАЦИИ ---
+// --- РАСШИРЕННЫЕ СИНОНИМЫ ДЛЯ МАКСИМАЛЬНОЙ УНИКАЛИЗАЦИИ ---
 const SYNONYMS = {
-    "аренда": ["сдача", "наем", "прокат", "бронирование", "съем", "лизинг", "найм", "резерв", "временное пользование", "заказ"],
-    "кресло": ["место", "рабочая зона", "стол мастера", "рабочее место", "позиция", "кабинет", "станция", "локация", "спот", "точка"],
-    "мастер": ["специалист", "парикмахер", "стилист", "профессионал", "эксперт", "визажист", "бьютимастер", "косметолог", "nail-мастер", "бьюти-специалист"],
-    "коворкинг": ["рабочее пространство", "beauty-пространство", "студия", "центр", "офис", "спейс", "хаб", "зона", "площадка", "локация"],
-    "места": ["локации", "помещения", "зоны", "пространства", "кабинеты", "студии", "точки", "позиции", "станции", "области"],
+    "аренда": ["сдача", "наем", "прокат", "бронирование", "съем", "лизинг", "найм", "резерв", "временное пользование", "заказ", "предоставление", "получение"],
+    "кресло": ["место", "рабочая зона", "стол мастера", "рабочее место", "позиция", "кабинет", "станция", "локация", "спот", "точка", "зона работы", "пространство"],
+    "мастер": ["специалист", "парикмахер", "стилист", "профессионал", "эксперт", "визажист", "бьютимастер", "косметолог", "nail-мастер", "бьюти-специалист", "мастер красоты"],
+    "коворкинг": ["рабочее пространство", "beauty-пространство", "студия", "центр", "офис", "спейс", "хаб", "зона", "площадка", "локация", "пространство", "центр красоты"],
+    "места": ["локации", "помещения", "зоны", "пространства", "кабинеты", "студии", "точки", "позиции", "станции", "области", "территории", "участки"],
     "салон": ["студия красоты", "beauty-центр", "студия", "центр красоты", "клиника красоты", "бьюти-студия", "spa-центр", "косметологический центр", "beauty-салон", "эстетический центр"],
-    "мелирование": ["осветление", "колорирование", "окрашивание", "блондирование", "тонирование", "обесцвечивание", "высветление", "омбре", "балаяж", "шатуш"],
+    "мелирование": ["осветление", "колорирование", "окрашивание", "блондирование", "тонирование", "обесцвечивание", "высветление", "омбре", "балаяж", "шатуш", "окраска", "покраска"],
     "тотал блонд": ["полное блондирование", "платиновый блонд", "ультра блонд", "белый блонд", "экстремальный блонд", "total blonde", "радикальный блонд", "ледяной блонд", "полное осветление", "максимальный блонд"]
 };
 
-// --- МОДИФИКАТОРЫ ДЛЯ ЗАГОЛОВКОВ ---
+// --- МОДИФИКАТОРЫ ДЛЯ ЗАГОЛОВКОВ (ИСПРАВЛЕНЫ) ---
 const TITLE_MODIFIERS = [
     "2025", "срочно", "сегодня", "сейчас", "премиум", "элитный", "профессиональный", "современный",
     "выгодно", "удобно", "комфортно", "стильно", "центр", "метро", "удобная локация", "без депозита",
-    "под ключ", "со всем оборудованием", "мебелированное", "для начинающих", "для опытных мастеров"
+    "под ключ", "со всем оборудованием", "мебелированное", "для начинающих", "для опытных мастеров",
+    "топ качество", "лучшие условия", "эксклюзив", "VIP", "бизнес класс"
 ];
 
 const DESCRIPTION_MODIFIERS = [
@@ -68,7 +69,7 @@ const TARGET_URLS = [
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
 const apiKey = process.env.API_KEY_CURRENT;
-const targetArticles = parseInt(process.env.ALPHA_ARTICLES, 10) || 250; // 250 статей на поток при 20 потоках = 5000
+const targetArticles = parseInt(process.env.ALPHA_ARTICLES, 10) || 250;
 
 if (!apiKey) {
     throw new Error(`[АЛЬФА-УДАР #${threadId}] Не был предоставлен API-ключ!`);
@@ -82,8 +83,12 @@ const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
 const GEMINI_MODEL_NAME = "gemini-2.5-flash";
 
-// --- БАЗА УНИКАЛЬНЫХ ЗАГОЛОВКОВ ---
-let usedTitles = new Set();
+// --- ГЛОБАЛЬНАЯ УНИКАЛИЗАЦИЯ ПО ВРЕМЕНИ + ПОТОКУ ---
+function generateUniqueId() {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substr(2, 5);
+    return `${threadId}_${timestamp}_${random}`;
+}
 
 function generateVariation(keyword) {
     const words = keyword.split(' ');
@@ -91,7 +96,7 @@ function generateVariation(keyword) {
     
     for (const word of words) {
         const cleanWord = word.toLowerCase();
-        if (SYNONYMS[cleanWord] && Math.random() > 0.6) {
+        if (SYNONYMS[cleanWord] && Math.random() > 0.5) {
             const synonyms = SYNONYMS[cleanWord];
             result += synonyms[Math.floor(Math.random() * synonyms.length)] + ' ';
         } else {
@@ -102,34 +107,59 @@ function generateVariation(keyword) {
     return result.trim();
 }
 
-function createUniqueTitle(baseKeyword, attempt = 1) {
-    if (attempt > 50) {
-        return `${baseKeyword} ${Math.random().toString(36).substr(2, 5)}`;
-    }
-    
+// УЛУЧШЕННАЯ СИСТЕМА УНИКАЛЬНЫХ ЗАГОЛОВКОВ (БЕЗ КОЛЛИЗИЙ)
+function createGloballyUniqueTitle(baseKeyword, postNumber) {
     const variation = generateVariation(baseKeyword);
     const modifier = TITLE_MODIFIERS[Math.floor(Math.random() * TITLE_MODIFIERS.length)];
-    const emoji = ['⭐', '🔥', '💎', '✨', '🎯'][Math.floor(Math.random() * 5)];
+    const uniqueId = generateUniqueId();
     
-    const title = `${variation}: ${modifier} ${emoji}`;
+    // Включаем номер поста для 100% уникальности
+    const title = `${variation}: ${modifier} #${postNumber}`;
     
-    if (title.length > 55 || usedTitles.has(title.toLowerCase())) {
-        return createUniqueTitle(baseKeyword, attempt + 1);
+    // Обрезаем до 45 символов, сохраняя целые слова
+    if (title.length <= 45) {
+        return title;
     }
     
-    usedTitles.add(title.toLowerCase());
-    return title;
+    const words = title.split(' ');
+    let result = '';
+    for (const word of words) {
+        if (result.length + word.length + 1 <= 45) {
+            result += (result ? ' ' : '') + word;
+        } else {
+            break;
+        }
+    }
+    
+    return result || `${baseKeyword} #${postNumber}`;
 }
 
-function createUniqueDescription(keyword) {
+function createGloballyUniqueDescription(keyword, postNumber) {
     const modifier = DESCRIPTION_MODIFIERS[Math.floor(Math.random() * DESCRIPTION_MODIFIERS.length)];
     const variation = generateVariation(keyword);
     
-    return `${modifier} ${variation} в BlondePlace! Профессиональное оборудование, удобная локация, выгодные условия. Звоните прямо сейчас!`;
+    const description = `${modifier} ${variation} в BlondePlace! Профессиональное оборудование, удобная локация, выгодные условия. Звоните прямо сейчас! #${postNumber}`;
+    
+    // Обрезаем до 164 символов, сохраняя целые слова
+    if (description.length <= 164) {
+        return description;
+    }
+    
+    const words = description.split(' ');
+    let result = '';
+    for (const word of words) {
+        if (result.length + word.length + 1 <= 164) {
+            result += (result ? ' ' : '') + word;
+        } else {
+            break;
+        }
+    }
+    
+    return result || `${keyword} в BlondePlace! Звоните сейчас!`;
 }
 
 async function generateWithRetry(prompt, maxRetries = 3) {
-    let delay = 2000; // Быстрее для Альфа-Удар
+    let delay = 2000;
     
     for (let i = 0; i < maxRetries; i++) {
         try {
@@ -173,10 +203,9 @@ async function generateWithRetry(prompt, maxRetries = 3) {
     }
 }
 
-// АГРЕССИВНАЯ ГЕНЕРАЦИЯ ССЫЛОК (70-100 НА СТАТЬЮ)
-function generateMassiveLinks(keyword, articleText) {
+// БЕЗОПАСНАЯ ГЕНЕРАЦИЯ ССЫЛОК (НЕ ЛОМАЕТ ЗАГОЛОВКИ)
+function generateMassiveLinksSecure(keyword, articleText) {
     const numLinks = 75 + Math.floor(Math.random() * 25); // 75-100 ссылок
-    let linkifiedText = articleText;
     
     // Анкоры для ссылок
     const anchorTemplates = [
@@ -192,27 +221,34 @@ function generateMassiveLinks(keyword, articleText) {
         `записаться на ${keyword}`
     ];
     
-    const sentences = linkifiedText.split('. ');
-    const linksPerSentence = Math.ceil(numLinks / sentences.length);
+    // Разделяем на заголовки и обычный текст
+    const lines = articleText.split('\n');
+    let processedLines = [];
+    let addedLinks = 0;
     
-    for (let i = 0; i < sentences.length && numLinks > 0; i++) {
-        const sentence = sentences[i];
-        const wordsInSentence = sentence.split(' ');
+    for (const line of lines) {
+        // НЕ добавляем ссылки в заголовки (начинающиеся с #)
+        if (line.trim().startsWith('#') || addedLinks >= numLinks) {
+            processedLines.push(line);
+            continue;
+        }
         
-        for (let j = 0; j < linksPerSentence && j < wordsInSentence.length - 2; j++) {
+        // Добавляем ссылки только в обычные абзацы
+        if (line.trim().length > 50 && Math.random() > 0.7) {
             const targetUrl = TARGET_URLS[Math.floor(Math.random() * TARGET_URLS.length)];
             const anchor = anchorTemplates[Math.floor(Math.random() * anchorTemplates.length)];
             
-            // Вставляем ссылку в случайное место предложения
-            const insertPos = Math.floor(Math.random() * (wordsInSentence.length - 2)) + 1;
-            wordsInSentence.splice(insertPos, 0, `<a href="${targetUrl}" target="_blank">${anchor}</a>`);
+            // Добавляем ссылку в конец абзаца
+            const linkedLine = `${line} Узнайте больше о <a href="${targetUrl}" target="_blank">${anchor}</a>.`;
+            processedLines.push(linkedLine);
+            addedLinks++;
+        } else {
+            processedLines.push(line);
         }
-        
-        sentences[i] = wordsInSentence.join(' ');
     }
     
-    console.log(`[💥] [АЛЬФА-УДАР #${threadId}] Вставлено ~${numLinks} ссылок на основной сайт`);
-    return sentences.join('. ');
+    console.log(`[💥] [АЛЬФА-УДАР #${threadId}] Вставлено ${addedLinks} ссылок на основной сайт`);
+    return processedLines.join('\n');
 }
 
 async function notifyIndexNow(url) {
@@ -230,46 +266,76 @@ async function notifyIndexNow(url) {
     }
 }
 
+async function commitToGithub(filePath, content, message) {
+    try {
+        const token = process.env.GITHUB_TOKEN;
+        const repo = process.env.GITHUB_REPOSITORY;
+        
+        if (!token || !repo) {
+            console.warn(`[!] [АЛЬФА-УДАР #${threadId}] GitHub токен или репозиторий не настроены`);
+            return;
+        }
+        
+        const encodedContent = Buffer.from(content).toString('base64');
+        
+        const response = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: message,
+                content: encodedContent
+            })
+        });
+        
+        if (response.ok) {
+            console.log(`[✅] [АЛЬФА-УДАР #${threadId}] Файл ${filePath} сохранен в GitHub`);
+        }
+    } catch (error) {
+        console.warn(`[!] [АЛЬФА-УДАР #${threadId}] Ошибка сохранения в GitHub: ${error.message}`);
+    }
+}
+
 async function generateAlphaArticle(keyword, postNumber) {
     console.log(`[💥] [АЛЬФА-УДАР #${threadId}] Генерирую статью #${postNumber} по ключу: ${keyword}`);
 
-    // АГРЕССИВНЫЙ ПРОМПТ ДЛЯ БЫСТРОЙ ГЕНЕРАЦИИ
-    const articlePrompt = `Напиши подробную статью на тему "${keyword}" для салона красоты BlondePlace. 
-    
-ТРЕБОВАНИЯ:
-- Объем: 8000+ символов
-- Заголовки: H1, H2, H3 в Markdown
-- Много подробностей про ${keyword}
-- От лица экспертов BlondePlace
-- БЕЗ ссылок в тексте (добавлю сам)
-- Сразу начинай с H1
+    // ОПТИМИЗИРОВАННЫЙ ПРОМПТ ДЛЯ СКОРОСТИ + SEO
+    const articlePrompt = `Напиши экспертную SEO-статью на тему "${keyword}" для салона красоты BlondePlace.
 
-Пиши быстро и содержательно!`;
+СТРОГИЕ ТРЕБОВАНИЯ:
+- Объем: 6000-8000 символов (не больше!)
+- Структура: # H1, ## H2, ### H3 в Markdown
+- Тематика: ${keyword} в контексте салона BlondePlace
+- Стиль: От лица экспертов BlondePlace
+- БЕЗ ссылок в тексте (добавлю отдельно)
+- БЕЗ изображений
+- Сразу начинай с заголовка H1
+
+Пиши профессионально, но быстро!`;
 
     let articleText = await generateWithRetry(articlePrompt);
     
-    // Очистка
+    // Супер-очистка
     articleText = articleText.replace(/!\[.*?\]\(.*?\)/g, '');
     articleText = articleText.replace(/\[.*?\]\([^\)]*\)/g, '');
     articleText = articleText.replace(/https?:\/\/[^\s\)\]]+/g, '');
+    articleText = articleText.replace(/www\.[^\s]+/g, '');
     articleText = articleText.trim();
 
-    // МАССОВАЯ ВСТАВКА ССЫЛОК (70-100)
-    articleText = generateMassiveLinks(keyword, articleText);
+    // БЕЗОПАСНАЯ ВСТАВКА ССЫЛОК
+    articleText = generateMassiveLinksSecure(keyword, articleText);
 
-    // АГРЕССИВНЫЕ МЕТА-ТЕГИ
-    const aggressiveTitle = createUniqueTitle(keyword);
-    const aggressiveDescription = createUniqueDescription(keyword);
-    
-    // Обрезаем до нужной длины без потери слов
-    const finalTitle = aggressiveTitle.length <= 45 ? aggressiveTitle : aggressiveTitle.slice(0, 42) + '...';
-    const finalDescription = aggressiveDescription.length <= 164 ? aggressiveDescription : aggressiveDescription.slice(0, 161) + '...';
+    // ГЛОБАЛЬНО УНИКАЛЬНЫЕ МЕТА-ТЕГИ
+    const uniqueTitle = createGloballyUniqueTitle(keyword, postNumber);
+    const uniqueDescription = createGloballyUniqueDescription(keyword, postNumber);
 
     const schema = {
         "@context": "https://schema.org",
         "@type": "Article",
-        "headline": finalTitle,
-        "description": finalDescription,
+        "headline": uniqueTitle,
+        "description": uniqueDescription,
         "author": { "@type": "Person", "name": BRAND_AUTHOR_NAME },
         "publisher": { "@type": "Organization", "name": BRAND_BLOG_NAME },
         "datePublished": new Date().toISOString(),
@@ -277,8 +343,8 @@ async function generateAlphaArticle(keyword, postNumber) {
     };
 
     const frontmatter = `---
-title: "${finalTitle.replace(/"/g, '\\"')}"
-description: "${finalDescription.replace(/"/g, '\\"')}"
+title: "${uniqueTitle.replace(/"/g, '\\"')}"
+description: "${uniqueDescription.replace(/"/g, '\\"')}"
 keywords: "${keyword}, BlondePlace, салон красоты, профессиональные услуги"
 pubDate: "${new Date().toISOString()}"
 author: "${BRAND_AUTHOR_NAME}"
@@ -289,7 +355,7 @@ schema: ${JSON.stringify(schema)}
 ${articleText}
 `;
 
-    return { content: frontmatter, title: finalTitle, description: finalDescription };
+    return { content: frontmatter, title: uniqueTitle, description: uniqueDescription };
 }
 
 async function main() {
@@ -301,7 +367,8 @@ async function main() {
         
         console.log(`[🎯] [АЛЬФА-УДАР #${threadId}] Цель: ${targetArticles} статей по 8 ключам`);
         
-        let postCounter = (threadId - 1) * targetArticles + 1; // Уникальная нумерация для каждого потока
+        // УНИКАЛЬНАЯ НУМЕРАЦИЯ ДЛЯ КАЖДОГО ПОТОКА
+        let postCounter = (threadId - 1) * 1000 + 1; // Поток 1: 1-1000, Поток 2: 1001-2000 и т.д.
         
         for (let i = 0; i < targetArticles; i++) {
             const keyword = ALPHA_KEYWORDS[i % ALPHA_KEYWORDS.length];
@@ -310,18 +377,25 @@ async function main() {
             try {
                 const slug = `post${postNumber}`;
                 const filePath = path.join(postsDir, `${slug}.md`);
+                const githubPath = `${POSTS_DIR}/${slug}.md`;
                 
                 const result = await generateAlphaArticle(keyword, postNumber);
+                
+                // Локальное сохранение
                 await fs.writeFile(filePath, result.content);
                 
+                // Сохранение в GitHub
+                await commitToGithub(githubPath, result.content, `🚀💥 АЛЬФА-УДАР: Статья #${postNumber} - ${result.title}`);
+                
                 console.log(`[✅] [АЛЬФА-УДАР #${threadId}] Статья #${postNumber} создана: "${result.title}"`);
+                console.log(`[📏] Title: ${result.title.length} символов, Description: ${result.description.length} символов`);
                 
                 // Мгновенная отправка в IndexNow
                 const url = `${SITE_URL}/blog/${slug}/`;
                 await notifyIndexNow(url);
                 
-                // Минимальная пауза для избежания rate limits
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // Минимальная пауза
+                await new Promise(resolve => setTimeout(resolve, 200));
                 
             } catch (error) {
                 console.error(`[💥] [АЛЬФА-УДАР #${threadId}] Ошибка статьи #${postCounter + i}: ${error.message}`);
@@ -331,7 +405,7 @@ async function main() {
         
         console.log(`[🏆] [АЛЬФА-УДАР #${threadId}] === МИССИЯ ЗАВЕРШЕНА ===`);
         console.log(`[📊] Создано статей: ${targetArticles}`);
-        console.log(`[🔗] Общее количество ссылок на основной сайт: ~${targetArticles * 85}`);
+        console.log(`[🔗] Общее количество ссылок на основной сайт: ~${targetArticles * 80}`);
         
     } catch (error) {
         console.error(`[💥] [АЛЬФА-УДАР #${threadId}] КРИТИЧЕСКАЯ ОШИБКА:`, error);
