@@ -1,15 +1,10 @@
 name: PLAN ALPHA-STRIKE v4.0 - INFORMATION CENTER
 
 on:
-
-permissions:
-  contents: write
-  actions: write
-
   workflow_dispatch:
     inputs:
       target_articles:
-        description: 'оличество статей (введите число)'
+        description: 'Target articles count'
         required: true
         default: '20'
         type: string
@@ -34,6 +29,10 @@ permissions:
         description: 'Start from thread (for partial runs)'
         required: false
         default: '1'
+
+permissions:
+  contents: write
+  actions: write
 
 jobs:
   alpha-strike-preparation:
@@ -106,47 +105,47 @@ jobs:
         npm install node-fetch
         npm install execa
 
-    - name: SETUP API KEYS (как в оригинальном factory.yml)
+    - name: SETUP API KEYS
       run: |
-        echo "🔑 Processing API keys for thread ${{ matrix.thread-id }}"
+        echo "Processing API keys for thread ${{ matrix.thread-id }}"
         
         if [ "${{ github.event.inputs.model_choice }}" == "gemini" ]; then
-          echo "📊 Setting up Gemini API keys..."
+          echo "Setting up Gemini API keys..."
           GEMINI_KEYS="${{ secrets.GEMINI_API_KEYS_POOL }}"
           if [ -z "$GEMINI_KEYS" ]; then
-            echo "❌ GEMINI_API_KEYS_POOL is empty!"
+            echo "GEMINI_API_KEYS_POOL is empty!"
             exit 1
           fi
           
-          echo "📊 Gemini keys available: YES"
-          echo "📊 OpenRouter keys available: NO"
+          echo "Gemini keys available: YES"
+          echo "OpenRouter keys available: NO"
           
           GEMINI_KEYS_COUNT=$(echo "$GEMINI_KEYS" | tr ',' '\n' | wc -l)
-          echo "📊 Gemini keys loaded: $GEMINI_KEYS_COUNT"
+          echo "Gemini keys loaded: $GEMINI_KEYS_COUNT"
           
           KEY_INDEX=$(( (${{ matrix.thread-id }} - 1) % $GEMINI_KEYS_COUNT + 1 ))
           SELECTED_KEY=$(echo "$GEMINI_KEYS" | tr ',' '\n' | sed -n "${KEY_INDEX}p")
           
-          echo "✅ Thread ${{ matrix.thread-id }} using Gemini key index: $KEY_INDEX"
+          echo "Thread ${{ matrix.thread-id }} using Gemini key index: $KEY_INDEX"
           echo "GEMINI_API_KEY_CURRENT=$SELECTED_KEY" >> $GITHUB_ENV
         else
-          echo "📊 Setting up OpenRouter API keys..."
+          echo "Setting up OpenRouter API keys..."
           OPENROUTER_KEYS="${{ secrets.OPENROUTER_API_KEYS_POOL }}"
           if [ -z "$OPENROUTER_KEYS" ]; then
-            echo "❌ OPENROUTER_API_KEYS_POOL is empty!"
+            echo "OPENROUTER_API_KEYS_POOL is empty!"
             exit 1
           fi
           
-          echo "📊 Gemini keys available: NO"
-          echo "📊 OpenRouter keys available: YES"
+          echo "Gemini keys available: NO"
+          echo "OpenRouter keys available: YES"
           
           OPENROUTER_KEYS_COUNT=$(echo "$OPENROUTER_KEYS" | tr ',' '\n' | wc -l)
-          echo "📊 OpenRouter keys loaded: $OPENROUTER_KEYS_COUNT"
+          echo "OpenRouter keys loaded: $OPENROUTER_KEYS_COUNT"
           
           KEY_INDEX=$(( (${{ matrix.thread-id }} - 1) % $OPENROUTER_KEYS_COUNT + 1 ))
           SELECTED_KEY=$(echo "$OPENROUTER_KEYS" | tr ',' '\n' | sed -n "${KEY_INDEX}p")
           
-          echo "✅ Thread ${{ matrix.thread-id }} using OpenRouter key index: $KEY_INDEX"
+          echo "Thread ${{ matrix.thread-id }} using OpenRouter key index: $KEY_INDEX"
           echo "OPENROUTER_API_KEY_CURRENT=$SELECTED_KEY" >> $GITHUB_ENV
         fi
         
