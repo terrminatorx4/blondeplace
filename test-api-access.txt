@@ -1,3 +1,0 @@
-# TEST FILE
-This is a test file to verify GitHub API access.
-Created: 08/02/2025 13:37:43
