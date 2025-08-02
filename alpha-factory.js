@@ -119,7 +119,7 @@ console.log(`🎯 [АЛЬФА-УДАР #${threadId}] Цель: ${targetArticles}
 // --- АДАПТИВНАЯ СИСТЕМА СКОРОСТИ v4.0 ---
 class AdaptiveSpeedController {
     constructor() {
-        this.baseDelay = apiKeysArray.length === 1 ? 1000 : 100; // Больше задержка для одного ключа
+        this.baseDelay = 500; // азовая задержка для индивидуального ключа
         this.currentDelay = this.baseDelay;
         this.errorCount = 0;
         this.successCount = 0;
@@ -131,7 +131,7 @@ class AdaptiveSpeedController {
         this.errorCount = Math.max(0, this.errorCount - 1);
         
         // Ускоряемся при успехах (только если несколько ключей)
-        if (apiKeysArray.length > 1 && this.successCount % 5 === 0 && this.currentDelay > 50) {
+        // скоряемся при успехах (каждый поток имеет свой ключ)
             this.currentDelay = Math.max(50, this.currentDelay * 0.9);
             console.log(`[⚡] [АЛЬФА-УДАР #${threadId}] Ускорение: ${this.currentDelay}мс`);
         }
