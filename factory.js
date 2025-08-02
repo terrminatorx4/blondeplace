@@ -10,7 +10,7 @@ const BRAND_NAME = 'BlondePlace';
 const BRAND_BLOG_NAME = 'Блог BlondePlace';
 const BRAND_AUTHOR_NAME = 'Эксперт BlondePlace';
 const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-    const INDEXNOW_API_KEY = 'df39150ca56f896546628ae3c923dd4a';
+const INDEXNOW_API_KEY = 'df39150ca56f896546628ae3c923dd4a';
 
 // --- НАСТРОЙКИ ОПЕРАЦИИ ---
 const TARGET_URL_MAIN = "https://blondeplace.ru";
@@ -20,7 +20,7 @@ const POSTS_DIR = 'src/content/posts';
 // --- НАСТРОЙКИ МОДЕЛЕЙ ---
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
-const GEMINI_MODEL_NAME = "gemini-2.5-pro";
+const GEMINI_MODEL_NAME = "gemini-2.5-flash";
 
 // --- ИНИЦИАЛИЗАЦИЯ ПОТОКА ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
@@ -38,24 +38,22 @@ if (modelChoice === 'deepseek') {
     console.log(`✨ [Поток #${threadId}] Использую модель Gemini с ключом ...${apiKey.slice(-4)}`);
 }
 
-// --- БАЗА ЗНАНИЙ О ЦЕЛЕВОМ САЙТЕ ---
+// --- БАЗА ЗНАНИЙ О ЦЕЛЕВОМ САЙТЕ (ИСПРАВЛЕННАЯ) ---
 const REAL_LINKS_MAP = {
     'general': [
-        { url: "https://blondeplace.ru", text: `главном сайте салона ${BRAND_NAME}` },
-        { url: "https://blondeplace.ru/o-nas", text: `салоне красоты ${BRAND_NAME}` },
-        { url: "https://blondeplace.ru/contacts", text: `странице контактов` },
-        { url: "https://blondeplace.ru/uslugi", text: `услугах салона красоты` },
+        { url: "https://blondeplace.ru/#about", text: `о салоне ${BRAND_NAME}` },
+        { url: "https://blondeplace.ru/#services", text: `услугах салона ${BRAND_NAME}` },
+        { url: "https://blondeplace.ru/#discount", text: `скидках ${BRAND_NAME}` },
+        { url: "https://blondeplace.ru/#coworking", text: `коворкинге ${BRAND_NAME}` },
     ],
-    'маникюр': { url: "https://blondeplace.ru/manicure", text: "услугах маникюра" },
-    'педикюр': { url: "https://blondeplace.ru/pedicure", text: "услугах педикюра" },
-    'окрашива': { url: "https://blondeplace.ru/coloring", text: "окрашивании волос" },
-    'стрижк': { url: "https://blondeplace.ru/hairstyles", text: "стрижках и укладках" },
-    'блонд': { url: "https://blondeplace.ru/blonde", text: "услугах блонд-окрашивания" },
-    'уход': { url: "https://blondeplace.ru/hair-care", text: "процедурах по уходу" },
-    'макияж': { url: "https://blondeplace.ru/makeup", text: "услугах макияжа" },
-    'брови': { url: "https://blondeplace.ru/eyebrows", text: "оформлении бровей" },
-    'косметолог': { url: "https://blondeplace.ru/cosmetology", text: "косметологических процедурах" },
-    'масс': { url: "https://blondeplace.ru/massage", text: "массажных процедурах" }
+    'коворкинг': { url: "https://blondeplace.ru/#coworking", text: "коворкинге для мастеров" },
+    'мастер': { url: "https://blondeplace.ru/#masters", text: "наших мастерах" },
+    'услуг': { url: "https://blondeplace.ru/#services", text: "услугах салона" },
+    'скидк': { url: "https://blondeplace.ru/#discount", text: "текущих скидках" },
+    'бренд': { url: "https://blondeplace.ru/#brands", text: "брендах в салоне" },
+    'новост': { url: "https://blondeplace.ru/#news", text: "новостях салона" },
+    'отзыв': { url: "https://blondeplace.ru/#comments", text: "отзывах клиентов" },
+    'почему': { url: "https://blondeplace.ru/#why", text: "преимуществах салона" }
 };
 
 function getContextualLink(topic) {
@@ -333,6 +331,4 @@ async function main() {
     }
 }
 
-
 main(); 
-
