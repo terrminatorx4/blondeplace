@@ -6,7 +6,7 @@ on:
       target_articles:
         description: 'Количество статей для генерации'
         required: true
-        default: '50'
+        default: '2'
         type: string
       threads:
         description: 'Количество потоков (1-20)'
@@ -227,4 +227,5 @@ jobs:
         echo "🧵 Потоков использовано: ${{ github.event.inputs.threads }}"
         echo "📊 Статей запрошено: ${{ github.event.inputs.target_articles }}"
         echo ""
+
         echo "🚀 ALPHA-STRIKE v5.9 ГОТОВ К ДОМИНИРОВАНИЮ С PERFECT SEO!" 
