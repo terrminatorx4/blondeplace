@@ -1,6 +1,11 @@
 name: PLAN ALPHA-STRIKE v4.0 - INFORMATION CENTER
 
 on:
+
+permissions:
+  contents: write
+  actions: write
+
   workflow_dispatch:
     inputs:
       target_articles:
