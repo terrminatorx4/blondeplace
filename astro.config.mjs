@@ -7,8 +7,11 @@ export default defineConfig({
   site: 'https://blondeplace.netlify.app',
   output: 'static',
   // adapter убран - для static output не нужен!
+  
+  // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ для hoisted scripts
   build: {
-    inlineStylesheets: 'never' // Исправляет проблему с hoisted scripts
+    inlineStylesheets: 'never', // Исправляет проблему с hoisted scripts
+    assets: 'assets'
   },
   
   integrations: [
@@ -30,21 +33,11 @@ export default defineConfig({
     contentCollectionCache: true,
   },
 
-  // Оптимизация для больших объемов beauty контента
+  // Упрощенная конфигурация Vite (убираем конфликты с hoisted scripts)
   vite: {
     build: {
       // Отключаем sourcemaps в продакшене для экономии памяти
       sourcemap: false,
-      // Оптимизация чанков для beauty контента
-      rollupOptions: {
-        output: {
-          manualChunks: undefined,
-          inlineDynamicImports: false,
-          chunkFileNames: 'assets/[name]-[hash].js',
-          entryFileNames: 'assets/[name]-[hash].js',
-          assetFileNames: 'assets/[name]-[hash].[ext]'
-        }
-      },
       // Увеличиваем лимит для больших чанков (beauty блоги объемные)
       chunkSizeWarningLimit: 2000,
       // Минификация только в продакшене
