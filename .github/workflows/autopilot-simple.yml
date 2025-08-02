@@ -1,0 +1,35 @@
+name: 🤖 AUTOPILOT SIMPLE
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  autopilot:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: 📦 Install
+      run: npm install node-fetch@2.6.7 axios cheerio
+    
+    - name: 🛠️ AUTO-FIXER
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🛠️ Проверка системы..."
+        if [ -f "auto-fixer.js" ]; then
+          node auto-fixer.js
+        else
+          echo "⚠️ auto-fixer.js не найден"
+        fi
+    
+    - name: 📊 STATUS
+      run: |
+        echo "✅ AUTOPILOT активен!"
+        echo "🎯 Мониторинг каждые 30 минут"
+        echo "🔄 Следующая проверка через 30 мин"
