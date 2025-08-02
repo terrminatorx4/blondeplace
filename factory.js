@@ -38,6 +38,37 @@ if (modelChoice === 'deepseek') {
     console.log(`✨ [Поток #${threadId}] Использую модель Gemini с ключом ...${apiKey.slice(-4)}`);
 }
 
+
+// ---     СТ ---
+const REAL_LINKS_MAP = {
+    'general': [
+        { url: "https://blondeplace.ru", text: `главном сайте салона ${BRAND_NAME}` },
+        { url: "https://blondeplace.ru/o-nas", text: `салоне красоты ${BRAND_NAME}` },
+        { url: "https://blondeplace.ru/contacts", text: `странице контактов` },
+        { url: "https://blondeplace.ru/uslugi", text: `услугах салона красоты` },
+    ],
+    'маникюр': { url: "https://blondeplace.ru/manicure", text: "услугах маникюра" },
+    'педикюр': { url: "https://blondeplace.ru/pedicure", text: "услугах педикюра" },
+    'окрашива': { url: "https://blondeplace.ru/coloring", text: "окрашивании волос" },
+    'стрижк': { url: "https://blondeplace.ru/hairstyles", text: "стрижках и укладках" },
+    'блонд': { url: "https://blondeplace.ru/blonde", text: "услугах блонд-окрашивания" },
+    'уход': { url: "https://blondeplace.ru/hair-care", text: "процедурах по уходу" },
+    'макияж': { url: "https://blondeplace.ru/makeup", text: "услугах макияжа" },
+    'брови': { url: "https://blondeplace.ru/eyebrows", text: "оформлении бровей" },
+    'косметолог': { url: "https://blondeplace.ru/cosmetology", text: "косметологических процедурах" },
+    'масс': { url: "https://blondeplace.ru/massage", text: "массажных процедурах" }
+};
+
+function getContextualLink(topic) {
+    const lowerTopic = topic.toLowerCase();
+    for (const keyword in REAL_LINKS_MAP) {
+        if (keyword !== 'general' && lowerTopic.includes(keyword)) {
+            return REAL_LINKS_MAP[keyword];
+        }
+    }
+    return REAL_LINKS_MAP.general[Math.floor(Math.random() * REAL_LINKS_MAP.general.length)];
+}
+
 function slugify(text) {
     const cleanedText = text.toString().replace(/[\x00-\x1F\x7F-\x9F]/g, "").trim();
     const from = "а б в г д е ё ж з и й к л м н о п р с т у ф х ц ч ш щ ъ ы ь э ю я".split(' ');
