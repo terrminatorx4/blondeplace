@@ -4,15 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       target_articles:
-        description: 'Количество статей'
+        description: 'Количество статей (введите число)'
         required: true
-        default: '600'
-        type: choice
-        options:
-          - '600'
-          - '1000'
-          - '2000'
-          - '5000'
+        default: '20'
+        type: string
       threads:
         description: 'Количество потоков'
         required: true
@@ -44,7 +39,7 @@ jobs:
     - name: Расчет параметров
       id: calculate
       run: |
-        TARGET_ARTICLES=${{ github.event.inputs.target_articles || '600' }}
+        TARGET_ARTICLES=${{ github.event.inputs.target_articles || '20' }}
         THREADS=${{ github.event.inputs.threads || '20' }}
         
         ARTICLES_PER_THREAD=$(( TARGET_ARTICLES / THREADS ))
@@ -155,7 +150,7 @@ jobs:
         echo "# Alpha-Strike Operation Report" > ALPHA_STRIKE_REPORT.md
         echo "" >> ALPHA_STRIKE_REPORT.md
         echo "## Parameters" >> ALPHA_STRIKE_REPORT.md
-        echo "- Articles: ${{ github.event.inputs.target_articles || '600' }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- Articles: ${{ github.event.inputs.target_articles || '20' }}" >> ALPHA_STRIKE_REPORT.md
         echo "- Threads: ${{ github.event.inputs.threads || '20' }}" >> ALPHA_STRIKE_REPORT.md
         echo "- Model: ${{ github.event.inputs.model_choice || 'gemini' }}" >> ALPHA_STRIKE_REPORT.md
         echo "- Expected links: ${{ needs.alpha-strike-preparation.outputs.expected-links }}" >> ALPHA_STRIKE_REPORT.md
