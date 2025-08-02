@@ -560,15 +560,11 @@ async function main() {
         console.log(`[STATS] Финальная скорость: 500мс`);
         console.log(`[STATS] Диапазон номеров: ${startNumber}-${startNumber + results.length - 1}`);
         
-        // СТАТИСТИКА ПО КЛЮЧЕВЫМ СЛОВАМ (КАК В BUTLER)
-        console.log(`[KEYWORDS] СТАТИСТИКА ПО КЛЮЧЕВЫМ СЛОВАМ:`);
-        const keywordStats = {};
-        results.forEach(result => {
-            keywordStats[result.keyword] = (keywordStats[result.keyword] || 0) + 1;
-        });
-        Object.entries(keywordStats).forEach(([keyword, count]) => {
-            console.log(`[KEYWORDS] "${keyword}": ${count} статей`);
-        });
+        // ALPHA-STRIKE СТАТИСТИКА (НЕ КАК В BUTLER!)
+        console.log(`[ALPHA] ALPHA-STRIKE СТАТИСТИКА:`);
+        console.log(`[ALPHA] Потоков задействовано: 20`);
+        console.log(`[ALPHA] Target keywords: 8 (бьюти коворкинг, аренда парикмахерского кресла, коворкинг для мастера, места в аренду, кресло для мастера, салон красоты, мелирование, тотал блонд)`);
+        console.log(`[ALPHA] Успешность: ${Math.round((results.length / targetArticles) * 100)}%`);
         
         // Результаты статей
         console.log(`[RESULTS] ССЫЛКИ НА СТАТЬИ:`);
@@ -576,11 +572,10 @@ async function main() {
             console.log(`[ARTICLE] Статья ${index + 1}: ${result.url}`);
         });
         
-        // INDEXNOW СТАТИСТИКА (КАК В BUTLER)
-        console.log(`[INDEXNOW] INDEXNOW СТАТИСТИКА:`);
-        console.log(`[INDEXNOW] Yandex IndexNow: ${results.length} URLs отправлено`);
-        console.log(`[INDEXNOW] Bing IndexNow: ${results.length} URLs отправлено`);
-        console.log(`[INDEXNOW] Google Sitemap Ping: ${results.length} URLs отправлено`);
+        // INDEXNOW ALPHA-STRIKE (ИНДИВИДУАЛЬНЫЕ УВЕДОМЛЕНИЯ)
+        console.log(`[INDEXNOW] ТУРБО-ИНДЕКСАЦИЯ:`);
+        console.log(`[INDEXNOW] Каждая статья уведомила: Yandex, Bing, Google`);
+        console.log(`[INDEXNOW] Всего уведомлений отправлено: ${results.length * 3}`);
         
     } catch (error) {
         console.error(`[FATAL ERROR] ${error.message}`);
