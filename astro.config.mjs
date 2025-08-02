@@ -7,6 +7,9 @@ export default defineConfig({
   site: 'https://blondeplace.netlify.app',
   output: 'static',
   // adapter убран - для static output не нужен!
+  build: {
+    inlineStylesheets: 'never' // Исправляет проблему с hoisted scripts
+  },
   
   integrations: [
     sitemap({
