@@ -10,7 +10,7 @@ const BRAND_NAME = 'BlondePlace';
 const BRAND_BLOG_NAME = 'Блог BlondePlace';
 const BRAND_AUTHOR_NAME = 'Эксперт BlondePlace';
 const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-const INDEXNOW_API_KEY = 'df39150ca56f896546628ae3c923dd4a';
+    const INDEXNOW_API_KEY = 'd1b055ab1eb146d892169bbb2c96550e';
 
 // --- НАСТРОЙКИ ОПЕРАЦИИ ---
 const TARGET_URL_MAIN = "https://blondeplace.ru";
@@ -38,8 +38,7 @@ if (modelChoice === 'deepseek') {
     console.log(`✨ [Поток #${threadId}] Использую модель Gemini с ключом ...${apiKey.slice(-4)}`);
 }
 
-
-// ---     СТ ---
+// --- БАЗА ЗНАНИЙ О ЦЕЛЕВОМ САЙТЕ ---
 const REAL_LINKS_MAP = {
     'general': [
         { url: "https://blondeplace.ru", text: `главном сайте салона ${BRAND_NAME}` },
@@ -186,6 +185,17 @@ ${plan}
         articleText += interlinkingBlock;
     }
 
+    // ДОБАВЛЕНИЕ КОНТЕКСТНЫХ ССЫЛОК НА ОСНОВНОЙ САЙТ
+    const paragraphs = articleText.split('\n\n');
+    if (paragraphs.length > 2) {
+        const contextualLink = getContextualLink(topic);
+        const randomAnchorText = `узнайте больше о ${contextualLink.text} на <a href="${contextualLink.url}" target="_blank" rel="nofollow">официальном сайте ${BRAND_NAME}</a>`;
+        
+        const randomIndex = Math.floor(Math.random() * (paragraphs.length - 2)) + 1;
+        paragraphs[randomIndex] += ` ${randomAnchorText}`;
+        articleText = paragraphs.join('\n\n');
+    }
+
     // ПРОСТОЙ SEO ПРОМПТ КАК У BUTLER (БЕЗ СЛОЖНОСТЕЙ)
     const seoPrompt = `Для статьи на тему "${topic}" сгенерируй JSON-объект. ВАЖНО: твой ответ должен быть ТОЛЬКО валидным JSON-объектом. JSON должен содержать: "title" (длиной ровно 40-45 символов), "description" (длиной ровно 150-160 символов), "keywords" (строка с 5-7 релевантными ключевыми словами через запятую). Контекст: это блог салона красоты ${BRAND_NAME}.`;
 
@@ -325,3 +335,4 @@ async function main() {
 
 
 main(); 
+
