@@ -1,4 +1,4 @@
-name: ALPHA-STRIKE v5.10-BUTLER-STRATEGY
+name: ALPHA-STRIKE v5.10-BUTLER-RETRY
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       target_articles:
         description: 'Количество статей для генерации'
         required: true
-        default: '2'
+        default: '50'
         type: string
       threads:
         description: 'Количество потоков (1-20)'
@@ -115,7 +115,7 @@ jobs:
         echo "🤖 Git стратегия: BUTLER STASH (БЕЗ случайных задержек!)"
         export THREAD_ID=${{ matrix.thread-id }}
         export TARGET_ARTICLES=${{ needs.prepare-matrix.outputs.articles-per-thread }}
-        node alpha-factory.js
+                    node alpha-factory-v5.10-BUTLER-RETRY.js
 
     - name: BUTLER GIT STRATEGY (БЕЗ RACE PROTECTION!)
       run: |
@@ -227,5 +227,4 @@ jobs:
         echo "🧵 Потоков использовано: ${{ github.event.inputs.threads }}"
         echo "📊 Статей запрошено: ${{ github.event.inputs.target_articles }}"
         echo ""
-
         echo "🚀 ALPHA-STRIKE v5.9 ГОТОВ К ДОМИНИРОВАНИЮ С PERFECT SEO!" 
