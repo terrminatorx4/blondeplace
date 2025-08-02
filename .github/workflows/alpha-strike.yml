@@ -1,10 +1,10 @@
-name: 🚀💥  "Ь-" v4.0 - Ы Т
+name: ALPHA-STRIKE v4.0
 
 on:
   workflow_dispatch:
     inputs:
       target_articles:
-        description: 'бщее количество статей для генерации'
+        description: 'Количество статей'
         required: true
         default: '600'
         type: choice
@@ -14,7 +14,7 @@ on:
           - '2000'
           - '5000'
       threads:
-        description: 'оличество параллельных потоков (1-20)'
+        description: 'Количество потоков'
         required: true
         default: '20'
         type: choice
@@ -23,21 +23,17 @@ on:
           - '10'
           - '20'
       model_choice:
-        description: 'ыбор AI модели'
+        description: 'AI модель'
         required: true
         default: 'gemini'
         type: choice
         options:
           - 'gemini'
           - 'deepseek'
-      start_from_thread:
-        description: 'ачать с потока (для частичных запусков)'
-        required: false
-        default: '1'
 
 jobs:
   alpha-strike-preparation:
-    name: 🎯 Т   "Ь-"
+    name: ПОДГОТОВКА
     runs-on: ubuntu-latest
     outputs:
       articles-per-thread: ${{ steps.calculate.outputs.articles-per-thread }}
@@ -45,22 +41,19 @@ jobs:
       thread-matrix: ${{ steps.calculate.outputs.thread-matrix }}
       
     steps:
-    - name: 📊 СТ Т 
+    - name: Расчет параметров
       id: calculate
       run: |
         TARGET_ARTICLES=${{ github.event.inputs.target_articles || '600' }}
         THREADS=${{ github.event.inputs.threads || '20' }}
-        START_FROM=${{ github.event.inputs.start_from_thread || '1' }}
         
-        # асчет статей на поток
         ARTICLES_PER_THREAD=$(( TARGET_ARTICLES / THREADS ))
         if [ $(( TARGET_ARTICLES % THREADS )) -ne 0 ]; then
           ARTICLES_PER_THREAD=$(( ARTICLES_PER_THREAD + 1 ))
         fi
         
-        # Создаем матрицу потоков начиная с указанного
         THREAD_LIST=""
-        for i in $(seq $START_FROM $THREADS); do
+        for i in $(seq 1 $THREADS); do
           if [ -z "$THREAD_LIST" ]; then
             THREAD_LIST="$i"
           else
@@ -68,22 +61,18 @@ jobs:
           fi
         done
         
-        # жидаемое количество ссылок (85 ссылок на статью)
         EXPECTED_LINKS=$(( TARGET_ARTICLES * 85 ))
         
         echo "articles-per-thread=$ARTICLES_PER_THREAD" >> $GITHUB_OUTPUT
         echo "expected-links=$EXPECTED_LINKS" >> $GITHUB_OUTPUT
         echo "thread-matrix=[$THREAD_LIST]" >> $GITHUB_OUTPUT
         
-        echo "🎯  :"
-        echo "   📰 бщее количество статей: $TARGET_ARTICLES"
-        echo "   🔗 жидаемое количество ссылок: $EXPECTED_LINKS"
-        echo "   ⚡ отоков: $THREADS (начиная с $START_FROM)"
-        echo "   📊 Статей на поток: $ARTICLES_PER_THREAD"
-        echo "   🎮 одель AI: ${{ github.event.inputs.model_choice || 'gemini' }}"
+        echo "Статей: $TARGET_ARTICLES"
+        echo "Потоков: $THREADS"
+        echo "Статей на поток: $ARTICLES_PER_THREAD"
 
   alpha-strike-attack:
-    name: 🚀💥 Ь- #${{ matrix.thread-id }}
+    name: АЛЬФА-УДАР #${{ matrix.thread-id }}
     runs-on: ubuntu-latest
     needs: alpha-strike-preparation
     strategy:
@@ -92,21 +81,21 @@ jobs:
         thread-id: ${{ fromJson(needs.alpha-strike-preparation.outputs.thread-matrix) }}
     
     steps:
-    - name: 📥   
+    - name: Checkout
       uses: actions/checkout@v4
       
-    - name: ⚙️ СТ Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         
-    - name: 📦 СТ ССТ
+    - name: Install dependencies
       run: |
         npm install @google/generative-ai
         npm install node-fetch
         npm install execa
         
-    - name: 🚀💥 С Ь- v4.0 #${{ matrix.thread-id }}
+    - name: Run Alpha-Strike
       env:
         THREAD_ID: ${{ matrix.thread-id }}
         ALPHA_ARTICLES: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }}
@@ -116,122 +105,74 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
       run: |
-        echo "🚀💥 [Ь- #${{ matrix.thread-id }}] ===  Т v4.0 ==="
-        echo "📊 араметры потока:"
-        echo "   🆔 ID потока: ${{ matrix.thread-id }}"
-        echo "   📰 Статей для генерации: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }}"
-        echo "   🤖 одель AI: ${{ github.event.inputs.model_choice || 'gemini' }}"
-        echo "   🔑 API ключ: ...${API_KEY_CURRENT: -4}"
+        echo "ALPHA-STRIKE Thread ${{ matrix.thread-id }} START"
+        echo "Articles: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }}"
+        echo "Model: ${{ github.event.inputs.model_choice || 'gemini' }}"
         
-        # апуск супер-улучшенной фабрики контента
         node alpha-factory.js
         
-        echo "✅ [Ь- #${{ matrix.thread-id }}] === Т Ш ==="
+        echo "ALPHA-STRIKE Thread ${{ matrix.thread-id }} COMPLETE"
 
   alpha-strike-quality-control:
-    name: 🔍 ТЬ СТ
+    name: КОНТРОЛЬ КАЧЕСТВА
     runs-on: ubuntu-latest
     needs: [alpha-strike-preparation, alpha-strike-attack]
     if: always()
     
     steps:
-    - name: 📥  
+    - name: Checkout
       uses: actions/checkout@v4
       
-    - name: 📊  С ТТ
+    - name: Analyze content
       run: |
-        echo "🔍 === ТЬ СТ  ==="
+        echo "=== QUALITY CONTROL ==="
         
-        # одсчет созданных файлов
         if [ -d "src/content/posts" ]; then
           POST_COUNT=$(find src/content/posts -name "post*.md" | wc -l)
-          echo "📰 айдено статей: $POST_COUNT"
+          echo "Articles found: $POST_COUNT"
           
-          # роверка уникальности заголовков
           UNIQUE_TITLES=$(find src/content/posts -name "post*.md" -exec grep -h "^title:" {} \; | sort | uniq | wc -l)
           TOTAL_TITLES=$(find src/content/posts -name "post*.md" -exec grep -h "^title:" {} \; | wc -l)
-          echo "📋 никальные заголовки: $UNIQUE_TITLES из $TOTAL_TITLES"
-          
-          # роверка длины мета-тегов (первые 5 файлов)
-          echo "📏 роверка длины мета-тегов (образцы):"
-          find src/content/posts -name "post*.md" | head -5 | while read file; do
-            TITLE=$(grep "^title:" "$file" | sed 's/title: "//g' | sed 's/"$//g')
-            DESC=$(grep "^description:" "$file" | sed 's/description: "//g' | sed 's/"$//g')
-            echo "   📄 $(basename "$file"): Title ${#TITLE} символов, Description ${#DESC} символов"
-          done
-          
-          # роверка количества ссылок (первые 3 файла)
-          echo "🔗 роверка ссылок (образцы):"
-          find src/content/posts -name "post*.md" | head -3 | while read file; do
-            LINKS=$(grep -o '<a href=' "$file" | wc -l)
-            echo "   📄 $(basename "$file"): $LINKS ссылок"
-          done
+          echo "Unique titles: $UNIQUE_TITLES of $TOTAL_TITLES"
         else
-          echo "⚠️ иректория src/content/posts не найдена"
+          echo "Directory src/content/posts not found"
         fi
         
-        echo "✅ онтроль качества завершен"
+        echo "Quality control completed"
 
   alpha-strike-final-report:
-    name: 📋 ЬЫ ТТ
+    name: ФИНАЛЬНЫЙ ОТЧЕТ
     runs-on: ubuntu-latest
     needs: [alpha-strike-preparation, alpha-strike-attack, alpha-strike-quality-control]
     if: always()
     
     steps:
-    - name: 📥  
+    - name: Checkout
       uses: actions/checkout@v4
       
-    - name: 📋 С ТТ 
+    - name: Create report
       run: |
-        cat > ALPHA_STRIKE_REPORT.md << 'EOF'
-# ALPHA-STRIKE OPERATION REPORT v4.0
-
-## Operation parameters
-- **Articles created**: ${{ github.event.inputs.target_articles || '600' }}
-- **Threads used**: ${{ github.event.inputs.threads || '20' }}
-- **AI Model**: ${{ github.event.inputs.model_choice || 'gemini' }}
-- **Expected links**: ${{ needs.alpha-strike-preparation.outputs.expected-links }}
-- **Operation date**: $(date)
-
-## Operation status
-- **Preparation**: ${{ needs.alpha-strike-preparation.result }}
-- **Execution**: ${{ needs.alpha-strike-attack.result }}
-- **Quality control**: ${{ needs.alpha-strike-quality-control.result }}
-
-## Expected results
-- **Start indexing**: 24-48 hours
-- **Position growth**: 3-7 days
-- **TOP-10 by keywords**: 1-2 weeks
-- **TOP-1 by keywords**: 2-4 weeks
-
-## Link aggression
-- **Links per article**: 85
-- **Total number**: ${{ needs.alpha-strike-preparation.outputs.expected-links }}
-- **Target URLs**: 10 different blondeplace.ru sections
-
-## Monitoring
-1. Track indexing in Yandex.Webmaster
-2. Check positions by key phrases
-3. Analyze traffic to main site
-4. Control link mass
-
-## Next steps
-- Wait for indexing (24-48 hours)
-- If necessary, run additional threads
-- Consider scaling to 10,000 articles
-
----
-*Report created automatically by Alpha-Strike system v4.0*
-EOF
+        echo "# Alpha-Strike Operation Report" > ALPHA_STRIKE_REPORT.md
+        echo "" >> ALPHA_STRIKE_REPORT.md
+        echo "## Parameters" >> ALPHA_STRIKE_REPORT.md
+        echo "- Articles: ${{ github.event.inputs.target_articles || '600' }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- Threads: ${{ github.event.inputs.threads || '20' }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- Model: ${{ github.event.inputs.model_choice || 'gemini' }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- Expected links: ${{ needs.alpha-strike-preparation.outputs.expected-links }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- Date: $(date)" >> ALPHA_STRIKE_REPORT.md
+        echo "" >> ALPHA_STRIKE_REPORT.md
+        echo "## Status" >> ALPHA_STRIKE_REPORT.md
+        echo "- Preparation: ${{ needs.alpha-strike-preparation.result }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- Execution: ${{ needs.alpha-strike-attack.result }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- Quality control: ${{ needs.alpha-strike-quality-control.result }}" >> ALPHA_STRIKE_REPORT.md
         
-        echo "📋 тчет создан: ALPHA_STRIKE_REPORT.md"
+        echo "Report created: ALPHA_STRIKE_REPORT.md"
         cat ALPHA_STRIKE_REPORT.md
         
-    - name: 💾 СХ ТТ
+    - name: Save report
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add ALPHA_STRIKE_REPORT.md
-        git commit -m "📋 тчет операции льфа-дар v4.0 - $(date)" || exit 0
-        git push || exit 0
+        git commit -m "Alpha-Strike v4.0 report - $(date)" || exit 0
+        git push || exit 0 
