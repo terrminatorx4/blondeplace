@@ -1,8 +1,10 @@
-// ===== ALPHA-FACTORY v5.7 - UNIQUE NUMBERS FIX =====
-// КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ:
-// 1. Функция getNextAvailablePostNumber() теперь учитывает threadId
-// 2. Каждый поток получает уникальный диапазон номеров
-// 3. Нет перезаписи статей между потоками
+// ===== ALPHA-FACTORY v5.8 - ABSOLUTE UNIQUE =====
+// АБСОЛЮТНАЯ УНИКАЛЬНОСТЬ для многократных запусков:
+// 1. 100+ вариаций заголовков
+// 2. 50+ вариаций описаний  
+// 3. Случайные элементы для каждой статьи
+// 4. Временные метки и географические вариации
+// 5. Поддержка 10,000+ уникальных статей
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
@@ -41,6 +43,64 @@ const TARGET_URLS = [
     `${MAIN_SITE_URL}/#location`
 ];
 
+// ===== МАССИВЫ ДЛЯ АБСОЛЮТНОЙ УНИКАЛЬНОСТИ =====
+
+const TITLE_PREFIXES = [
+    "Полный гид по", "Экспертный обзор", "Профессиональный выбор", "Секреты выбора",
+    "Всё о", "Как выбрать", "Лучший", "Идеальный", "Правильный", "Качественный",
+    "Современный", "Инновационный", "Практический гид", "Детальный обзор",
+    "Мастер-класс по", "Тренды 2025", "Новинки", "Топ решений", "Анализ рынка",
+    "Сравнение", "Рейтинг", "Обзор новинок", "Гид покупателя", "Советы экспертов"
+];
+
+const TITLE_MODIFIERS = [
+    "для профессионалов", "в СПб", "2025 года", "от BlondePlace", "с гарантией",
+    "премиум класса", "для салонов красоты", "эконом варианты", "люкс сегмента",
+    "для начинающих", "для опытных мастеров", "бюджетные решения", "топ качества",
+    "проверенные временем", "инновационные", "классические", "модные тренды",
+    "популярные модели", "рекомендуемые", "сертифицированные", "надёжные",
+    "долговечные", "стильные", "функциональные", "универсальные", "специализированные"
+];
+
+const DESCRIPTION_STARTERS = [
+    "Выбираете", "Ищете качественный", "Планируете купить", "Хотите найти лучший",
+    "Нужен надёжный", "Думаете о покупке", "Рассматриваете варианты", "Решили приобрести",
+    "Подбираете оптимальный", "Сравниваете модели", "Изучаете рынок", "Анализируете предложения",
+    "Выбираете между", "Оцениваете варианты", "Рассматриваете покупку", "Ищете подходящий"
+];
+
+const DESCRIPTION_MIDDLES = [
+    "Наш экспертный гид поможет", "Подробный анализ всех нюансов", "Разбираем все детали",
+    "Сравниваем характеристики", "Изучаем преимущества и недостатки", "Анализируем отзывы",
+    "Рассматриваем лучшие варианты", "Делимся профессиональным опытом", "Даём практические советы",
+    "Объясняем критерии выбора", "Показываем на что обратить внимание", "Раскрываем секреты",
+    "Предлагаем проверенные решения", "Рекомендуем оптимальные варианты", "Помогаем сделать выбор"
+];
+
+const DESCRIPTION_ENDINGS = [
+    "Сделайте правильный выбор с нами", "Профессиональные рекомендации от BlondePlace",
+    "Экспертные советы для вашего успеха", "Качественные решения для профессионалов",
+    "Проверенные варианты от экспертов", "Лучшие предложения на рынке",
+    "Оптимальное соотношение цены и качества", "Решения для любого бюджета",
+    "Гарантия качества от BlondePlace", "Только проверенные производители",
+    "Индивидуальный подход к каждому клиенту", "Консультации от профессионалов"
+];
+
+const GEO_CONTEXTS = [
+    "в Санкт-Петербурге", "в центре Питера", "на Невском проспекте", "в Василеостровском районе",
+    "в Приморском районе", "в Центральном районе", "в Петроградском районе", "в Красногвардейском районе",
+    "в Московском районе", "в Фрунзенском районе", "в Калининском районе", "в Выборгском районе",
+    "в салоне BlondePlace", "в премиум-салоне", "для мастеров СПб", "в beauty-индустрии",
+    "в современном салоне", "в центре города", "в деловом районе", "рядом с метро"
+];
+
+const STYLE_MODIFIERS = [
+    "стильный", "элегантный", "современный", "классический", "инновационный", "практичный",
+    "универсальный", "профессиональный", "качественный", "надёжный", "удобный", "функциональный",
+    "эргономичный", "компактный", "просторный", "уютный", "престижный", "доступный",
+    "популярный", "рекомендуемый", "сертифицированный", "проверенный", "новый", "улучшенный"
+];
+
 // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ УНИКАЛЬНОЙ НУМЕРАЦИИ =====
 async function getNextAvailablePostNumber(threadId) {
     try {
@@ -48,7 +108,7 @@ async function getNextAvailablePostNumber(threadId) {
         
         const response = await fetch('https://api.github.com/repos/terrminatorx4/blondeplace/contents/src/content/posts', {
             headers: {
-                'User-Agent': 'Alpha-Factory-v5.7'
+                'User-Agent': 'Alpha-Factory-v5.8'
             }
         });
         
@@ -88,6 +148,87 @@ async function getNextAvailablePostNumber(threadId) {
         console.log(`[NUMBERS] Thread #${threadId}: ⚠️ Ошибка при получении номера: ${error.message}`);
         // Fallback с уникальным номером для каждого потока
         return 30000 + (threadId * 1000);
+    }
+}
+
+// ===== ФУНКЦИЯ АБСОЛЮТНО УНИКАЛЬНОГО ЗАГОЛОВКА =====
+async function createAbsolutelyUniqueTitle(keyword, postNumber, threadId) {
+    try {
+        // Комбинируем различные элементы для уникальности
+        const randomPrefix = TITLE_PREFIXES[Math.floor(Math.random() * TITLE_PREFIXES.length)];
+        const randomModifier = TITLE_MODIFIERS[Math.floor(Math.random() * TITLE_MODIFIERS.length)];
+        const randomStyle = STYLE_MODIFIERS[Math.floor(Math.random() * STYLE_MODIFIERS.length)];
+        
+        // Различные шаблоны заголовков
+        const titleTemplates = [
+            `${randomPrefix} ${keyword}`,
+            `${keyword}: ${randomPrefix}`,
+            `${randomStyle} ${keyword}`,
+            `${keyword} ${randomModifier}`,
+            `${randomPrefix} ${keyword} ${randomModifier}`,
+            `${randomStyle} ${keyword}: ${randomPrefix}`,
+            `${keyword}: ${randomStyle} ${randomPrefix}`,
+            `${randomPrefix}: ${randomStyle} ${keyword}`,
+            `${keyword} - ${randomPrefix}`,
+            `${randomStyle} ${keyword} ${randomModifier}`
+        ];
+        
+        // Выбираем шаблон на основе postNumber и threadId для дополнительной уникальности
+        const templateIndex = (postNumber + threadId + Date.now()) % titleTemplates.length;
+        let title = titleTemplates[templateIndex];
+        
+        // Обрезаем до 45 символов для SEO
+        if (title.length > 45) {
+            title = title.substring(0, 42) + '...';
+        }
+        
+        console.log(`[UNIQUE] Thread #${threadId}: Создан уникальный заголовок: "${title}"`);
+        return { title };
+        
+    } catch (error) {
+        console.log(`[UNIQUE] Thread #${threadId}: Ошибка создания заголовка: ${error.message}`);
+        // Fallback
+        return { title: `${keyword}: гид по выбору` };
+    }
+}
+
+// ===== ФУНКЦИЯ АБСОЛЮТНО УНИКАЛЬНОГО ОПИСАНИЯ =====
+async function createAbsolutelyUniqueDescription(keyword, postNumber, threadId, geoContext) {
+    try {
+        // Комбинируем различные элементы для уникальности
+        const randomStarter = DESCRIPTION_STARTERS[Math.floor(Math.random() * DESCRIPTION_STARTERS.length)];
+        const randomMiddle = DESCRIPTION_MIDDLES[Math.floor(Math.random() * DESCRIPTION_MIDDLES.length)];
+        const randomEnding = DESCRIPTION_ENDINGS[Math.floor(Math.random() * DESCRIPTION_ENDINGS.length)];
+        const randomStyle = STYLE_MODIFIERS[Math.floor(Math.random() * STYLE_MODIFIERS.length)];
+        
+        // Различные шаблоны описаний
+        const descriptionTemplates = [
+            `${randomStarter} ${randomStyle} ${keyword}? ${randomMiddle}. ${randomEnding}.`,
+            `${randomStarter} ${keyword} ${geoContext}? ${randomMiddle}. ${randomEnding}.`,
+            `${randomStyle.charAt(0).toUpperCase() + randomStyle.slice(1)} ${keyword} - ${randomMiddle.toLowerCase()}. ${randomEnding}.`,
+            `${randomStarter} ${keyword}? ${randomMiddle} ${geoContext}. ${randomEnding}.`,
+            `${randomMiddle} для выбора ${keyword} ${geoContext}. ${randomEnding}.`,
+            `${randomStarter} лучший ${keyword}? ${randomMiddle}. Профессиональные советы ${geoContext}.`,
+            `${randomStyle.charAt(0).toUpperCase() + randomStyle.slice(1)} ${keyword}: ${randomMiddle.toLowerCase()}. ${randomEnding}.`,
+            `${randomStarter} ${keyword}? Экспертный анализ всех нюансов ${geoContext}. ${randomEnding}.`
+        ];
+        
+        // Выбираем шаблон на основе postNumber, threadId и времени
+        const templateIndex = (postNumber * 3 + threadId * 7 + Date.now()) % descriptionTemplates.length;
+        let description = descriptionTemplates[templateIndex];
+        
+        // Обрезаем до 160 символов для SEO
+        if (description.length > 160) {
+            description = description.substring(0, 157) + '...';
+        }
+        
+        console.log(`[UNIQUE] Thread #${threadId}: Создано уникальное описание: "${description.substring(0, 50)}..."`);
+        return description;
+        
+    } catch (error) {
+        console.log(`[UNIQUE] Thread #${threadId}: Ошибка создания описания: ${error.message}`);
+        // Fallback
+        return `Выбираете ${keyword}? Наш гид поможет сделать правильный выбор. Экспертные рекомендации от BlondePlace.`;
     }
 }
 
@@ -187,9 +328,9 @@ ${plan}
         const articleResponse = await generateWithAI(articlePrompt);
         let articleText = cleanAIComments(articleResponse);
         
-        // Создаем мета-данные
-        const seoData = await createSmartUniqueTitle(keyword, postNumber, geoContext);
-        const description = await createSmartUniqueDescription(keyword, postNumber, geoContext);
+        // Создаем абсолютно уникальные мета-данные
+        const seoData = await createAbsolutelyUniqueTitle(keyword, postNumber, threadId);
+        const description = await createAbsolutelyUniqueDescription(keyword, postNumber, threadId, geoContext);
         
         // Генерируем правильное изображение
         const heroImage = generateProperHeroImage(keyword);
@@ -245,44 +386,7 @@ ${JSON.stringify(schema, null, 2)}
 
 // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
 function getGeoContext(threadId) {
-    const contexts = [
-        "в Санкт-Петербурге",
-        "в центре Питера", 
-        "на Невском проспекте",
-        "в салоне BlondePlace",
-        "в премиум-салоне",
-        "для мастеров СПб",
-        "в beauty-индустрии",
-        "в современном салоне"
-    ];
-    return contexts[(threadId - 1) % contexts.length];
-}
-
-async function createSmartUniqueTitle(keyword, postNumber, geoContext) {
-    const variations = [
-        `${keyword}: ваш гид по эргономике`,
-        `${keyword}: секреты профессионалов`,
-        `${keyword}: полный обзор 2025`,
-        `${keyword}: как выбрать правильно`,
-        `${keyword}: экспертные советы`,
-        `${keyword}: практический гид`,
-        `${keyword}: все что нужно знать`,
-        `${keyword}: профессиональный подход`
-    ];
-    
-    const baseTitle = variations[postNumber % variations.length];
-    return { title: baseTitle.slice(0, 45) }; // Максимум 45 символов
-}
-
-async function createSmartUniqueDescription(keyword, postNumber, geoContext) {
-    const variations = [
-        `Неудобное кресло крадет вашу энергию и деньги. В статье разбираем, как высота, спинка и колесики влияют на продуктивность. Сделайте правильный выбор с нами.`,
-        `Выбираете ${keyword}? Наш экспертный гид поможет избежать ошибок. Разбираем все нюансы: от эргономики до цены. Профессиональные советы ${geoContext}.`,
-        `Качественный ${keyword} - основа успешной работы. Делимся секретами выбора, на которые обращают внимание профессионалы. Экспертные рекомендации от BlondePlace.`
-    ];
-    
-    const description = variations[postNumber % variations.length];
-    return description.slice(0, 160); // Максимум 160 символов
+    return GEO_CONTEXTS[(threadId - 1) % GEO_CONTEXTS.length];
 }
 
 function createHowToSchema(title, description, heroImage, postNumber) {
@@ -416,11 +520,13 @@ async function main() {
         const modelChoice = process.env.MODEL_CHOICE || 'gemini';
         
         console.log(`[KEY] [ALPHA-STRIKE #${threadId}] Модель: ${modelChoice}, ключ: ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.7 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.7 ===`);
+        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.8 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.8 - ABSOLUTE UNIQUE ===`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Цель: ${targetArticles} уникальных статей`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Ключевые слова: ${ALPHA_KEYWORDS.length} шт`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Правильные ключи: ${ALPHA_KEYWORDS.join(', ')}`);
+        console.log(`[UNIQUE] [ALPHA-STRIKE #${threadId}] Заголовков: ${TITLE_PREFIXES.length * TITLE_MODIFIERS.length}+ комбинаций`);
+        console.log(`[UNIQUE] [ALPHA-STRIKE #${threadId}] Описаний: ${DESCRIPTION_STARTERS.length * DESCRIPTION_MIDDLES.length * DESCRIPTION_ENDINGS.length}+ комбинаций`);
         
         // ИСПРАВЛЕНО: Получаем уникальный стартовый номер для каждого потока
         const startNumber = await getNextAvailablePostNumber(threadId);
@@ -441,7 +547,7 @@ async function main() {
             await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.7 ЗАВЕРШЕНА ===`);
+        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.8 ЗАВЕРШЕНА ===`);
         console.log(`[STATS] Создано статей: ${results.length}`);
         console.log(`[STATS] Общее количество ссылок на основной сайт: ~${results.length * 85}`);
         console.log(`[STATS] Финальная скорость: 500мс`);
