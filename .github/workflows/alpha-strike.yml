@@ -1,4 +1,4 @@
-name: 🚀 ALPHA-STRIKE v5.0
+name: ALPHA-STRIKE v5.1
 
 on:
   workflow_dispatch:
@@ -28,25 +28,25 @@ permissions:
 
 jobs:
   alpha-strike-attack:
-    name: 🎯 ALPHA-STRIKE v5.0 (${{ matrix.thread-id }})
+    name: ALPHA-STRIKE v5.1 (${{ matrix.thread-id }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
         thread-id: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     
     steps:
-      - name: 📦 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
         
-      - name: 🟢 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           
-      - name: 📚 Install Dependencies
+      - name: Install Dependencies
         run: npm install @google/generative-ai
 
-      - name: 🔑 SETUP API KEYS
+      - name: SETUP API KEYS
         run: |
           echo "Processing API keys for thread ${{ matrix.thread-id }}"
           if [ "${{ github.event.inputs.model_choice }}" == "gemini" ]; then
@@ -65,7 +65,7 @@ jobs:
             echo "Thread ${{ matrix.thread-id }} using OpenRouter key: ...${SELECTED_KEY: -4}"
           fi
 
-      - name: 🚀 RUN ALPHA-STRIKE v5.0 #${{ matrix.thread-id }}
+      - name: RUN ALPHA-STRIKE v5.1
         env:
           TARGET_ARTICLES: ${{ github.event.inputs.target_articles }}
           MODEL_CHOICE: ${{ github.event.inputs.model_choice }}
@@ -79,11 +79,11 @@ jobs:
           
           # GIT COMMIT AND PUSH LIKE ORIGINAL FACTORY.YML
           if [[ -z $(git status --porcelain) ]]; then
-            echo "✅ Thread ${{ matrix.thread-id }}: No new articles created. Finishing."
+            echo "Thread ${{ matrix.thread-id }}: No new articles created. Finishing."
             exit 0
           fi
 
-          echo "🔥 Thread ${{ matrix.thread-id }}: Found new Alpha-Strike content. Publishing..."
+          echo "Thread ${{ matrix.thread-id }}: Found new Alpha-Strike content. Publishing..."
           
           # Setup git config
           git config --global user.name 'Alpha-Strike Bot'
@@ -95,7 +95,7 @@ jobs:
           RETRY_DELAY=3
           
           for ((i=1; i<=MAX_RETRIES; i++)); do
-            echo "🔄 Attempt $i/$MAX_RETRIES: Syncing and pushing..."
+            echo "Attempt $i/$MAX_RETRIES: Syncing and pushing..."
             
             # Stash any changes first
             git stash push -u -m "Thread ${{ matrix.thread-id }} - attempt $i" || echo "Nothing to stash"
@@ -111,19 +111,19 @@ jobs:
             
             # Check if there's anything to commit
             if git diff --cached --quiet; then
-              echo "✅ No changes to commit in attempt $i"
+              echo "No changes to commit in attempt $i"
               break
             fi
             
             # Commit
-            git commit -m "🚀 Alpha-Strike content from thread ${{ matrix.thread-id }} (${{ github.event.inputs.model_choice || 'gemini' }})"
+            git commit -m "Alpha-Strike content from thread ${{ matrix.thread-id }} (${{ github.event.inputs.model_choice || 'gemini' }})"
             
             # Try to push
             if git push origin main; then
-              echo "✅ Push successful on attempt $i"
+              echo "Push successful on attempt $i"
               break
             else
-              echo "⚠️ Push failed on attempt $i"
+              echo "Push failed on attempt $i"
               if [ $i -eq $MAX_RETRIES ]; then
                 echo "::error::Failed to push after $MAX_RETRIES attempts"
                 exit 1
@@ -138,16 +138,16 @@ jobs:
           echo "ALPHA-STRIKE Thread ${{ matrix.thread-id }} COMPLETE"
 
   quality-control:
-    name: 🔍 QUALITY CONTROL
+    name: QUALITY CONTROL
     runs-on: ubuntu-latest
     needs: alpha-strike-attack
     if: always()
     
     steps:
-      - name: 📦 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
         
-      - name: 🔍 Quality Control Check
+      - name: Quality Control Check
         run: |
           echo "=== QUALITY CONTROL OPERATION ==="
           
@@ -157,7 +157,7 @@ jobs:
           
           if [ $ARTICLES -gt 0 ]; then
             echo ""
-            echo "📝 CREATED ARTICLES LIST:"
+            echo "CREATED ARTICLES LIST:"
             for file in src/content/posts/post*.md; do
               if [ -f "$file" ]; then
                 BASENAME=$(basename "$file" .md)
@@ -166,7 +166,7 @@ jobs:
             done
             
             echo ""
-            echo "📊 QUALITY METRICS:"
+            echo "QUALITY METRICS:"
             
             # Check unique titles
             TITLES=$(grep -h "^title:" src/content/posts/post*.md 2>/dev/null | sort | uniq | wc -l)
@@ -199,7 +199,7 @@ jobs:
             done
             
             echo ""
-            echo "📢 IndexNow URLs (samples):"
+            echo "IndexNow URLs (samples):"
             for file in $(find src/content/posts -name "post*.md" | head -5); do
               if [ -f "$file" ]; then
                 BASENAME=$(basename "$file" .md)
@@ -212,23 +212,23 @@ jobs:
           echo "Quality control completed"
 
   final-report:
-    name: 📊 FINAL REPORT
+    name: FINAL REPORT
     runs-on: ubuntu-latest
     needs: [alpha-strike-attack, quality-control]
     if: always()
     
     steps:
-      - name: 📦 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
         
-      - name: 📊 Generate Final Report
+      - name: Generate Final Report
         run: |
           ARTICLES_COUNT=${{ github.event.inputs.target_articles }}
           THREADS_COUNT=${{ github.event.inputs.target_threads }}
           MODEL_CHOICE=${{ github.event.inputs.model_choice }}
           EXPECTED_LINKS=$((ARTICLES_COUNT * 85))
           
-          echo "# ALPHA-STRIKE OPERATION REPORT v5.0" > ALPHA_STRIKE_REPORT.md
+          echo "# ALPHA-STRIKE OPERATION REPORT v5.1" > ALPHA_STRIKE_REPORT.md
           echo "" >> ALPHA_STRIKE_REPORT.md
           echo "## Operation parameters" >> ALPHA_STRIKE_REPORT.md
           echo "- **Articles target**: $ARTICLES_COUNT" >> ALPHA_STRIKE_REPORT.md
@@ -283,15 +283,30 @@ jobs:
           echo "- Consider scaling to 10,000 articles" >> ALPHA_STRIKE_REPORT.md
           echo "" >> ALPHA_STRIKE_REPORT.md
           echo "---" >> ALPHA_STRIKE_REPORT.md
-          echo "*Report created automatically by Alpha-Strike system v5.0*" >> ALPHA_STRIKE_REPORT.md
+          echo "*Report created automatically by Alpha-Strike system v5.1*" >> ALPHA_STRIKE_REPORT.md
           
           echo "Report created: ALPHA_STRIKE_REPORT.md"
           cat ALPHA_STRIKE_REPORT.md
           
-      - name: 💾 Commit Report
+      - name: Commit Report with Git Pull
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          
+          # Pull latest changes first to avoid conflicts
+          git pull origin main || echo "Pull completed with conflicts"
+          
           git add ALPHA_STRIKE_REPORT.md
-          git commit -m "Alpha-Strike v5.0 operation report - $(date)"
-          git push
+          git commit -m "Alpha-Strike v5.1 operation report - $(date)" || echo "Nothing to commit"
+          
+          # Try to push with retry logic
+          for i in {1..3}; do
+            if git push origin main; then
+              echo "Report pushed successfully"
+              break
+            else
+              echo "Push failed, attempt $i. Pulling and retrying..."
+              git pull --rebase origin main
+              sleep 2
+            fi
+          done
