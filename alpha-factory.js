@@ -1,14 +1,13 @@
-// ===== ALPHA-FACTORY v5.5 - COMPLETE FIX =====
+// ===== ALPHA-FACTORY v5.6 - ES MODULES FIX =====
 // Исправления:
-// 1. getNextAvailablePostNumber() - корректная работа
-// 2. Агрессивная очистка ИИ комментариев
-// 3. Правильные изображения (не от Butler)
-// 4. Улучшенная обработка ошибок
+// 1. Переписан на ES modules (import/export)
+// 2. Совместимость с package.json "type": "module"
+// 3. Все остальные исправления v5.5 сохранены
 
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const fetch = require('node-fetch');
-const fs = require('fs').promises;
-const path = require('path');
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import fetch from 'node-fetch';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // ===== КОНФИГУРАЦИЯ =====
 const ALPHA_KEYWORDS = [
@@ -49,7 +48,7 @@ async function getNextAvailablePostNumber() {
         
         const response = await fetch('https://api.github.com/repos/terrminatorx4/blondeplace/contents/src/content/posts', {
             headers: {
-                'User-Agent': 'Alpha-Factory-v5.5'
+                'User-Agent': 'Alpha-Factory-v5.6'
             }
         });
         
@@ -190,7 +189,7 @@ ${plan}
         const heroImage = generateProperHeroImage(keyword);
         
         // Создаем Schema.org
-        const schema = createHowToSchema(seoData.title, description, heroImage);
+        const schema = createHowToSchema(seoData.title, description, heroImage, postNumber);
         
         // Вставляем ссылки
         articleText = generateIntelligentLinks(articleText);
@@ -280,7 +279,7 @@ async function createSmartUniqueDescription(keyword, postNumber, geoContext) {
     return description.slice(0, 160); // Максимум 160 символов
 }
 
-function createHowToSchema(title, description, heroImage) {
+function createHowToSchema(title, description, heroImage, postNumber) {
     const ratingValue = (4.7 + Math.random() * 0.3).toFixed(1);
     const reviewCount = Math.floor(Math.random() * 600) + 300;
     
@@ -411,8 +410,8 @@ async function main() {
         const modelChoice = process.env.MODEL_CHOICE || 'gemini';
         
         console.log(`[KEY] [ALPHA-STRIKE #${threadId}] Модель: ${modelChoice}, ключ: ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.5 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.5 ===`);
+        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.6 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.6 ===`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Цель: ${targetArticles} уникальных статей`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Ключевые слова: ${ALPHA_KEYWORDS.length} шт`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Правильные ключи: ${ALPHA_KEYWORDS.join(', ')}`);
@@ -436,7 +435,7 @@ async function main() {
             await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.5 ЗАВЕРШЕНА ===`);
+        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.6 ЗАВЕРШЕНА ===`);
         console.log(`[STATS] Создано статей: ${results.length}`);
         console.log(`[STATS] Общее количество ссылок на основной сайт: ~${results.length * 85}`);
         console.log(`[STATS] Финальная скорость: 500мс`);
@@ -471,9 +470,10 @@ async function main() {
     }
 }
 
-// Запуск
-if (require.main === module) {
-    main();
-}
+// ES MODULES EXPORT
+export { main };
 
-module.exports = { main }; 
+// Запуск для прямого вызова
+if (import.meta.url === `file://${process.argv[1]}`) {
+    main();
+} 
