@@ -1,15 +1,15 @@
-name: ALPHA-STRIKE v4.0
+name: PLAN ALPHA-STRIKE v4.0 - INFORMATION CENTER
 
 on:
   workflow_dispatch:
     inputs:
       target_articles:
-        description: 'Количество статей (введите число)'
+        description: 'оличество статей (введите число)'
         required: true
         default: '20'
         type: string
       threads:
-        description: 'Количество потоков'
+        description: 'Number of parallel threads (1-20)'
         required: true
         default: '20'
         type: choice
@@ -18,17 +18,21 @@ on:
           - '10'
           - '20'
       model_choice:
-        description: 'AI модель'
+        description: 'AI model choice'
         required: true
         default: 'gemini'
         type: choice
         options:
           - 'gemini'
           - 'deepseek'
+      start_from_thread:
+        description: 'Start from thread (for partial runs)'
+        required: false
+        default: '1'
 
 jobs:
   alpha-strike-preparation:
-    name: ПОДГОТОВКА
+    name: ALPHA-STRIKE PREPARATION
     runs-on: ubuntu-latest
     outputs:
       articles-per-thread: ${{ steps.calculate.outputs.articles-per-thread }}
@@ -36,19 +40,22 @@ jobs:
       thread-matrix: ${{ steps.calculate.outputs.thread-matrix }}
       
     steps:
-    - name: Расчет параметров
+    - name: CALCULATE OPERATION PARAMETERS
       id: calculate
       run: |
         TARGET_ARTICLES=${{ github.event.inputs.target_articles || '20' }}
         THREADS=${{ github.event.inputs.threads || '20' }}
+        START_FROM=${{ github.event.inputs.start_from_thread || '1' }}
         
+        # Calculate articles per thread
         ARTICLES_PER_THREAD=$(( TARGET_ARTICLES / THREADS ))
         if [ $(( TARGET_ARTICLES % THREADS )) -ne 0 ]; then
           ARTICLES_PER_THREAD=$(( ARTICLES_PER_THREAD + 1 ))
         fi
         
+        # Create thread matrix starting from specified
         THREAD_LIST=""
-        for i in $(seq 1 $THREADS); do
+        for i in $(seq $START_FROM $THREADS); do
           if [ -z "$THREAD_LIST" ]; then
             THREAD_LIST="$i"
           else
@@ -56,18 +63,22 @@ jobs:
           fi
         done
         
+        # Expected number of links (85 links per article)
         EXPECTED_LINKS=$(( TARGET_ARTICLES * 85 ))
         
         echo "articles-per-thread=$ARTICLES_PER_THREAD" >> $GITHUB_OUTPUT
         echo "expected-links=$EXPECTED_LINKS" >> $GITHUB_OUTPUT
         echo "thread-matrix=[$THREAD_LIST]" >> $GITHUB_OUTPUT
         
-        echo "Статей: $TARGET_ARTICLES"
-        echo "Потоков: $THREADS"
-        echo "Статей на поток: $ARTICLES_PER_THREAD"
+        echo "OPERATION PLAN:"
+        echo "   Total articles: $TARGET_ARTICLES"
+        echo "   Expected links: $EXPECTED_LINKS"
+        echo "   Threads: $THREADS (starting from $START_FROM)"
+        echo "   Articles per thread: $ARTICLES_PER_THREAD"
+        echo "   AI Model: ${{ github.event.inputs.model_choice || 'gemini' }}"
 
   alpha-strike-attack:
-    name: АЛЬФА-УДАР #${{ matrix.thread-id }}
+    name: ALPHA-STRIKE #${{ matrix.thread-id }}
     runs-on: ubuntu-latest
     needs: alpha-strike-preparation
     strategy:
@@ -76,27 +87,69 @@ jobs:
         thread-id: ${{ fromJson(needs.alpha-strike-preparation.outputs.thread-matrix) }}
     
     steps:
-    - name: Checkout
+    - name: GET OPERATION CODE
       uses: actions/checkout@v4
       
-    - name: Setup Node.js
+    - name: SETUP Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         
-    - name: Install dependencies
+    - name: INSTALL DEPENDENCIES
       run: |
         npm install @google/generative-ai
         npm install node-fetch
         npm install execa
+
+    - name: SETUP API KEYS (как в оригинальном factory.yml)
+      run: |
+        echo "🔑 Processing API keys for thread ${{ matrix.thread-id }}"
         
-    - name: Run Alpha-Strike
+        if [ "${{ github.event.inputs.model_choice }}" == "gemini" ]; then
+          echo "📊 Setting up Gemini API keys..."
+          GEMINI_KEYS="${{ secrets.GEMINI_API_KEYS_POOL }}"
+          if [ -z "$GEMINI_KEYS" ]; then
+            echo "❌ GEMINI_API_KEYS_POOL is empty!"
+            exit 1
+          fi
+          
+          echo "📊 Gemini keys available: YES"
+          echo "📊 OpenRouter keys available: NO"
+          
+          GEMINI_KEYS_COUNT=$(echo "$GEMINI_KEYS" | tr ',' '\n' | wc -l)
+          echo "📊 Gemini keys loaded: $GEMINI_KEYS_COUNT"
+          
+          KEY_INDEX=$(( (${{ matrix.thread-id }} - 1) % $GEMINI_KEYS_COUNT + 1 ))
+          SELECTED_KEY=$(echo "$GEMINI_KEYS" | tr ',' '\n' | sed -n "${KEY_INDEX}p")
+          
+          echo "✅ Thread ${{ matrix.thread-id }} using Gemini key index: $KEY_INDEX"
+          echo "GEMINI_API_KEY_CURRENT=$SELECTED_KEY" >> $GITHUB_ENV
+        else
+          echo "📊 Setting up OpenRouter API keys..."
+          OPENROUTER_KEYS="${{ secrets.OPENROUTER_API_KEYS_POOL }}"
+          if [ -z "$OPENROUTER_KEYS" ]; then
+            echo "❌ OPENROUTER_API_KEYS_POOL is empty!"
+            exit 1
+          fi
+          
+          echo "📊 Gemini keys available: NO"
+          echo "📊 OpenRouter keys available: YES"
+          
+          OPENROUTER_KEYS_COUNT=$(echo "$OPENROUTER_KEYS" | tr ',' '\n' | wc -l)
+          echo "📊 OpenRouter keys loaded: $OPENROUTER_KEYS_COUNT"
+          
+          KEY_INDEX=$(( (${{ matrix.thread-id }} - 1) % $OPENROUTER_KEYS_COUNT + 1 ))
+          SELECTED_KEY=$(echo "$OPENROUTER_KEYS" | tr ',' '\n' | sed -n "${KEY_INDEX}p")
+          
+          echo "✅ Thread ${{ matrix.thread-id }} using OpenRouter key index: $KEY_INDEX"
+          echo "OPENROUTER_API_KEY_CURRENT=$SELECTED_KEY" >> $GITHUB_ENV
+        fi
+        
+    - name: RUN ALPHA-STRIKE v4.0 #${{ matrix.thread-id }}
       env:
         THREAD_ID: ${{ matrix.thread-id }}
         ALPHA_ARTICLES: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }}
         MODEL_CHOICE: ${{ github.event.inputs.model_choice || 'gemini' }}
-        GEMINI_API_KEY_CURRENT: ${{ secrets.GEMINI_API_KEYS_POOL }}
-        OPENROUTER_API_KEY_CURRENT: ${{ secrets.OPENROUTER_API_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
       run: |
@@ -104,31 +157,49 @@ jobs:
         echo "Articles: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }}"
         echo "Model: ${{ github.event.inputs.model_choice || 'gemini' }}"
         
+        # Run super-enhanced content factory
         node alpha-factory.js
         
         echo "ALPHA-STRIKE Thread ${{ matrix.thread-id }} COMPLETE"
 
   alpha-strike-quality-control:
-    name: КОНТРОЛЬ КАЧЕСТВА
+    name: QUALITY CONTROL
     runs-on: ubuntu-latest
     needs: [alpha-strike-preparation, alpha-strike-attack]
     if: always()
     
     steps:
-    - name: Checkout
+    - name: GET CODE
       uses: actions/checkout@v4
       
-    - name: Analyze content
+    - name: ANALYZE CREATED CONTENT
       run: |
-        echo "=== QUALITY CONTROL ==="
+        echo "=== QUALITY CONTROL OPERATION ==="
         
+        # Count created files
         if [ -d "src/content/posts" ]; then
           POST_COUNT=$(find src/content/posts -name "post*.md" | wc -l)
-          echo "Articles found: $POST_COUNT"
+          echo "Found articles: $POST_COUNT"
           
+          # Check title uniqueness
           UNIQUE_TITLES=$(find src/content/posts -name "post*.md" -exec grep -h "^title:" {} \; | sort | uniq | wc -l)
           TOTAL_TITLES=$(find src/content/posts -name "post*.md" -exec grep -h "^title:" {} \; | wc -l)
           echo "Unique titles: $UNIQUE_TITLES of $TOTAL_TITLES"
+          
+          # Check meta-tag length (first 5 files)
+          echo "Meta-tag length check (samples):"
+          find src/content/posts -name "post*.md" | head -5 | while read file; do
+            TITLE=$(grep "^title:" "$file" | sed 's/title: "//g' | sed 's/"$//g')
+            DESC=$(grep "^description:" "$file" | sed 's/description: "//g' | sed 's/"$//g')
+            echo "   $(basename "$file"): Title ${#TITLE} chars, Description ${#DESC} chars"
+          done
+          
+          # Check link count (first 3 files)
+          echo "Link check (samples):"
+          find src/content/posts -name "post*.md" | head -3 | while read file; do
+            LINKS=$(grep -o '<a href=' "$file" | wc -l)
+            echo "   $(basename "$file"): $LINKS links"
+          done
         else
           echo "Directory src/content/posts not found"
         fi
@@ -136,38 +207,63 @@ jobs:
         echo "Quality control completed"
 
   alpha-strike-final-report:
-    name: ФИНАЛЬНЫЙ ОТЧЕТ
+    name: FINAL REPORT
     runs-on: ubuntu-latest
     needs: [alpha-strike-preparation, alpha-strike-attack, alpha-strike-quality-control]
     if: always()
     
     steps:
-    - name: Checkout
+    - name: GET CODE
       uses: actions/checkout@v4
       
-    - name: Create report
+    - name: CREATE OPERATION REPORT
       run: |
-        echo "# Alpha-Strike Operation Report" > ALPHA_STRIKE_REPORT.md
+        echo "# ALPHA-STRIKE OPERATION REPORT v4.0" > ALPHA_STRIKE_REPORT.md
         echo "" >> ALPHA_STRIKE_REPORT.md
-        echo "## Parameters" >> ALPHA_STRIKE_REPORT.md
-        echo "- Articles: ${{ github.event.inputs.target_articles || '20' }}" >> ALPHA_STRIKE_REPORT.md
-        echo "- Threads: ${{ github.event.inputs.threads || '20' }}" >> ALPHA_STRIKE_REPORT.md
-        echo "- Model: ${{ github.event.inputs.model_choice || 'gemini' }}" >> ALPHA_STRIKE_REPORT.md
-        echo "- Expected links: ${{ needs.alpha-strike-preparation.outputs.expected-links }}" >> ALPHA_STRIKE_REPORT.md
-        echo "- Date: $(date)" >> ALPHA_STRIKE_REPORT.md
+        echo "## Operation parameters" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Articles created**: ${{ github.event.inputs.target_articles || '20' }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Threads used**: ${{ github.event.inputs.threads || '20' }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- **AI Model**: ${{ github.event.inputs.model_choice || 'gemini' }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Expected links**: ${{ needs.alpha-strike-preparation.outputs.expected-links }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Operation date**: $(date)" >> ALPHA_STRIKE_REPORT.md
         echo "" >> ALPHA_STRIKE_REPORT.md
-        echo "## Status" >> ALPHA_STRIKE_REPORT.md
-        echo "- Preparation: ${{ needs.alpha-strike-preparation.result }}" >> ALPHA_STRIKE_REPORT.md
-        echo "- Execution: ${{ needs.alpha-strike-attack.result }}" >> ALPHA_STRIKE_REPORT.md
-        echo "- Quality control: ${{ needs.alpha-strike-quality-control.result }}" >> ALPHA_STRIKE_REPORT.md
+        echo "## Operation status" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Preparation**: ${{ needs.alpha-strike-preparation.result }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Execution**: ${{ needs.alpha-strike-attack.result }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Quality control**: ${{ needs.alpha-strike-quality-control.result }}" >> ALPHA_STRIKE_REPORT.md
+        echo "" >> ALPHA_STRIKE_REPORT.md
+        echo "## Expected results" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Start indexing**: 24-48 hours" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Position growth**: 3-7 days" >> ALPHA_STRIKE_REPORT.md
+        echo "- **TOP-10 by keywords**: 1-2 weeks" >> ALPHA_STRIKE_REPORT.md
+        echo "- **TOP-1 by keywords**: 2-4 weeks" >> ALPHA_STRIKE_REPORT.md
+        echo "" >> ALPHA_STRIKE_REPORT.md
+        echo "## Link aggression" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Links per article**: 85" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Total number**: ${{ needs.alpha-strike-preparation.outputs.expected-links }}" >> ALPHA_STRIKE_REPORT.md
+        echo "- **Target URLs**: 10 different blondeplace.ru sections" >> ALPHA_STRIKE_REPORT.md
+        echo "" >> ALPHA_STRIKE_REPORT.md
+        echo "## Monitoring" >> ALPHA_STRIKE_REPORT.md
+        echo "1. Track indexing in Yandex.Webmaster" >> ALPHA_STRIKE_REPORT.md
+        echo "2. Check positions by key phrases" >> ALPHA_STRIKE_REPORT.md
+        echo "3. Analyze traffic to main site" >> ALPHA_STRIKE_REPORT.md
+        echo "4. Control link mass" >> ALPHA_STRIKE_REPORT.md
+        echo "" >> ALPHA_STRIKE_REPORT.md
+        echo "## Next steps" >> ALPHA_STRIKE_REPORT.md
+        echo "- Wait for indexing (24-48 hours)" >> ALPHA_STRIKE_REPORT.md
+        echo "- If necessary, run additional threads" >> ALPHA_STRIKE_REPORT.md
+        echo "- Consider scaling to 10,000 articles" >> ALPHA_STRIKE_REPORT.md
+        echo "" >> ALPHA_STRIKE_REPORT.md
+        echo "---" >> ALPHA_STRIKE_REPORT.md
+        echo "*Report created automatically by Alpha-Strike system v4.0*" >> ALPHA_STRIKE_REPORT.md
         
         echo "Report created: ALPHA_STRIKE_REPORT.md"
         cat ALPHA_STRIKE_REPORT.md
         
-    - name: Save report
+    - name: SAVE REPORT
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add ALPHA_STRIKE_REPORT.md
-        git commit -m "Alpha-Strike v4.0 report - $(date)" || exit 0
-        git push || exit 0 
+        git commit -m "Alpha-Strike v4.0 operation report - $(date)" || exit 0
+        git push || exit 0
