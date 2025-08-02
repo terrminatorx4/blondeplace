@@ -1,36 +1,80 @@
 [build]
+  command = "npm run build"
   publish = "dist"
-  command = "npm install --legacy-peer-deps && astro build && node postbuild.js"
   
 [build.environment]
   NODE_VERSION = "18"
-  ASTRO_TELEMETRY_DISABLED = "1"
-  NODE_ENV = "production"
 
-# SECURITY HEADERS
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
+
+[plugins.inputs]
+  buildDir = "dist"
+
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com; media-src 'self'; connect-src 'self' https://api.indexnow.org; frame-src 'none';"
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+    Content-Type = "application/xml"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+    Content-Type = "text/plain"
+
+[[redirects]]
+  from = "/blog/index.html"
+  to = "/blog/"
+  status = 301
+
+[[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301
+
+# Security headers для улучшения SEO и безопасности (как в Butler Factory)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://mc.yandex.ru; media-src 'self'; connect-src 'self' https://api.indexnow.org; frame-src 'none';"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
-# 🔥 SEO OPTIMIZATION PLUGINS ONLY
-[[plugins]]
-  package = "@netlify/plugin-sitemap"
-  
-  [plugins.inputs]
-    changeFreq = "daily"
-    priority = 0.8
-    prettyURLs = true
-    trailingSlash = false
-
-# УБИРАЕМ LIGHTHOUSE ВРЕМЕННО - ОН ЛОМАЕТ DEPLOY
-# [[plugins]]
-#   package = "@netlify/plugin-lighthouse"
-#   
-#   [plugins.inputs]
-#     fail_deploy_on_score_thresholds = "false"
+# Кеширование для лучшей производительности
+[[headers]]
+  for = "/blog/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, s-maxage=86400" 
