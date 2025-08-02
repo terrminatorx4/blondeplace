@@ -95,8 +95,8 @@ jobs:
         THREAD_ID: ${{ matrix.thread-id }}
         ALPHA_ARTICLES: ${{ needs.alpha-strike-preparation.outputs.articles-per-thread }}
         MODEL_CHOICE: ${{ github.event.inputs.model_choice || 'gemini' }}
-        API_KEY_CURRENT: ${{ secrets.GEMINI_API_KEYS_POOL }}
-        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        GEMINI_API_KEY_CURRENT: ${{ secrets.GEMINI_API_KEYS_POOL }}
+        OPENROUTER_API_KEY_CURRENT: ${{ secrets.OPENROUTER_API_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
       run: |
