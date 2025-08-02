@@ -1,29 +1,28 @@
-// Файл: alpha-factory.js (ИСПРАВЛЕННАЯ ВЕРСИЯ БЕЗ СИНТАКСИЧЕСКИХ ОШИБОК)
+// айл: alpha-factory.js (Alpha-Strike v5.0 - СЯ   FACTORY.JS)
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
 import fetch from 'node-fetch';
 import { execa } from 'execa';
 
-// --- КОНСТАНТЫ ---
+// --- СТТЫ ---
 const SITE_URL = 'https://blondeplace.netlify.app';
 const BRAND_NAME = 'BlondePlace';
-const BRAND_BLOG_NAME = 'Блог BlondePlace';
-const BRAND_AUTHOR_NAME = 'Эксперт BlondePlace';
+const BRAND_BLOG_NAME = 'лог BlondePlace';
+const BRAND_AUTHOR_NAME = 'ксперт BlondePlace';
 const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop';
 const INDEXNOW_API_KEY = 'df39150ca56f896546628ae3c923dd4a';
 
-// --- НАСТРОЙКИ ОПЕРАЦИИ ---
+// --- СТ  ---
 const TARGET_URL_MAIN = "https://blondeplace.ru";
-const TOPICS_FILE = 'topics.txt';
 const POSTS_DIR = 'src/content/posts';
 
-// --- НАСТРОЙКИ МОДЕЛЕЙ ---
+// --- СТ  ---
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
 const GEMINI_MODEL_NAME = "gemini-2.5-pro";
 
-// --- ИНИЦИАЛИЗАЦИЯ API КЛЮЧЕЙ (УПРОЩЕННАЯ КАК В FACTORY.JS) ---
+// --- Я API  (ЩЯ   FACTORY.JS) ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
 const GEMINI_API_KEY_CURRENT = process.env.GEMINI_API_KEY_CURRENT;
@@ -37,22 +36,15 @@ if (modelChoice === 'deepseek') {
 }
 
 if (!apiKey) {
-    throw new Error(`[АЛЬФА-УДАР #${threadId}] Не был предоставлен API-ключ!`);
+    throw new Error(`[Ь- #${threadId}] е был предоставлен API-ключ!`);
 }
+console.log(`[🔑] [Ь- #${threadId}] одель: ${modelChoice}, ключ: ...${apiKey.slice(-4)}`);
 
-console.log(`[🔑] [АЛЬФА-УДАР #${threadId}] Модель: ${modelChoice}, ключ: ...${apiKey.slice(-4)}`);
-
-const targetArticles = parseInt(process.env.ALPHA_ARTICLES, 10) || 30;
-
-console.log(`🚀💥 [АЛЬФА-УДАР #${threadId}] Инициализация боевой системы v4.0 с ключом ...${apiKey.slice(-4)}`);
-console.log(`🎯 [АЛЬФА-УДАР #${threadId}] Цель: ${targetArticles} статей с 85+ ссылками каждая`);
-
-// --- ПРОСТАЯ ЗАДЕРЖКА (БЕЗ АДАПТИВНОЙ ЛОГИКИ) ---
+// --- СТЯ  ( Т ) ---
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-
-const baseDelay = 500; // Базовая задержка
+const baseDelay = 500; // азовая задержка
 
 function slugify(text) {
     const cleanedText = text.toString().replace(/[\x00-\x1F\x7F-\x9F]/g, "").trim();
@@ -66,7 +58,7 @@ function slugify(text) {
 }
 
 async function generateWithRetry(prompt, maxRetries = 4) {
-    let delayTime = baseDelay;
+    let delay = 5000;
     for (let i = 0; i < maxRetries; i++) {
         try {
             if (modelChoice === 'deepseek') {
@@ -85,10 +77,10 @@ async function generateWithRetry(prompt, maxRetries = 4) {
                 });
                 if (!response.ok) {
                     if (response.status === 429) throw new Error(`429 Too Many Requests`);
-                    throw new Error(`Ошибка HTTP от OpenRouter: ${response.status}`);
+                    throw new Error(`шибка HTTP от OpenRouter: ${response.status}`);
                 }
                 const data = await response.json();
-                if (!data.choices || data.choices.length === 0) throw new Error("Ответ от API OpenRouter не содержит поля 'choices'.");
+                if (!data.choices || data.choices.length === 0) throw new Error("твет от API OpenRouter не содержит поля 'choices'.");
                 return data.choices[0].message.content;
             } else {
                 const genAI = new GoogleGenerativeAI(apiKey);
@@ -98,109 +90,137 @@ async function generateWithRetry(prompt, maxRetries = 4) {
             }
         } catch (error) {
             if (error.message.includes('503') || error.message.includes('429')) {
-                console.warn(`[!] [АЛЬФА-УДАР #${threadId}] Ошибка ${i + 1}/${maxRetries}. Повтор через ${delayTime}мс`);
-                await delay(delayTime);
-                delayTime *= 2;
+                console.warn(`[!] [Ь- #${threadId}] одель перегружена. опытка ${i + 1}/${maxRetries}. ду ${delay / 1000}с...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
             } else {
                 throw error;
             }
         }
     }
-    throw new Error(`[АЛЬФА-УДАР #${threadId}] Не удалось получить ответ от модели ${modelChoice} после ${maxRetries} попыток.`);
+    throw new Error(`[Ь- #${threadId}] е удалось получить ответ от модели ${modelChoice} после ${maxRetries} попыток.`);
 }
 
-// --- ПРОСТАЯ ГЕНЕРАЦИЯ СТАТЬИ ---
+// ---   FACTORY.JS: ЬЯ Я generatePost ---
 async function generatePost(topic, postNumber) {
-    console.log(`[💥] [АЛЬФА-УДАР #${threadId}] Генерирую супер-статью #${postNumber} по ключу: ${topic}`);
+    console.log(`[💥] [Ь- #${threadId}] енерирую супер-статью #${postNumber} по ключу: ${topic}`);
     
-    const articlePrompt = `Напиши экспертную статью объемом МИНИМУМ 8000 символов на тему "${topic}".
+    // 🎯  FACTORY.JS: С-ТЬЫ 
+    const planPrompt = `Создай максимально детальный, многоуровневый план для экспертной SEO-статьи на тему "${topic}". 
 
-КРИТИЧЕСКИЕ ТРЕБОВАНИЯ:
-- Статья должна быть МАКСИМАЛЬНО подробной и экспертной
-- Обязательно включи FAQ секцию в конце  
-- Пиши от лица экспертов салона красоты ${BRAND_NAME}
-- Используй структуру: введение, основная часть, практические советы, FAQ, заключение
-- Title должен быть 35-40 символов
-- Description должна быть 140-155 символов
-- Статья должна быть уникальной и полезной
+ТЯ  :
+- инимум 15-20 разделов и подразделов
+- ключи практические примеры, кейсы, пошаговые инструкции  
+- обавь FAQ секцию (5-7 вопросов)
+- ключи разделы: введение, основная часть, практические советы, частые ошибки, заключение
+- лан должен покрывать тему полностью и всесторонне
 
-Формат ответа:
-TITLE: [заголовок 35-40 символов]
-DESCRIPTION: [описание 140-155 символов] 
-CONTENT: [текст статьи минимум 8000 символов]`;
+онтекст: статья для блога салона красоты ${BRAND_NAME}, целевая аудитория - женщины 25-45 лет, интересующиеся красотой.`;
 
-    const generatedContent = await generateWithRetry(articlePrompt);
-    
-    // Простая обработка
-    const lines = generatedContent.split('\n');
-    let title = `${topic} - профессиональные советы ${postNumber}`;
-    let description = `Экспертные советы по ${topic} от салона красоты BlondePlace. Профессиональные рекомендации.`;
-    let content = generatedContent;
+    const plan = await generateWithRetry(planPrompt);
 
-    // Парсим если есть структура
-    for (let line of lines) {
-        if (line.startsWith('TITLE:')) {
-            title = line.replace('TITLE:', '').trim();
-        } else if (line.startsWith('DESCRIPTION:')) {
-            description = line.replace('DESCRIPTION:', '').trim();
-        } else if (line.startsWith('CONTENT:')) {
-            content = generatedContent.substring(generatedContent.indexOf('CONTENT:') + 8).trim();
-        }
-    }
+    // 🎯  FACTORY.JS: ТЯ    СТСТ
+    const articlePrompt = `апиши исчерпывающую, экспертную статью объемом  15000 символов по этому плану:
 
-    // Вставляем 85 ссылок
-    const links = [
-        'https://blondeplace.ru/', 'https://blondeplace.ru/services/', 'https://blondeplace.ru/about/',
-        'https://blondeplace.ru/gallery/', 'https://blondeplace.ru/prices/', 'https://blondeplace.ru/contacts/',
-        'https://blondeplace.ru/beauty/', 'https://blondeplace.ru/salon/', 'https://blondeplace.ru/experts/', 'https://blondeplace.ru/blog/'
+${plan}
+
+ТС ТЯ:
+- Статья должна быть СЬ подробной и экспертной
+- ключи множество конкретных примеров, практических советов, кейсов
+- обавь списки, таблицы сравнения, пошаговые инструкции
+- бязательно включи FAQ секцию в конце  
+- иши от лица экспертов салона красоты ${BRAND_NAME}
+-  используй слова типа "конечно", "вот статья" и другие вводные фразы
+-  дублируй TITLE и DESCRIPTION в тексте
+- ачинай статью сразу с содержательного введения
+- спользуй профессиональную терминологию
+- аждый раздел должен содержать практическую ценность
+- ключи реальные примеры и кейсы из практики
+- бязательно добавь схемы действий и чек-листы
+
+Тема статьи: ${topic}
+онтекст: экспертный блог салона красоты ${BRAND_NAME}`;
+
+    const rawContent = await generateWithRetry(articlePrompt);
+
+    // 🚨  FACTORY.JS: СТ Т Т 
+    let cleanedContent = rawContent
+        .replace(/^.*?вот\s+(экспертная\s+)?статья.*?$/gmi, "")
+        .replace(/^title:\s*.*/gmi, "")
+        .replace(/^description:\s*.*/gmi, "")
+        .replace(/^content:\s*.*/gmi, "")
+        .replace(/^\s*конечно,?\s*/gmi, "")
+        .replace(/\*\*title:\*\*.*$/gmi, "")
+        .replace(/\*\*description:\*\*.*$/gmi, "")
+        .trim();
+
+    // Создаем title  номера (как должно быть)
+    const title = `${topic} - экспертные советы от BlondePlace`;
+    const description = `рофессиональные советы по ${topic} от экспертов салона красоты BlondePlace. рактические рекомендации и секреты мастеров.`;
+
+    // нтегрируем ссылки как в factory.js
+    const targetUrls = [
+        `${TARGET_URL_MAIN}/uslugi/okrashivanie-volos`,
+        `${TARGET_URL_MAIN}/uslugi/strizhki-ukladki`,
+        `${TARGET_URL_MAIN}/uslugi/manicure-pedicure`,
+        `${TARGET_URL_MAIN}/uslugi/kosmetologia`,
+        `${TARGET_URL_MAIN}/about`,
+        `${TARGET_URL_MAIN}/contacts`,
+        `${TARGET_URL_MAIN}/portfolio`,
+        `${TARGET_URL_MAIN}/ceny`,
+        `${TARGET_URL_MAIN}/akcii`,
+        `${TARGET_URL_MAIN}/blog`
     ];
-    
-    const words = content.split(' ');
-    const linkEveryN = Math.floor(words.length / 85);
-    let externalLinks = 0;
-    
-    for (let i = linkEveryN; i < words.length && externalLinks < 85; i += linkEveryN) {
-        const linkUrl = links[externalLinks % links.length];
-        const linkText = words[i];
-        words[i] = `<a href="${linkUrl}" target="_blank">${linkText}</a>`;
-        externalLinks++;
-    }
-    
-    content = words.join(' ');
-    
-    console.log(`[🔗] [АЛЬФА-УДАР #${threadId}] Вставлено 85 ссылок (внешних: ${externalLinks}, внутренних: 0)`);
 
+    // ставляем 85 ссылок
+    const words = cleanedContent.split(' ');
+    let linkCount = 0;
+    const targetLinkCount = 85;
+    const linkInterval = Math.floor(words.length / targetLinkCount);
+
+    for (let i = linkInterval; i < words.length && linkCount < targetLinkCount; i += linkInterval) {
+        const targetUrl = targetUrls[linkCount % targetUrls.length];
+        const anchorText = words[i];
+        words[i] = `[${anchorText}](${targetUrl})`;
+        linkCount++;
+    }
+
+    const finalContent = words.join(' ');
+    console.log(`[🔗] [Ь- #${threadId}] ставлено ${linkCount} ссылок (внешних: ${linkCount}, внутренних: 0)`);
+
+    // Создаем frontmatter
     const frontmatter = `---
 title: "${title}"
 description: "${description}"
-pubDate: ${new Date().toISOString()}
+pubDate: "${new Date().toISOString().split('T')[0]}"
 author: "${BRAND_AUTHOR_NAME}"
-tags: ["красота", "салон", "советы", "${topic}"]
+tags: ["beauty-tips"]
 image: "${FALLBACK_IMAGE_URL}"
+category: "beauty-tips"
 slug: "post${postNumber}"
 ---`;
 
-    const fullContent = `${frontmatter}\n\n${content}`;
+    const fullArticle = `${frontmatter}\n\n${finalContent}`;
     
     // Сохраняем файл
     const filename = `post${postNumber}.md`;
-    const filepath = path.join(POSTS_DIR, filename);
+    const filePath = path.join(POSTS_DIR, filename);
     
-    try {
-        await fs.writeFile(filepath, fullContent, 'utf8');
-        console.log(`[✅] [АЛЬФА-УДАР #${threadId}] Статья #${postNumber} создана: "${title}"`);
-        console.log(`[📏] Title: ${title.length} символов, Description: ${description.length} символов`);
-        
-        // IndexNow уведомление
-        const articleUrl = `${SITE_URL}/blog/post${postNumber}`;
-        await notifyIndexNow(articleUrl);
-        console.log(`[📢] [АЛЬФА-УДАР #${threadId}] Турбо-индексация: 3/3 сервисов уведомлены`);
-        
-        return { title, description, url: articleUrl };
-    } catch (error) {
-        console.error(`[!] [АЛЬФА-УДАР #${threadId}] Ошибка создания файла: ${error.message}`);
-        throw error;
-    }
+    await fs.writeFile(filePath, fullArticle, 'utf-8');
+    console.log(`[✅] [Ь- #${threadId}] Статья #${postNumber} создана: "${title}"`);
+    console.log(`[📏] Title: ${title.length} символов, Description: ${description.length} символов`);
+    
+    // IndexNow уведомление
+    const articleUrl = `${SITE_URL}/blog/post${postNumber}`;
+    await notifyIndexNow(articleUrl);
+    console.log(`[📢] [Ь- #${threadId}] Турбо-индексация: 3/3 сервисов уведомлены`);
+    
+    return {
+        filename,
+        title,
+        url: articleUrl,
+        linkCount
+    };
 }
 
 async function notifyIndexNow(url) {
@@ -210,25 +230,31 @@ async function notifyIndexNow(url) {
     try {
         await execa('curl', ['-X', 'POST', 'https://yandex.com/indexnow', '-H', 'Content-Type: application/json; charset=utf-8', '-d', payload]);
         await execa('curl', ['-X', 'POST', 'https://www.bing.com/indexnow', '-H', 'Content-Type: application/json; charset=utf-8', '-d', payload]);
+        await execa('curl', ['-X', 'POST', 'https://google.com/ping?sitemap=' + encodeURIComponent(SITE_URL + '/sitemap.xml')]);
     } catch (error) {
-        console.error(`[!] [АЛЬФА-УДАР #${threadId}] Ошибка IndexNow:`, error.message);
+        console.error(`[!] [Ь- #${threadId}] шибка IndexNow:`, error.message);
     }
 }
 
-// --- ОСНОВНАЯ ЛОГИКА ---
+// --- СЯ  ---
+const targetArticles = parseInt(process.env.TARGET_ARTICLES, 10) || 1;
 const keywords = [
     "бьюти коворкинг", "салон красоты", "косметология", "маникюр педикюр", 
     "парикмахерская", "эстетическая косметология", "spa процедуры", "красота и здоровье"
 ];
 
-console.log(`🚀💥 [АЛЬФА-УДАР #${threadId}] === БОЕВОЙ ЗАПУСК v4.0 ===`);
-console.log(`[🎯] [АЛЬФА-УДАР #${threadId}] Цель: ${targetArticles} статей по ${keywords.length} ключам`);
+console.log(`🚀💥 [Ь- #${threadId}] нициализация боевой системы v5.0 с ключом ...${apiKey.slice(-4)}`);
+console.log(`🎯 [Ь- #${threadId}] ель: ${targetArticles} статей с 85+ ссылками каждая`);
+
+console.log(`🚀💥 [Ь- #${threadId}] ===  С v5.0 ===`);
+console.log(`[🎯] [Ь- #${threadId}] ель: ${targetArticles} статей по ${keywords.length} ключам`);
 
 const startNumber = threadId * 1000;
-console.log(`[🔢] [АЛЬФА-УДАР #${threadId}] Начинаю нумерацию с: ${startNumber}`);
+console.log(`[🔢] [Ь- #${threadId}] ачинаю нумерацию с: ${startNumber}`);
 
 let createdArticles = 0;
 let totalLinks = 0;
+const createdUrls = [];
 
 for (let i = 0; i < targetArticles; i++) {
     const keyword = keywords[i % keywords.length];
@@ -237,16 +263,28 @@ for (let i = 0; i < targetArticles; i++) {
     try {
         const result = await generatePost(keyword, postNumber);
         createdArticles++;
-        totalLinks += 85;
+        totalLinks += result.linkCount;
+        createdUrls.push(result.url);
         
         await delay(baseDelay);
     } catch (error) {
-        console.error(`[💥] [АЛЬФА-УДАР #${threadId}] Ошибка статьи #${postNumber}: ${error.message}`);
+        console.error(`[💥] [Ь- #${threadId}] шибка статьи #${postNumber}: ${error.message}`);
     }
 }
 
-console.log(`[🏆] [АЛЬФА-УДАР #${threadId}] === МИССИЯ v4.0 ЗАВЕРШЕНА ===`);
+console.log(`[🏆] [Ь- #${threadId}] === ССЯ v5.0 Ш ===`);
 console.log(`[📊] Создано статей: ${createdArticles}`);
-console.log(`[🔗] Общее количество ссылок на основной сайт: ~${totalLinks}`);
-console.log(`[⚡] Финальная скорость: ${baseDelay}мс`);
-console.log(`[🔢] Диапазон номеров: ${startNumber}-${startNumber + targetArticles - 1}`); 
+console.log(`[🔗] бщее количество ссылок на основной сайт: ~${totalLinks}`);
+console.log(`[⚡] инальная скорость: ${baseDelay}мс`);
+console.log(`[🔢] иапазон номеров: ${startNumber}-${startNumber + targetArticles - 1}`);
+
+// 🎯 ТТ С ССЫ ( С ЬТЬ)
+console.log(`[🌐] СЫ СТТЬ:`);
+createdUrls.forEach((url, index) => {
+    console.log(`[📝] Статья ${index + 1}: ${url}`);
+});
+
+console.log(`[📢] INDEXNOW ТТ:`);
+console.log(`[✅] Yandex IndexNow: ${createdArticles} URLs отправлено`);
+console.log(`[✅] Bing IndexNow: ${createdArticles} URLs отправлено`);
+console.log(`[✅] Google Sitemap Ping: ${createdArticles} URLs отправлено`);
