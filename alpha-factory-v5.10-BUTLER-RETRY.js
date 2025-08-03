@@ -318,7 +318,7 @@ ${plan}
         // Вставляем ссылки (МЕНЬШЕ для снижения тошноты)
         articleText = generateIntelligentLinks(articleText);
         
-        // Формируем финальный контент с KEYWORDS
+        // Формируем финальный контент с РАСШИРЕННЫМИ МЕТАТЕГАМИ для CheckSite
         const frontMatter = `---
 title: "${seoData.title}"
 description: "${description}"
@@ -327,6 +327,21 @@ pubDate: ${new Date().toISOString()}
 heroImage: "${heroImage}"
 category: "Beauty советы"
 tags: ["${keyword}", "beauty", "салон красоты", "BlondePlace"]
+author: "BlondePlace Team"
+robots: "index, follow"
+canonical: "https://blondeplace.netlify.app/blog/post${postNumber}/"
+ogTitle: "${seoData.title}"
+ogDescription: "${description}"
+ogImage: "${heroImage}"
+ogType: "article"
+ogUrl: "https://blondeplace.netlify.app/blog/post${postNumber}/"
+twitterCard: "summary_large_image"
+twitterTitle: "${seoData.title}"
+twitterDescription: "${description}"
+twitterImage: "${heroImage}"
+twitterSite: "@BlondePlace"
+lang: "ru"
+alternateLinks: []
 ---
 
 <script type="application/ld+json">
