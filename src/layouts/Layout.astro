@@ -52,7 +52,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="robots" content={robots} />
 		<meta name="author" content={author} />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="referrer" content="strict-origin-when-cross-origin" />
+		<meta name="theme-color" content="#f8d7da" />
+		<meta name="msapplication-TileColor" content="#f8d7da" />
+		<meta name="application-name" content="BLONDE PLACE" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="shortlink" href={canonical || canonicalURL} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 
@@ -62,6 +68,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		
 		<!-- Canonical URL -->
 		<link rel="canonical" href={canonical || canonicalURL} />
+		
+		<!-- Alternate links for SEO -->
+		<link rel="alternate" href={canonical || canonicalURL} hreflang="ru" />
+		<link rel="alternate" href={canonical || canonicalURL} hreflang="x-default" />
 
                 <!-- Verification meta-tags (критично для SEO) -->
                 <meta name="google-site-verification" content="QmTdEF5xHLHXsL1FEcotg-xZTPfD14z9BxH6D64b0ds" />
@@ -79,6 +89,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta property="og:description" content={ogDescription || description} />
 		{(ogImage || heroImage) && <meta property="og:image" content={new URL(ogImage || heroImage, Astro.url)} />}
 		<meta property="og:site_name" content="BLONDE PLACE" />
+		<meta property="og:locale" content="ru_RU" />
 		
 		<!-- Twitter -->
 		<meta name="twitter:card" content={twitterCard} />
