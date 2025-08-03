@@ -1,5 +1,5 @@
-// ===== ALPHA-FACTORY v5.22 - ИСПРАВЛЕНИЕ АНКОРОВ ССЫЛОК =====
-// РЕШЕНИЕ: АНКОРЫ = КЛЮЧЕВЫЕ СЛОВА ДЛЯ ДОМИНИРОВАНИЯ В СЕМАНТИЧЕСКОМ ЯДРЕ!
+// ===== ALPHA-FACTORY v5.23 - КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ ОШИБКИ =====
+// ИСПРАВЛЕНО: Ошибка области видимости getKeywordSpamStrategy функции!
 // 1. Title: 40-45 символов ✅
 // 2. Description: 150-164 символа ✅  
 // 3. Keywords: УБРАНЫ (98%→23% с ними!) ✅
@@ -88,6 +88,65 @@ const GEO_CONTEXTS = [
     "в Московском районе", "в Фрунзенском районе", "в Калининском районе", "в Выборгском районе",
     "в салоне BlondePlace", "в премиум-салоне", "для мастеров СПб", "в beauty-индустрии"
 ];
+
+// ===== ФУНКЦИЯ АГРЕССИВНОГО ПЕРЕСПАМА КЛЮЧЕВЫХ СЛОВ =====
+function getKeywordSpamStrategy(keyword) {
+    const strategies = {
+        "бьюти коворкинг": {
+            primary: "бьюти",
+            secondary: "коворкинг", 
+            primaryCount: "70-80",
+            secondaryCount: "50-60"
+        },
+        "аренда парикмахерского кресла": {
+            primary: "аренда",
+            secondary: "кресла",
+            tertiary: "парикмахерского",
+            primaryCount: "70-80", 
+            secondaryCount: "50-60",
+            tertiaryCount: "30-40"
+        },
+        "коворкинг для мастера": {
+            primary: "коворкинг",
+            secondary: "мастера",
+            primaryCount: "70-80",
+            secondaryCount: "50-60"
+        },
+        "места в аренду": {
+            primary: "места",
+            secondary: "аренду",
+            primaryCount: "70-80",
+            secondaryCount: "50-60"
+        },
+        "кресло для мастера": {
+            primary: "кресло",
+            secondary: "мастера", 
+            primaryCount: "70-80",
+            secondaryCount: "50-60"
+        },
+        "салон красоты": {
+            primary: "салон",
+            secondary: "красоты",
+            primaryCount: "70-80", 
+            secondaryCount: "50-60"
+        },
+        "мелирование": {
+            primary: "мелирование",
+            primaryCount: "70-80"
+        },
+        "тотал блонд": {
+            primary: "тотал",
+            secondary: "блонд",
+            primaryCount: "70-80",
+            secondaryCount: "50-60"
+        }
+    };
+    
+    return strategies[keyword] || {
+        primary: keyword.split(' ')[0],
+        primaryCount: "70-80"
+    };
+}
 
 // ===== ФУНКЦИЯ УНИКАЛЬНОЙ НУМЕРАЦИИ =====
 async function getNextAvailablePostNumber(threadId) {
@@ -278,65 +337,7 @@ async function generatePost(keyword, postNumber, threadId) {
         const planResponse = await generateWithAI(planPrompt);
         const plan = cleanAIComments(planResponse);
         
-        // Функция для агрессивного переспама ключевых слов
-        function getKeywordSpamStrategy(keyword) {
-            const strategies = {
-                "бьюти коворкинг": {
-                    primary: "бьюти",
-                    secondary: "коворкинг", 
-                    primaryCount: "70-80",
-                    secondaryCount: "50-60"
-                },
-                "аренда парикмахерского кресла": {
-                    primary: "аренда",
-                    secondary: "кресла",
-                    tertiary: "парикмахерского",
-                    primaryCount: "70-80", 
-                    secondaryCount: "50-60",
-                    tertiaryCount: "30-40"
-                },
-                "коворкинг для мастера": {
-                    primary: "коворкинг",
-                    secondary: "мастера",
-                    primaryCount: "70-80",
-                    secondaryCount: "50-60"
-                },
-                "места в аренду": {
-                    primary: "места",
-                    secondary: "аренду",
-                    primaryCount: "70-80",
-                    secondaryCount: "50-60"
-                },
-                "кресло для мастера": {
-                    primary: "кресло",
-                    secondary: "мастера", 
-                    primaryCount: "70-80",
-                    secondaryCount: "50-60"
-                },
-                "салон красоты": {
-                    primary: "салон",
-                    secondary: "красоты",
-                    primaryCount: "70-80", 
-                    secondaryCount: "50-60"
-                },
-                "мелирование": {
-                    primary: "мелирование",
-                    primaryCount: "70-80"
-                },
-                "тотал блонд": {
-                    primary: "тотал",
-                    secondary: "блонд",
-                    primaryCount: "70-80",
-                    secondaryCount: "50-60"
-                }
-            };
-            
-            return strategies[keyword] || {
-                primary: keyword.split(' ')[0],
-                primaryCount: "70-80"
-            };
-        }
-        
+        // Получаем стратегию переспама для ключевого слова
         const spamStrategy = getKeywordSpamStrategy(keyword);
         
         // Шаг 2: Генерация статьи с АГРЕССИВНЫМ ПЕРЕСПАМОМ
@@ -667,8 +668,8 @@ async function main() {
         const modelChoice = process.env.MODEL_CHOICE || 'gemini';
         
         console.log(`[KEY] [ALPHA-STRIKE #${threadId}] Модель: ${modelChoice}, ключ: ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.22 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.22 - ИСПРАВЛЕНИЕ АНКОРОВ ===`);
+        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.23 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.23 - КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ ===`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Цель: ${targetArticles} уникальных статей`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Ключевые слова: ${ALPHA_KEYWORDS.length} шт`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Правильные ключи: ${ALPHA_KEYWORDS.join(', ')}`);
@@ -703,7 +704,7 @@ async function main() {
             await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.22 ЗАВЕРШЕНА ===`);
+        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.23 ЗАВЕРШЕНА ===`);
         console.log(`[STATS] Создано статей: ${results.length}`);
         console.log(`[STATS] Общее количество ссылок на основной сайт: ~${results.length * 85}`);
         console.log(`[STATS] Финальная скорость: 500мс`);
