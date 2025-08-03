@@ -1,10 +1,11 @@
-// ===== ALPHA-FACTORY v5.11 - NO KEYWORDS =====
-// ЭКСТРЕННЫЙ ОТКАТ KEYWORDS - CheckSite их НАКАЗЫВАЕТ!
-// 1. Title: 40-45 символов
-// 2. Description: 150-164 символа
-// 3. Keywords: УБРАНЫ (98%→23% с ними!)
-// 4. Robots: УБРАНЫ (CheckSite считает спамом!)
-// 5. Минимальные базовые метатеги
+// ===== ALPHA-FACTORY v5.12 - LINKS FIXED =====
+// ИСПРАВЛЕНЫ ВНЕШНИЕ ССЫЛКИ + УБРАНЫ KEYWORDS!
+// 1. Title: 40-45 символов ✅
+// 2. Description: 150-164 символа ✅  
+// 3. Keywords: УБРАНЫ (98%→23% с ними!) ✅
+// 4. Robots: УБРАНЫ (CheckSite считает спамом!) ✅
+// 5. Внешние ссылки: ВОССТАНОВЛЕНЫ до 60+ (было 4) ✅
+// 6. Вероятность ссылок: 70% (было 30%) ✅
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
@@ -306,7 +307,7 @@ ${plan}
         // Создаем Schema.org
         const schema = createHowToSchema(seoData.title, description, heroImage, postNumber);
         
-        // Вставляем ссылки (МЕНЬШЕ для снижения тошноты)
+        // Вставляем ссылки (ВОССТАНОВЛЕНО количество по плану Альфа-удар)
         articleText = generateIntelligentLinks(articleText);
         
         // Формируем финальный контент с РАСШИРЕННЫМИ МЕТАТЕГАМИ для CheckSite
@@ -402,12 +403,12 @@ function createHowToSchema(title, description, heroImage, postNumber) {
 }
 
 function generateIntelligentLinks(text) {
-    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 15);
     let linkCount = 0;
     const targetLinkCount = 60; // ВОССТАНОВЛЕНО - ссылки важны для продвижения
     
     for (let i = 0; i < sentences.length && linkCount < targetLinkCount; i++) {
-        if (Math.random() < 0.3) { // ВОССТАНОВЛЕНО для эффективности
+        if (Math.random() < 0.7) { // УВЕЛИЧЕНО для большего количества ссылок
             const isExternal = Math.random() < 0.8; // ВОССТАНОВЛЕНО 80% внешних ссылок
             
             if (isExternal) {
