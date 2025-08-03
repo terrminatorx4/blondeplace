@@ -116,8 +116,8 @@ function getKeywordSpamStrategy(keyword) {
         "места в аренду": {
             primary: "места",
             secondary: "аренду",
-            primaryCount: "70-80",
-            secondaryCount: "50-60"
+            primaryCount: "80-90",
+            secondaryCount: "60-70"
         },
         "кресло для мастера": {
             primary: "кресло",
