@@ -11,7 +11,7 @@ const {
 	title, 
 	description = "Экспертные советы по красоте от салона BlondePlace", 
 	heroImage, 
-	keywords, 
+	keywords = "салон красоты BlondePlace, beauty процедуры, профессиональный уход, маникюр, педикюр, окрашивание волос", 
 	schema
 } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -28,6 +28,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 		<!-- ТОЛЬКО БАЗОВЫЕ МЕТАТЕГИ (как у Butler) -->
 		<meta name="description" content={description} />
+		<meta name="keywords" content={keywords} />
+		<meta name="robots" content="index, follow" />
 		
 		<!-- Canonical URL -->
 		<link rel="canonical" href={canonicalURL} />
