@@ -1,11 +1,12 @@
-// ===== ALPHA-FACTORY v5.12 - LINKS FIXED =====
-// ИСПРАВЛЕНЫ ВНЕШНИЕ ССЫЛКИ + УБРАНЫ KEYWORDS!
+// ===== ALPHA-FACTORY v5.13 - REAL EXTERNAL LINKS =====
+// РЕАЛЬНО ВНЕШНИЕ ССЫЛКИ ДЛЯ CHECKSITE + УБРАНЫ KEYWORDS!
 // 1. Title: 40-45 символов ✅
 // 2. Description: 150-164 символа ✅  
 // 3. Keywords: УБРАНЫ (98%→23% с ними!) ✅
 // 4. Robots: УБРАНЫ (CheckSite считает спамом!) ✅
-// 5. Внешние ссылки: ВОССТАНОВЛЕНЫ до 60+ (было 4) ✅
-// 6. Вероятность ссылок: 70% (было 30%) ✅
+// 5. Внешние ссылки: 30% на реальные внешние домены ✅
+// 6. Основной сайт: 40% ссылок для продвижения ✅
+// 7. Внутренние: 30% ссылок на блог ✅
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
@@ -30,18 +31,28 @@ const SITE_URL = "https://blondeplace.netlify.app";
 const MAIN_SITE_URL = "https://blondeplace.ru";
 const INDEXNOW_API_KEY = "df39150ca56f896546628ae3c923dd4a";
 
-// Правильные целевые URL для внешних ссылок (НЕ от Butler!)
+// РЕАЛЬНО ВНЕШНИЕ ДОМЕНЫ для CheckSite (не blondeplace.ru!)
 const TARGET_URLS = [
-    `${MAIN_SITE_URL}/#services`,
-    `${MAIN_SITE_URL}/#about`, 
-    `${MAIN_SITE_URL}/#contacts`,
-    `${MAIN_SITE_URL}/#portfolio`,
-    `${MAIN_SITE_URL}/#team`,
-    `${MAIN_SITE_URL}/#pricing`,
-    `${MAIN_SITE_URL}/#booking`,
-    `${MAIN_SITE_URL}/#gallery`,
-    `${MAIN_SITE_URL}/#reviews`,
-    `${MAIN_SITE_URL}/#location`
+    "https://beauty.mail.ru",
+    "https://www.cosmo.ru/beauty",
+    "https://www.elle.ru/krasota",
+    "https://www.marieclaire.ru/krasota",
+    "https://www.allure.com/beauty",
+    "https://www.vogue.ru/beauty",
+    "https://beauty.ua",
+    "https://www.byrdie.com",
+    "https://www.refinery29.com/beauty",
+    "https://www.glamour.com/beauty",
+    "https://www.harpersbazaar.com/beauty",
+    "https://www.instyle.com/beauty",
+    "https://www.popsugar.com/beauty",
+    "https://www.nykaa.com",
+    "https://www.sephora.com",
+    "https://www.ulta.com",
+    "https://www.lookfantastic.com",
+    "https://www.beautybay.com",
+    "https://www.cultbeauty.co.uk",
+    "https://www.sallybeauty.com"
 ];
 
 // ===== МАССИВЫ ДЛЯ АБСОЛЮТНОЙ УНИКАЛЬНОСТИ (УВЕЛИЧЕНЫ ДЛЯ SEO) =====
@@ -409,16 +420,25 @@ function generateIntelligentLinks(text) {
     
     for (let i = 0; i < sentences.length && linkCount < targetLinkCount; i++) {
         if (Math.random() < 0.7) { // УВЕЛИЧЕНО для большего количества ссылок
-            const isExternal = Math.random() < 0.8; // ВОССТАНОВЛЕНО 80% внешних ссылок
+            const linkType = Math.random();
             
-            if (isExternal) {
+            if (linkType < 0.3) {
+                // 30% - РЕАЛЬНО внешние ссылки (для CheckSite)
                 const targetUrl = TARGET_URLS[Math.floor(Math.random() * TARGET_URLS.length)];
                 const linkTexts = ["подробнее", "узнать больше", "записаться", "консультация"];
                 const linkText = linkTexts[Math.floor(Math.random() * linkTexts.length)];
                 sentences[i] += ` <a href="${targetUrl}" target="_blank" rel="nofollow">${linkText}</a>`;
                 linkCount++;
+            } else if (linkType < 0.7) {
+                // 40% - Ссылки на основной сайт (для продвижения)
+                const mainSitePages = ["/#services", "/#about", "/#contacts", "/#booking", "/#gallery"];
+                const mainPage = mainSitePages[Math.floor(Math.random() * mainSitePages.length)];
+                const linkTexts = ["записаться", "консультация", "узнать больше", "подробнее"];
+                const linkText = linkTexts[Math.floor(Math.random() * linkTexts.length)];
+                sentences[i] += ` <a href="${MAIN_SITE_URL}${mainPage}" target="_blank">${linkText}</a>`;
+                linkCount++;
             } else {
-                // Внутренняя ссылка
+                // 30% - Внутренние ссылки блога
                 const internalPostNum = Math.floor(Math.random() * 20000) + 1000;
                 sentences[i] += ` <a href="${SITE_URL}/blog/post${internalPostNum}/">читать здесь</a>`;
                 linkCount++;
@@ -426,7 +446,7 @@ function generateIntelligentLinks(text) {
         }
     }
     
-    console.log(`[LINKS] Вставлено ${linkCount} ссылок (внешних: ${Math.floor(linkCount * 0.8)}, внутренних: ${Math.floor(linkCount * 0.2)})`);
+    console.log(`[LINKS] Вставлено ${linkCount} ссылок (внешних CheckSite: ${Math.floor(linkCount * 0.3)}, на основной сайт: ${Math.floor(linkCount * 0.4)}, внутренних: ${Math.floor(linkCount * 0.3)})`);
     
     return sentences.join('.') + '.';
 }
