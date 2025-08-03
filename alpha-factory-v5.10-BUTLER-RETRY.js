@@ -1,13 +1,13 @@
-// ===== ALPHA-FACTORY v5.21 - АГРЕССИВНЫЙ ПЕРЕСПАМ =====
-// СТРАТЕГИЯ: КАЖДОЕ СЛОВО КЛЮЧЕВОЙ ФРАЗЫ В ТОП-3!
+// ===== ALPHA-FACTORY v5.22 - ИСПРАВЛЕНИЕ АНКОРОВ ССЫЛОК =====
+// РЕШЕНИЕ: АНКОРЫ = КЛЮЧЕВЫЕ СЛОВА ДЛЯ ДОМИНИРОВАНИЯ В СЕМАНТИЧЕСКОМ ЯДРЕ!
 // 1. Title: 40-45 символов ✅
 // 2. Description: 150-164 символа ✅  
 // 3. Keywords: УБРАНЫ (98%→23% с ними!) ✅
 // 4. Robots: УБРАНЫ (CheckSite считает спамом!) ✅
 // 5. Ссылки: 135 ЦЕЛЕВЫХ (вероятность 95%) ✅
 // 6. Объем: 17000+ символов ✅
-// 7. ПЕРЕСПАМ: Каждое слово фразы 60-80 раз (1-е место) ✅
-// 8. БЫСТРЫЙ SEO: Агрессивные частоты для мгновенного роста ✅
+// 7. ПЕРЕСПАМ: Каждое слово фразы 70-80 раз (1-е место) ✅
+// 8. АНКОРЫ: Ключевые слова вместо "читать", "узнать" ✅
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
@@ -394,7 +394,7 @@ ${spamStrategy.tertiary ? `- ОБЯЗАТЕЛЬНО используй "${spamSt
         const schema = createHowToSchema(seoData.title, description, heroImage, postNumber);
         
         // Вставляем ссылки (ВОССТАНОВЛЕНО количество по плану Альфа-удар)
-        articleText = generateIntelligentLinks(articleText);
+        articleText = generateIntelligentLinks(articleText, keyword);
         
         // Формируем финальный контент с РАСШИРЕННЫМИ МЕТАТЕГАМИ для CheckSite
         const frontMatter = `---
@@ -488,32 +488,89 @@ function createHowToSchema(title, description, heroImage, postNumber) {
     };
 }
 
-function generateIntelligentLinks(text) {
+function generateIntelligentLinks(text, keyword) {
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 15);
     let linkCount = 0;
     const targetLinkCount = 135; // ТРЕБОВАНИЯ ПОЛЬЗОВАТЕЛЯ: 100 на основной + 35 внутренних = 135!
+    
+    // Получаем стратегию переспама для ключевого слова
+    const spamStrategy = getKeywordSpamStrategy(keyword);
+    
+    // НОВЫЕ АНКОРЫ НА ОСНОВЕ КЛЮЧЕВЫХ СЛОВ (БЕЗ "читать", "узнать", "больше"!)
+    const keywordAnchors = {
+        external: [
+            `${spamStrategy.primary} СПб`,
+            `лучший ${spamStrategy.primary}`,
+            `профессиональный ${spamStrategy.primary}`,
+            `${spamStrategy.primary} премиум`,
+            `качественный ${spamStrategy.primary}`,
+            `${spamStrategy.primary} в центре`,
+            spamStrategy.primary,
+            `${spamStrategy.primary} услуги`
+        ],
+        internal: [
+            `${spamStrategy.primary} отзывы`,
+            `${spamStrategy.primary} цены`, 
+            `${spamStrategy.primary} фото`,
+            `${spamStrategy.primary} примеры`,
+            `${spamStrategy.primary} варианты`,
+            `про ${spamStrategy.primary}`,
+            `о ${spamStrategy.primary}`,
+            `${spamStrategy.primary} статья`
+        ]
+    };
+    
+    // Добавляем анкоры для вторичного ключевого слова
+    if (spamStrategy.secondary) {
+        keywordAnchors.external.push(
+            `${spamStrategy.secondary} СПб`,
+            `лучший ${spamStrategy.secondary}`,
+            spamStrategy.secondary,
+            `качественный ${spamStrategy.secondary}`
+        );
+        keywordAnchors.internal.push(
+            `${spamStrategy.secondary} отзывы`,
+            `про ${spamStrategy.secondary}`,
+            `о ${spamStrategy.secondary}`,
+            `${spamStrategy.secondary} варианты`
+        );
+    }
+    
+    // Добавляем анкоры для третичного ключевого слова
+    if (spamStrategy.tertiary) {
+        keywordAnchors.external.push(
+            `${spamStrategy.tertiary} услуги`,
+            spamStrategy.tertiary,
+            `качественный ${spamStrategy.tertiary}`
+        );
+        keywordAnchors.internal.push(
+            `про ${spamStrategy.tertiary}`,
+            `${spamStrategy.tertiary} варианты`
+        );
+    }
     
     for (let i = 0; i < sentences.length && linkCount < targetLinkCount; i++) {
         if (Math.random() < 0.95) { // МАКСИМАЛЬНО для достижения 135 ссылок
             const isExternal = Math.random() < 0.74; // 74% внешних ссылок (100 из 135)
             
             if (isExternal) {
-                // 74% - ССЫЛКИ НА ОСНОВНОЙ САЙТ (100 из 135)
+                // 74% - ССЫЛКИ НА ОСНОВНОЙ САЙТ (100 из 135) с КЛЮЧЕВЫМИ анкорами
                 const targetUrl = TARGET_URLS[Math.floor(Math.random() * TARGET_URLS.length)];
-                const linkTexts = ["подробнее", "узнать больше", "записаться", "консультация"];
-                const linkText = linkTexts[Math.floor(Math.random() * linkTexts.length)];
+                const linkText = keywordAnchors.external[Math.floor(Math.random() * keywordAnchors.external.length)];
                 sentences[i] += ` <a href="${targetUrl}" target="_blank" rel="nofollow">${linkText}</a>`;
                 linkCount++;
             } else {
-                // 26% - ВНУТРЕННИЕ ССЫЛКИ БЛОГА (35 из 135)
+                // 26% - ВНУТРЕННИЕ ССЫЛКИ БЛОГА (35 из 135) с КЛЮЧЕВЫМИ анкорами
                 const internalPostNum = Math.floor(Math.random() * 20000) + 1000;
-                sentences[i] += ` <a href="${SITE_URL}/blog/post${internalPostNum}/">читать здесь</a>`;
+                const linkText = keywordAnchors.internal[Math.floor(Math.random() * keywordAnchors.internal.length)];
+                sentences[i] += ` <a href="${SITE_URL}/blog/post${internalPostNum}/">${linkText}</a>`;
                 linkCount++;
             }
         }
     }
     
-    console.log(`[LINKS] Вставлено ${linkCount} ссылок (на основной сайт: ${Math.floor(linkCount * 0.74)}, внутренних: ${Math.floor(linkCount * 0.26)})`);
+    console.log(`[LINKS] Вставлено ${linkCount} ссылок с КЛЮЧЕВЫМИ анкорами (на основной сайт: ${Math.floor(linkCount * 0.74)}, внутренних: ${Math.floor(linkCount * 0.26)})`);
+    console.log(`[ANCHORS] Все анкоры используют ключевые слова: "${spamStrategy.primary}", "${spamStrategy.secondary || 'нет'}", "${spamStrategy.tertiary || 'нет'}"`);
     
     return sentences.join('.') + '.';
 }
@@ -610,13 +667,13 @@ async function main() {
         const modelChoice = process.env.MODEL_CHOICE || 'gemini';
         
         console.log(`[KEY] [ALPHA-STRIKE #${threadId}] Модель: ${modelChoice}, ключ: ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.21 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.21 - АГРЕССИВНЫЙ ПЕРЕСПАМ ===`);
+        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.22 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.22 - ИСПРАВЛЕНИЕ АНКОРОВ ===`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Цель: ${targetArticles} уникальных статей`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Ключевые слова: ${ALPHA_KEYWORDS.length} шт`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Правильные ключи: ${ALPHA_KEYWORDS.join(', ')}`);
         console.log(`[SEO] [ALPHA-STRIKE #${threadId}] SEO ОПТИМИЗАЦИЯ: Title 40-45 символов, Description 150-164 символа`);
-        console.log(`[SEO] [ALPHA-STRIKE #${threadId}] ПЕРЕСПАМ СТРАТЕГИЯ: Каждое слово фразы 70-80 раз!`);
+        console.log(`[SEO] [ALPHA-STRIKE #${threadId}] АНКОРЫ ССЫЛОК: Используют только ключевые слова!`);
         
         // Получаем уникальный стартовый номер для каждого потока
         const startNumber = await getNextAvailablePostNumber(threadId);
@@ -646,7 +703,7 @@ async function main() {
             await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.21 ЗАВЕРШЕНА ===`);
+        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.22 ЗАВЕРШЕНА ===`);
         console.log(`[STATS] Создано статей: ${results.length}`);
         console.log(`[STATS] Общее количество ссылок на основной сайт: ~${results.length * 85}`);
         console.log(`[STATS] Финальная скорость: 500мс`);
