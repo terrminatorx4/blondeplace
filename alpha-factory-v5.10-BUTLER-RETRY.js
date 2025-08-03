@@ -415,11 +415,11 @@ function createHowToSchema(title, description, heroImage, postNumber) {
 function generateIntelligentLinks(text) {
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
     let linkCount = 0;
-    const targetLinkCount = 15; // РАДИКАЛЬНО СНИЖЕНО для SEO (как у Butler)
+    const targetLinkCount = 60; // ВОССТАНОВЛЕНО - ссылки важны для продвижения
     
     for (let i = 0; i < sentences.length && linkCount < targetLinkCount; i++) {
-        if (Math.random() < 0.2) { // СНИЖЕНО до 20% для меньшего количества ссылок
-            const isExternal = Math.random() < 0.2; // СНИЖЕНО до 20% внешних ссылок (как Butler)
+        if (Math.random() < 0.3) { // ВОССТАНОВЛЕНО для эффективности
+            const isExternal = Math.random() < 0.8; // ВОССТАНОВЛЕНО 80% внешних ссылок
             
             if (isExternal) {
                 const targetUrl = TARGET_URLS[Math.floor(Math.random() * TARGET_URLS.length)];
