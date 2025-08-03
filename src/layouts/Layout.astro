@@ -5,20 +5,6 @@ export interface Props {
 	heroImage?: string;
 	keywords?: string;
 	schema?: any;
-	author?: string;
-	robots?: string;
-	canonical?: string;
-	ogTitle?: string;
-	ogDescription?: string;
-	ogImage?: string;
-	ogType?: string;
-	ogUrl?: string;
-	twitterCard?: string;
-	twitterTitle?: string;
-	twitterDescription?: string;
-	twitterImage?: string;
-	twitterSite?: string;
-	lang?: string;
 }
 
 const { 
@@ -26,56 +12,25 @@ const {
 	description = "Экспертные советы по красоте от салона BlondePlace", 
 	heroImage, 
 	keywords, 
-	schema,
-	author = "BlondePlace Team",
-	robots = "index, follow",
-	canonical,
-	ogTitle,
-	ogDescription,
-	ogImage,
-	ogType = "website",
-	ogUrl,
-	twitterCard = "summary_large_image",
-	twitterTitle,
-	twitterDescription,
-	twitterImage,
-	twitterSite = "@BlondePlace",
-	lang = "ru"
+	schema
 } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!DOCTYPE html>
-<html lang={lang}>
+<html lang="ru">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="robots" content={robots} />
-		<meta name="author" content={author} />
-		<meta name="format-detection" content="telephone=no" />
-		<meta name="referrer" content="strict-origin-when-cross-origin" />
-		<meta name="theme-color" content="#f8d7da" />
-		<meta name="msapplication-TileColor" content="#f8d7da" />
-		<meta name="application-name" content="BLONDE PLACE" />
+		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="shortlink" href={canonical || canonicalURL} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 
-                <!-- Meta tags -->
-                <meta name="description" content={description} />
-                <meta name="keywords" content={keywords || "салон красоты BlondePlace, beauty процедуры, профессиональный уход, маникюр, педикюр, окрашивание волос"} />
+		<!-- ТОЛЬКО БАЗОВЫЕ МЕТАТЕГИ (как у Butler) -->
+		<meta name="description" content={description} />
 		
 		<!-- Canonical URL -->
-		<link rel="canonical" href={canonical || canonicalURL} />
-		
-		<!-- Alternate links for SEO -->
-		<link rel="alternate" href={canonical || canonicalURL} hreflang="ru" />
-		<link rel="alternate" href={canonical || canonicalURL} hreflang="x-default" />
-
-                <!-- Verification meta-tags (критично для SEO) -->
-                <meta name="google-site-verification" content="QmTdEF5xHLHXsL1FEcotg-xZTPfD14z9BxH6D64b0ds" />
-                <meta name="yandex-verification" content="92b03968d7c06925" />
+		<link rel="canonical" href={canonicalURL} />
 		
 		<!-- Schema.org JSON-LD -->
 		{schema && (
@@ -83,288 +38,41 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		)}
 		
 		<!-- Open Graph / Facebook -->
-		<meta property="og:type" content={ogType} />
-		<meta property="og:url" content={ogUrl || Astro.url} />
-		<meta property="og:title" content={ogTitle || title} />
-		<meta property="og:description" content={ogDescription || description} />
-		{(ogImage || heroImage) && <meta property="og:image" content={new URL(ogImage || heroImage, Astro.url)} />}
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={Astro.url} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		{heroImage && <meta property="og:image" content={new URL(heroImage, Astro.url)} />}
 		<meta property="og:site_name" content="BLONDE PLACE" />
-		<meta property="og:locale" content="ru_RU" />
 		
-		<!-- Twitter -->
-		<meta name="twitter:card" content={twitterCard} />
-		<meta name="twitter:url" content={ogUrl || Astro.url} />
-		<meta name="twitter:title" content={twitterTitle || title} />
-		<meta name="twitter:description" content={twitterDescription || description} />
-		{(twitterImage || heroImage) && <meta name="twitter:image" content={new URL(twitterImage || heroImage, Astro.url)} />}
-		<meta name="twitter:site" content={twitterSite} />
-		<meta name="twitter:creator" content={twitterSite} />
-		
-                <!-- Yandex.Metrika counter (обновлено автономной системой) -->
+		<!-- Twitter (только базовые как у Butler) -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:url" content={Astro.url} />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		{heroImage && <meta name="twitter:image" content={new URL(heroImage, Astro.url)} />}
+
+                <!-- Yandex.Metrika counter -->
                 <script type="text/javascript">
                     (function(m,e,t,r,i,k,a){
                         m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
                         m[i].l=1*new Date();
                         for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
                         k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-                    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=103564367', 'ym');
+                    })
+                    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
-                    ym(103564367, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
+                    ym(103564367, "init", {
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true,
+                        webvisor:true,
+                        ecommerce:"dataLayer"
+                    });
                 </script>
-
-                <!-- �� ВСТРОЕННЫЕ СТИЛИ БЕЗ ВНЕШНИХ РЕСУРСОВ -->
-		<style>
-			/* === BEAUTY DESIGN SYSTEM === */
-			:root {
-				--blonde-gold: #f8d7da;
-				--blonde-rose: #fde2e4;
-				--beauty-pink: #fbb6ce;
-				--salon-purple: #c297b8;
-				--elegant-gray: #4a4a4a;
-				--soft-black: #2d2d2d;
-				--pure-white: #ffffff;
-				--warm-beige: #f5f5f0;
-				
-				--font-heading: Georgia, 'Times New Roman', Times, serif;
-				--font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-				
-				--container-max: 1200px;
-				--spacing-xs: 0.5rem;
-				--spacing-sm: 1rem;
-				--spacing-md: 1.5rem;
-				--spacing-lg: 2rem;
-				--spacing-xl: 3rem;
-			}
-
-			* {
-				margin: 0;
-				padding: 0;
-				box-sizing: border-box;
-			}
-
-			body {
-				font-family: var(--font-body);
-				line-height: 1.6;
-				color: var(--soft-black);
-				background-color: var(--pure-white);
-				overflow-x: hidden;
-				max-width: 100%;
-			}
-
-			.container {
-				max-width: var(--container-max);
-				margin: 0 auto;
-				padding: 0 var(--spacing-md);
-			}
-
-			/* === HEADER === */
-			.site-header {
-				background: linear-gradient(135deg, var(--blonde-gold), var(--blonde-rose));
-				box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-				position: sticky;
-				top: 0;
-				z-index: 100;
-			}
-
-			.navbar {
-				padding: var(--spacing-md) 0;
-			}
-
-			.navbar .container {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-			}
-
-			.brand-link {
-				text-decoration: none;
-				color: var(--soft-black);
-			}
-
-			.brand-name {
-				font-family: var(--font-heading);
-				font-size: 2rem;
-				font-weight: 600;
-				margin-bottom: 0.2rem;
-			}
-
-			.brand-tagline {
-				font-size: 0.9rem;
-				color: var(--elegant-gray);
-				font-weight: 300;
-			}
-
-			.nav-menu {
-				display: flex;
-				gap: var(--spacing-lg);
-			}
-
-			.nav-link {
-				text-decoration: none;
-				color: var(--soft-black);
-				font-weight: 500;
-				padding: var(--spacing-xs) var(--spacing-sm);
-				border-radius: 20px;
-				transition: all 0.3s ease;
-			}
-
-			.nav-link:hover {
-				background-color: rgba(255,255,255,0.7);
-				transform: translateY(-2px);
-			}
-
-			/* === MAIN CONTENT === */
-			.main-content {
-				min-height: 70vh;
-				padding: var(--spacing-xl) 0;
-			}
-
-			/* === FOOTER === */
-			.site-footer {
-				background: var(--warm-beige);
-				padding: var(--spacing-xl) 0 var(--spacing-lg);
-				margin-top: var(--spacing-xl);
-			}
-
-			.footer-content {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-				gap: var(--spacing-lg);
-				margin-bottom: var(--spacing-lg);
-			}
-
-			.footer-section h3,
-			.footer-section h4 {
-				font-family: var(--font-heading);
-				color: var(--soft-black);
-				margin-bottom: var(--spacing-md);
-			}
-
-			.footer-section p {
-				color: var(--elegant-gray);
-				margin-bottom: var(--spacing-md);
-			}
-
-			.footer-links {
-				list-style: none;
-			}
-
-			.footer-links li {
-				margin-bottom: var(--spacing-xs);
-			}
-
-			.footer-links a {
-				color: var(--elegant-gray);
-				text-decoration: none;
-				transition: color 0.3s ease;
-			}
-
-			.footer-links a:hover {
-				color: var(--beauty-pink);
-			}
-
-			.footer-bottom {
-				border-top: 1px solid rgba(0,0,0,0.1);
-				padding-top: var(--spacing-md);
-				text-align: center;
-				color: var(--elegant-gray);
-				font-size: 0.9rem;
-			}
-
-			.footer-note {
-				margin-top: var(--spacing-xs);
-				font-style: italic;
-			}
-
-			/* === RESPONSIVE === */
-			@media (max-width: 768px) {
-				.navbar .container {
-					flex-direction: column;
-					gap: var(--spacing-md);
-				}
-
-				.nav-menu {
-					flex-wrap: wrap;
-					justify-content: center;
-					gap: var(--spacing-sm);
-				}
-
-				.brand-name {
-					font-size: 1.5rem;
-				}
-
-				.footer-content {
-					grid-template-columns: 1fr;
-					text-align: center;
-				}
-			}
-		</style>
+                <noscript><div><img src="https://mc.yandex.ru/watch/103564367" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 	</head>
 	<body>
-                <!-- Yandex.Metrika noscript (обновлено автономной системой) -->
-                <noscript><div><img src="https://mc.yandex.ru/watch/103564367" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-
-		<!-- Header -->
-		<header class="site-header">
-			<nav class="navbar">
-				<div class="container">
-					<div class="nav-brand">
-						<a href="/" class="brand-link">
-							<h1 class="brand-name">BlondePlace</h1>
-							<span class="brand-tagline">Beauty Blog</span>
-						</a>
-					</div>
-					<div class="nav-menu">
-						<a href="/blog" class="nav-link">Блог</a>
-						<a href="/uslugi" class="nav-link">Услуги</a>
-						<a href="/kontakty" class="nav-link">Контакты</a>
-						<a href="/o-nas" class="nav-link">О нас</a>
-					</div>
-				</div>
-			</nav>
-		</header>
-
-		<!-- Main Content -->
-		<main class="main-content">
-			<slot />
-		</main>
-
-		<!-- Footer -->
-		<footer class="site-footer">
-			<div class="container">
-				<div class="footer-content">
-					<div class="footer-section">
-						<h3>BlondePlace Beauty Studio</h3>
-						<p>Профессиональный салон красоты, специализирующийся на окрашивании волос, стрижках и beauty-процедурах.</p>
-					</div>
-					
-					<div class="footer-section">
-						<h4>Услуги салона</h4>
-						<ul class="footer-links">
-							<li><a href="/uslugi#coloring">Окрашивание волос</a></li>
-							<li><a href="/uslugi#cutting">Стрижки и укладки</a></li>
-							<li><a href="/uslugi#manicure">Маникюр и педикюр</a></li>
-							<li><a href="/uslugi#treatments">Beauty-процедуры</a></li>
-						</ul>
-					</div>
-					
-					<div class="footer-section">
-						<h4>Полезное</h4>
-						<ul class="footer-links">
-							<li><a href="/blog">Beauty блог</a></li>
-							<li><a href="/kontakty">Контакты</a></li>
-							<li><a href="/o-nas">О салоне</a></li>
-						</ul>
-					</div>
-				</div>
-				
-				<div class="footer-bottom">
-					<p>&copy; 2024 BlondePlace Beauty Studio. Все права защищены.</p>
-					<p class="footer-note">
-						Экспертные советы и статьи о красоте от профессионалов салона BlondePlace
-					</p>
-				</div>
-			</div>
-		</footer>
+		<slot />
 	</body>
-</html>
+</html> 
