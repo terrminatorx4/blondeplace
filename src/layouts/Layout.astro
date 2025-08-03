@@ -70,6 +70,31 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
                         ecommerce:"dataLayer"
                     });
                 </script>
+                
+                <!-- ОТЛАДОЧНЫЙ КОД ДЛЯ ДИАГНОСТИКИ МЕТРИКИ -->
+                <script>
+                    // Проверка загрузки через 3 секунды
+                    setTimeout(function() {
+                        if (typeof ym !== 'undefined') {
+                            console.log('✅ [METRIKA] Яндекс Метрика загружена успешно');
+                            console.log('✅ [METRIKA] ID: 103564367');
+                            console.log('✅ [METRIKA] URL:', window.location.href);
+                            // Принудительная отправка хита
+                            ym(103564367, 'hit', window.location.href);
+                        } else {
+                            console.log('❌ [METRIKA] Яндекс Метрика НЕ загружена');
+                            console.log('❌ [METRIKA] Возможные причины: блокировщики рекламы, CSP, сетевые ошибки');
+                        }
+                    }, 3000);
+                    
+                    // Проверка сетевых ошибок
+                    window.addEventListener('error', function(e) {
+                        if (e.target && e.target.src && e.target.src.includes('mc.yandex.ru')) {
+                            console.log('❌ [METRIKA] Ошибка загрузки скрипта Яндекс:', e.target.src);
+                        }
+                    });
+                </script>
+                
                 <noscript><div><img src="https://mc.yandex.ru/watch/103564367" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 	</head>
 	<body>
