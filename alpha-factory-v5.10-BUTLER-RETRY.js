@@ -1,13 +1,13 @@
-// ===== ALPHA-FACTORY v5.14 - ПЛАН АЛЬФА-УДАР ВОССТАНОВЛЕН =====
-// ВОЗВРАТ К ТОЧНОМУ СЛЕДОВАНИЮ ПЛАНА АЛЬФА-УДАР!
+// ===== ALPHA-FACTORY v5.15 - ИСПРАВЛЕНО КОЛИЧЕСТВО ССЫЛОК =====
+// КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: 85 ССЫЛОК НА СТАТЬЮ!
 // 1. Title: 40-45 символов ✅
 // 2. Description: 150-164 символа ✅  
 // 3. Keywords: УБРАНЫ (98%→23% с ними!) ✅
 // 4. Robots: УБРАНЫ (CheckSite считает спамом!) ✅
-// 5. Ссылки: 80% на основной сайт blondeplace.ru ✅
-// 6. Ссылки: 20% внутренние (блог) ✅
-// 7. Цель: 425,000-850,000 ссылок на основной сайт ✅
-// 8. НИКАКИХ сторонних beauty сайтов! ✅
+// 5. Ссылки: 85 ВСЕГО (было 60) ✅
+// 6. Ссылки: 68 на основной сайт (80% от 85) ✅
+// 7. Ссылки: 17 внутренних (20% от 85) ✅
+// 8. ТОЧНОЕ СЛЕДОВАНИЕ ПЛАНУ АЛЬФА-УДАР! ✅
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
@@ -407,7 +407,7 @@ function createHowToSchema(title, description, heroImage, postNumber) {
 function generateIntelligentLinks(text) {
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 15);
     let linkCount = 0;
-    const targetLinkCount = 60; // ВОССТАНОВЛЕНО - ссылки важны для продвижения
+    const targetLinkCount = 85; // ПЛАН АЛЬФА-УДАР: 85 ссылок на статью!
     
     for (let i = 0; i < sentences.length && linkCount < targetLinkCount; i++) {
         if (Math.random() < 0.7) { // УВЕЛИЧЕНО для большего количества ссылок
