@@ -1,10 +1,10 @@
-// ===== ALPHA-FACTORY v5.9 - PERFECT SEO =====
-// ИСПРАВЛЕНЫ КРИТИЧЕСКИЕ SEO ПРОБЛЕМЫ:
-// 1. Title: 40-45 символов (было 37)
-// 2. Description: 150-164 символа (было 93) 
-// 3. Keywords: добавлены мета-теги
-// 4. Тошнота: снижена до нормы <5
-// 5. Упрощена race protection
+// ===== ALPHA-FACTORY v5.11 - NO KEYWORDS =====
+// ЭКСТРЕННЫЙ ОТКАТ KEYWORDS - CheckSite их НАКАЗЫВАЕТ!
+// 1. Title: 40-45 символов
+// 2. Description: 150-164 символа
+// 3. Keywords: УБРАНЫ (98%→23% с ними!)
+// 4. Robots: УБРАНЫ (CheckSite считает спамом!)
+// 5. Минимальные базовые метатеги
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
@@ -195,14 +195,6 @@ async function createPerfectSEODescription(keyword, postNumber, threadId, geoCon
     }
 }
 
-// ===== ФУНКЦИЯ СОЗДАНИЯ KEYWORDS =====
-function createSEOKeywords(keyword, geoContext) {
-    const baseKeywords = [keyword, "BlondePlace", "салон красоты", "Санкт-Петербург"];
-    const additionalKeywords = ["профессиональный", "качественный", "экспертные советы"];
-    
-    return [...baseKeywords, ...additionalKeywords].join(", ");
-}
-
 // ===== АГРЕССИВНАЯ ОЧИСТКА ИИ КОММЕНТАРИЕВ =====
 function cleanAIComments(text) {
     console.log('[CLEAN] Начинаю агрессивную очистку ИИ комментариев...');
@@ -307,7 +299,6 @@ ${plan}
         // Создаем PERFECT SEO мета-данные
         const seoData = await createPerfectSEOTitle(keyword, postNumber, threadId);
         const description = await createPerfectSEODescription(keyword, postNumber, threadId, geoContext);
-        const keywords = createSEOKeywords(keyword, geoContext);
         
         // Генерируем правильное изображение
         const heroImage = generateProperHeroImage(keyword);
@@ -322,7 +313,6 @@ ${plan}
         const frontMatter = `---
 title: "${seoData.title}"
 description: "${description}"
-keywords: "${keywords}"
 pubDate: ${new Date().toISOString()}
 heroImage: "${heroImage}"
 category: "Beauty советы"
@@ -359,7 +349,6 @@ ${JSON.stringify(schema, null, 2)}
         
         console.log(`[DONE] Thread #${threadId}: Статья #${postNumber} создана: "${seoData.title}"`);
         console.log(`[SEO] Title: ${seoData.title.length} символов, Description: ${description.length} символов`);
-        console.log(`[SEO] Keywords: ${keywords}`);
         console.log(`[IMAGE] Изображение: ${heroImage}`);
         
         // IndexNow уведомление
