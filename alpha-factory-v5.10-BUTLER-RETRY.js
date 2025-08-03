@@ -415,17 +415,17 @@ function createHowToSchema(title, description, heroImage, postNumber) {
 function generateIntelligentLinks(text) {
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
     let linkCount = 0;
-    const targetLinkCount = 60; // СНИЖЕНО с 85 для уменьшения тошноты
+    const targetLinkCount = 15; // РАДИКАЛЬНО СНИЖЕНО для SEO (как у Butler)
     
     for (let i = 0; i < sentences.length && linkCount < targetLinkCount; i++) {
-        if (Math.random() < 0.3) { // СНИЖЕНО с 40% до 30%
-            const isExternal = Math.random() < 0.8; // 80% внешние ссылки
+        if (Math.random() < 0.2) { // СНИЖЕНО до 20% для меньшего количества ссылок
+            const isExternal = Math.random() < 0.2; // СНИЖЕНО до 20% внешних ссылок (как Butler)
             
             if (isExternal) {
                 const targetUrl = TARGET_URLS[Math.floor(Math.random() * TARGET_URLS.length)];
                 const linkTexts = ["подробнее", "узнать больше", "записаться", "консультация"];
                 const linkText = linkTexts[Math.floor(Math.random() * linkTexts.length)];
-                sentences[i] += ` <a href="${targetUrl}" target="_blank">${linkText}</a>`;
+                sentences[i] += ` <a href="${targetUrl}" target="_blank" rel="nofollow">${linkText}</a>`;
                 linkCount++;
             } else {
                 // Внутренняя ссылка
