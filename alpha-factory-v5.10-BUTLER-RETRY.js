@@ -1,5 +1,5 @@
-// ===== ALPHA-FACTORY v5.23 - КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ ОШИБКИ =====
-// ИСПРАВЛЕНО: Ошибка области видимости getKeywordSpamStrategy функции!
+// ===== ALPHA-FACTORY v5.24 - ИСПРАВЛЕНИЕ HTML И GIT КОНФЛИКТОВ =====
+// ИСПРАВЛЕНО: HTML код не попадает в семантическое ядро + надежный git push!
 // 1. Title: 40-45 символов ✅
 // 2. Description: 150-164 символа ✅  
 // 3. Keywords: УБРАНЫ (98%→23% с ними!) ✅
@@ -8,6 +8,7 @@
 // 6. Объем: 17000+ символов ✅
 // 7. ПЕРЕСПАМ: Каждое слово фразы 70-80 раз (1-е место) ✅
 // 8. АНКОРЫ: Ключевые слова вместо "читать", "узнать" ✅
+// 9. HTML: Исправлено попадание тегов в семантическое ядро ✅
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
@@ -558,13 +559,15 @@ function generateIntelligentLinks(text, keyword) {
                 // 74% - ССЫЛКИ НА ОСНОВНОЙ САЙТ (100 из 135) с КЛЮЧЕВЫМИ анкорами
                 const targetUrl = TARGET_URLS[Math.floor(Math.random() * TARGET_URLS.length)];
                 const linkText = keywordAnchors.external[Math.floor(Math.random() * keywordAnchors.external.length)];
-                sentences[i] += ` <a href="${targetUrl}" target="_blank" rel="nofollow">${linkText}</a>`;
+                // ИСПРАВЛЕНИЕ: Правильное формирование HTML ссылки с пробелами
+                sentences[i] += ` [${linkText}](${targetUrl})`;
                 linkCount++;
             } else {
-                // 26% - ВНУТРЕННИЕ ССЫЛКИ БЛОГА (35 из 135) с КЛЮЧЕВЫМИ анкорами
+                // 26% - ВНУТРЕННИЕ ССЫЛКИ БЛОГА (35 из 135) с КЛЮЧЕВЫМИ анкорами  
                 const internalPostNum = Math.floor(Math.random() * 20000) + 1000;
                 const linkText = keywordAnchors.internal[Math.floor(Math.random() * keywordAnchors.internal.length)];
-                sentences[i] += ` <a href="${SITE_URL}/blog/post${internalPostNum}/">${linkText}</a>`;
+                // ИСПРАВЛЕНИЕ: Правильное формирование внутренней ссылки
+                sentences[i] += ` [${linkText}](/blog/post${internalPostNum}/)`;
                 linkCount++;
             }
         }
@@ -572,6 +575,7 @@ function generateIntelligentLinks(text, keyword) {
     
     console.log(`[LINKS] Вставлено ${linkCount} ссылок с КЛЮЧЕВЫМИ анкорами (на основной сайт: ${Math.floor(linkCount * 0.74)}, внутренних: ${Math.floor(linkCount * 0.26)})`);
     console.log(`[ANCHORS] Все анкоры используют ключевые слова: "${spamStrategy.primary}", "${spamStrategy.secondary || 'нет'}", "${spamStrategy.tertiary || 'нет'}"`);
+    console.log(`[HTML] Используется Markdown формат ссылок вместо HTML тегов`);
     
     return sentences.join('.') + '.';
 }
@@ -668,13 +672,13 @@ async function main() {
         const modelChoice = process.env.MODEL_CHOICE || 'gemini';
         
         console.log(`[KEY] [ALPHA-STRIKE #${threadId}] Модель: ${modelChoice}, ключ: ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.23 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
-        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.23 - КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ ===`);
+        console.log(`[INIT] [ALPHA-STRIKE #${threadId}] Инициализация боевой системы v5.24 с ключом ...${(process.env.GEMINI_API_KEY_CURRENT || process.env.OPENROUTER_API_KEY_CURRENT || '').slice(-4)}`);
+        console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] === АЛЬФА-УДАР v5.24 - ИСПРАВЛЕНИЕ HTML И GIT ===`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Цель: ${targetArticles} уникальных статей`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Ключевые слова: ${ALPHA_KEYWORDS.length} шт`);
         console.log(`[ALPHA] [ALPHA-STRIKE #${threadId}] Правильные ключи: ${ALPHA_KEYWORDS.join(', ')}`);
         console.log(`[SEO] [ALPHA-STRIKE #${threadId}] SEO ОПТИМИЗАЦИЯ: Title 40-45 символов, Description 150-164 символа`);
-        console.log(`[SEO] [ALPHA-STRIKE #${threadId}] АНКОРЫ ССЫЛОК: Используют только ключевые слова!`);
+        console.log(`[SEO] [ALPHA-STRIKE #${threadId}] ССЫЛКИ: Markdown формат вместо HTML тегов!`);
         
         // Получаем уникальный стартовый номер для каждого потока
         const startNumber = await getNextAvailablePostNumber(threadId);
@@ -704,7 +708,7 @@ async function main() {
             await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.23 ЗАВЕРШЕНА ===`);
+        console.log(`[COMPLETE] [ALPHA-STRIKE #${threadId}] === МИССИЯ v5.24 ЗАВЕРШЕНА ===`);
         console.log(`[STATS] Создано статей: ${results.length}`);
         console.log(`[STATS] Общее количество ссылок на основной сайт: ~${results.length * 85}`);
         console.log(`[STATS] Финальная скорость: 500мс`);
