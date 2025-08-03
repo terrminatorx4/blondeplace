@@ -5,18 +5,53 @@ export interface Props {
 	heroImage?: string;
 	keywords?: string;
 	schema?: any;
+	author?: string;
+	robots?: string;
+	canonical?: string;
+	ogTitle?: string;
+	ogDescription?: string;
+	ogImage?: string;
+	ogType?: string;
+	ogUrl?: string;
+	twitterCard?: string;
+	twitterTitle?: string;
+	twitterDescription?: string;
+	twitterImage?: string;
+	twitterSite?: string;
+	lang?: string;
 }
 
-const { title, description = "Экспертные советы по красоте от салона BlondePlace", heroImage, keywords, schema } = Astro.props;
+const { 
+	title, 
+	description = "Экспертные советы по красоте от салона BlondePlace", 
+	heroImage, 
+	keywords, 
+	schema,
+	author = "BlondePlace Team",
+	robots = "index, follow",
+	canonical,
+	ogTitle,
+	ogDescription,
+	ogImage,
+	ogType = "website",
+	ogUrl,
+	twitterCard = "summary_large_image",
+	twitterTitle,
+	twitterDescription,
+	twitterImage,
+	twitterSite = "@BlondePlace",
+	lang = "ru"
+} = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!DOCTYPE html>
-<html lang="ru">
+<html lang={lang}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="robots" content="index, follow" />
+		<meta name="robots" content={robots} />
+		<meta name="author" content={author} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
@@ -26,7 +61,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
                 <meta name="keywords" content={keywords || "салон красоты BlondePlace, beauty процедуры, профессиональный уход, маникюр, педикюр, окрашивание волос"} />
 		
 		<!-- Canonical URL -->
-		<link rel="canonical" href={canonicalURL} />
+		<link rel="canonical" href={canonical || canonicalURL} />
 
                 <!-- Verification meta-tags (критично для SEO) -->
                 <meta name="google-site-verification" content="QmTdEF5xHLHXsL1FEcotg-xZTPfD14z9BxH6D64b0ds" />
@@ -38,19 +73,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		)}
 		
 		<!-- Open Graph / Facebook -->
-		<meta property="og:type" content="website" />
-		<meta property="og:url" content={Astro.url} />
-		<meta property="og:title" content={title} />
-		<meta property="og:description" content={description} />
-		{heroImage && <meta property="og:image" content={new URL(heroImage, Astro.url)} />}
+		<meta property="og:type" content={ogType} />
+		<meta property="og:url" content={ogUrl || Astro.url} />
+		<meta property="og:title" content={ogTitle || title} />
+		<meta property="og:description" content={ogDescription || description} />
+		{(ogImage || heroImage) && <meta property="og:image" content={new URL(ogImage || heroImage, Astro.url)} />}
 		<meta property="og:site_name" content="BLONDE PLACE" />
 		
 		<!-- Twitter -->
-		<meta property="twitter:card" content="summary_large_image" />
-		<meta property="twitter:url" content={Astro.url} />
-		<meta property="twitter:title" content={title} />
-		<meta property="twitter:description" content={description} />
-		{heroImage && <meta property="twitter:image" content={new URL(heroImage, Astro.url)} />}
+		<meta name="twitter:card" content={twitterCard} />
+		<meta name="twitter:url" content={ogUrl || Astro.url} />
+		<meta name="twitter:title" content={twitterTitle || title} />
+		<meta name="twitter:description" content={twitterDescription || description} />
+		{(twitterImage || heroImage) && <meta name="twitter:image" content={new URL(twitterImage || heroImage, Astro.url)} />}
+		<meta name="twitter:site" content={twitterSite} />
+		<meta name="twitter:creator" content={twitterSite} />
 		
 		<!-- Beauty-специфичные мета-теги -->
 		<meta name="author" content="BlondePlace Beauty Expert" />
