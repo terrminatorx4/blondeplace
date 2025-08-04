@@ -52,6 +52,34 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta name="twitter:description" content={description} />
 		{heroImage && <meta name="twitter:image" content={new URL(heroImage, Astro.url)} />}
 
+		<!-- PWA MANIFEST -->
+		<link rel="manifest" href="/site.webmanifest" />
+
+		<!-- PWA THEME COLOR -->
+		<meta name="theme-color" content="#ff6b9d" />
+		<meta name="background-color" content="#ffffff" />
+
+		<!-- APPLE PWA SUPPORT -->
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<meta name="apple-mobile-web-app-title" content="BlondePlace" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+
+		<!-- PWA SERVICE WORKER REGISTRATION -->
+		<script>
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('/sw.js')
+					.then(registration => {
+						console.log('✅ [PWA] Service Worker registered successfully:', registration.scope);
+					})
+					.catch(error => {
+						console.log('❌ [PWA] Service Worker registration failed:', error);
+					});
+			});
+		}
+		</script>
+
                 <!-- Yandex.Metrika counter -->
                 <script type="text/javascript">
                     (function(m,e,t,r,i,k,a){
