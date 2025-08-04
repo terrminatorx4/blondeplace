@@ -26,7 +26,8 @@ const ALPHA_KEYWORDS = [
     "кресло для мастера",
     "салон красоты",
     "мелирование",
-    "тотал блонд"
+    "тотал блонд",
+    "бьюти-коворкинг"
 ];
 
 const BRAND_BLOG_NAME = "BlondePlace Beauty Blog";
@@ -142,6 +143,12 @@ function getKeywordSpamStrategy(keyword) {
             secondary: "блонд",
             primaryCount: "70-80",
             secondaryCount: "50-60"
+        },
+        "бьюти-коворкинг": {
+            primary: "бьюти",
+            secondary: "коворкинг",
+            primaryCount: "80-90",
+            secondaryCount: "60-70"
         }
     };
     
@@ -307,17 +314,18 @@ function cleanAIComments(text) {
 function generateProperHeroImage(keyword) {
     // ИСПРАВЛЕНО: Правильные изображения для BlondePlace (НЕ от Butler!)
     const imageMap = {
-        "бьюти коворкинг": "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=2070&auto=format&fit=crop",
-        "аренда парикмахерского кресла": "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2070&auto=format&fit=crop", 
-        "коворкинг для мастера": "https://images.unsplash.com/photo-1582095133179-bfd08e2fc6b3?q=80&w=2070&auto=format&fit=crop",
-        "места в аренду": "https://images.unsplash.com/photo-1560448075-bb485b067938?q=80&w=2070&auto=format&fit=crop",
-        "кресло для мастера": "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2070&auto=format&fit=crop",
-        "салон красоты": "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=2070&auto=format&fit=crop",
-        "мелирование": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=2070&auto=format&fit=crop",
-        "тотал блонд": "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=2070&auto=format&fit=crop"
+        "бьюти коворкинг": "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=800&auto=format&fit=crop",
+        "аренда парикмахерского кресла": "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=800&auto=format&fit=crop", 
+        "коворкинг для мастера": "https://images.unsplash.com/photo-1582095133179-bfd08e2fc6b3?q=80&w=800&auto=format&fit=crop",
+        "места в аренду": "https://images.unsplash.com/photo-1560448075-bb485b067938?q=80&w=800&auto=format&fit=crop",
+        "кресло для мастера": "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=800&auto=format&fit=crop",
+        "салон красоты": "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=800&auto=format&fit=crop",
+        "мелирование": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=800&auto=format&fit=crop",
+        "тотал блонд": "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=800&auto=format&fit=crop",
+        "бьюти-коворкинг": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop"
     };
     
-    return imageMap[keyword] || "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=2070&auto=format&fit=crop";
+    return imageMap[keyword] || "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=800&auto=format&fit=crop";
 }
 
 // ===== ГЕНЕРАЦИЯ КОНТЕНТА С PERFECT SEO =====
@@ -615,7 +623,7 @@ async function generateWithAI(prompt) {
                 if (!apiKey) throw new Error('GEMINI_API_KEY_CURRENT не найден');
                 
                 const genAI = new GoogleGenerativeAI(apiKey);
-                const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+                const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
                 
                 const result = await model.generateContent(prompt);
                 return result.response.text();
@@ -765,6 +773,4 @@ export { main };
 // Запуск для прямого вызова
 if (import.meta.url === `file://${process.argv[1]}`) {
     main();
-
 } 
-
