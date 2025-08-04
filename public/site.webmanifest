@@ -1,76 +1,48 @@
 {
-  "name": "BLONDE PLACE - Салон красоты",
-  "short_name": "BLONDE PLACE",
-  "description": "Профессиональные услуги красоты в центре СПб: окрашивание волос, стрижки, маникюр, уход за кожей. Beauty коворкинг.",
+  "name": "BlondePlace Beauty Blog",
+  "short_name": "BlondePlace",
+  "description": "Экспертные советы по красоте от салона BlondePlace",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "theme_color": "#ff6b9d",
   "background_color": "#ffffff",
+  "theme_color": "#ff6b9d",
+  "orientation": "portrait-primary",
+  "scope": "/",
   "lang": "ru",
-  "dir": "ltr",
-  "categories": ["beauty", "lifestyle", "business"],
+  "categories": ["beauty", "lifestyle", "health"],
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/icon-192.svg",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.svg", 
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180", 
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-maskable-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
+      "src": "/favicon.ico",
+      "sizes": "32x32", 
+      "type": "image/x-icon",
       "purpose": "any"
     }
   ],
   "shortcuts": [
     {
-      "name": "Наши услуги",
-      "short_name": "Услуги",
-      "description": "Посмотреть все услуги салона",
-      "url": "/#services",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Записаться",
-      "short_name": "Запись",
-      "description": "Записаться на консультацию",
-      "url": "https://t.me/Blondeplace",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshot-wide.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshot-narrow.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow"
+      "name": "Блог",
+      "short_name": "Блог",
+      "description": "Читать статьи о красоте",
+      "url": "/blog/",
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" }]
     }
   ]
-}
+} 
