@@ -1,146 +1,108 @@
-const CACHE_NAME = 'blondeplace-v1';
-const STATIC_ASSETS = [
+// BLONDEPLACE PWA SERVICE WORKER v1.0
+const CACHE_NAME = 'blondeplace-v1.0.0';
+const CACHE_ASSETS = [
   '/',
-  '/services/',
-  '/about/',
-  '/contacts/',
-  '/beauty-coworking/',
   '/blog/',
-  '/favicon.ico',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/apple-touch-icon.png'
+  '/o-nas/',
+  '/uslugi/',
+  '/offline/',
+  '/site.webmanifest',
+  '/favicon.ico'
 ];
 
-// Install - кеширование статических ресурсов
-self.addEventListener('install', (event) => {
+// Install event - кэшируем ресурсы
+self.addEventListener('install', event => {
   console.log('PWA: Service Worker installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
+      .then(cache => {
         console.log('PWA: Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
+        return cache.addAll(CACHE_ASSETS);
       })
       .then(() => {
         console.log('PWA: Static assets cached');
         return self.skipWaiting();
       })
+      .catch(error => console.log('PWA: Cache failed:', error))
   );
 });
 
-// Activate - очистка старого кеша
-self.addEventListener('activate', (event) => {
+// Activate event - очищаем старые кэши
+self.addEventListener('activate', event => {
   console.log('PWA: Service Worker activating...');
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('PWA: Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      console.log('PWA: Service Worker activated');
-      return self.clients.claim();
-    })
+    caches.keys()
+      .then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            if (cacheName !== CACHE_NAME) {
+              console.log('PWA: Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+      .then(() => {
+        console.log('PWA: Service Worker activated');
+        return self.clients.claim();
+      })
   );
 });
 
-// Fetch - стратегия кеширования
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-
-  // Только для нашего домена
-  if (url.origin !== location.origin) {
+// Fetch event - стратегия кэширования
+self.addEventListener('fetch', event => {
+  // Пропускаем внешние запросы
+  if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
   event.respondWith(
-    caches.match(request)
-      .then((cachedResponse) => {
-        // Если есть в кеше - возвращаем
-        if (cachedResponse) {
-          console.log('PWA: Serving from cache:', request.url);
-          return cachedResponse;
+    caches.match(event.request)
+      .then(response => {
+        if (response) {
+          console.log('PWA: Serving from cache:', event.request.url);
+          return response;
         }
 
-        // Если нет - загружаем и кешируем
-        return fetch(request)
-          .then((response) => {
-            // Кешируем только успешные ответы
-            if (response.status === 200) {
-              const responseClone = response.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => {
-                  cache.put(request, responseClone);
-                });
+        // Клонируем запрос для кэширования
+        const fetchRequest = event.request.clone();
+
+        return fetch(fetchRequest)
+          .then(response => {
+            // Проверяем валидность ответа
+            if (!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
             }
+
+            // Клонируем ответ для кэширования
+            const responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+
             return response;
           })
           .catch(() => {
-            // Офлайн fallback
-            if (request.destination === 'document') {
-              return caches.match('/');
+            // Возвращаем страницу офлайн для HTML запросов
+            if (event.request.destination === 'document') {
+              return caches.match('/offline/');
             }
           });
       })
   );
 });
 
-// Background Sync для офлайн форм
-self.addEventListener('sync', (event) => {
+// Background sync для уведомлений
+self.addEventListener('sync', event => {
   if (event.tag === 'background-sync') {
     console.log('PWA: Background sync triggered');
-    event.waitUntil(
-      // Здесь можно добавить логику отправки офлайн форм
-      Promise.resolve()
-    );
+    event.waitUntil(doBackgroundSync());
   }
 });
 
-// Push notifications (если понадобятся)
-self.addEventListener('push', (event) => {
-  if (event.data) {
-    const data = event.data.json();
-    const options = {
-      body: data.body,
-      icon: '/icon-192.png',
-      badge: '/icon-192.png',
-      vibrate: [100, 50, 100],
-      data: {
-        dateOfArrival: Date.now(),
-        primaryKey: data.primaryKey
-      },
-      actions: [
-        {
-          action: 'explore',
-          title: 'Посмотреть',
-          icon: '/icon-192.png'
-        },
-        {
-          action: 'close',
-          title: 'Закрыть',
-          icon: '/icon-192.png'
-        }
-      ]
-    };
-
-    event.waitUntil(
-      self.registration.showNotification(data.title, options)
-    );
-  }
-});
-
-// Notification click
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-
-  if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  }
-});
+function doBackgroundSync() {
+  // Здесь можно добавить синхронизацию данных
+  return Promise.resolve();
+} 
