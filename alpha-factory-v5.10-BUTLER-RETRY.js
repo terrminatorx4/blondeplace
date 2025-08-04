@@ -22,12 +22,13 @@ const ALPHA_KEYWORDS = [
     "бьюти коворкинг",
     "аренда парикмахерского кресла", 
     "коворкинг для мастера",
-    "места в аренду",
     "кресло для мастера",
     "салон красоты",
     "мелирование",
     "тотал блонд",
-    "бьюти-коворкинг"
+    "бьюти-коворкинг",
+    "салон-красоты",
+    "парикмахерское-кресло"
 ];
 
 const BRAND_BLOG_NAME = "BlondePlace Beauty Blog";
@@ -116,12 +117,6 @@ function getKeywordSpamStrategy(keyword) {
             primaryCount: "70-80",
             secondaryCount: "50-60"
         },
-        "места в аренду": {
-            primary: "места",
-            secondary: "аренду",
-            primaryCount: "80-90",
-            secondaryCount: "60-70"
-        },
         "кресло для мастера": {
             primary: "кресло",
             secondary: "мастера", 
@@ -148,6 +143,18 @@ function getKeywordSpamStrategy(keyword) {
             primary: "бьюти",
             secondary: "коворкинг",
             primaryCount: "80-90",
+            secondaryCount: "60-70"
+        },
+        "салон-красоты": {
+            primary: "салон",
+            secondary: "красоты",
+            primaryCount: "75-85",
+            secondaryCount: "55-65"
+        },
+        "парикмахерское-кресло": {
+            primary: "парикмахерское",
+            secondary: "кресло",
+            primaryCount: "70-80",
             secondaryCount: "60-70"
         }
     };
@@ -317,12 +324,13 @@ function generateProperHeroImage(keyword) {
         "бьюти коворкинг": "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=800&auto=format&fit=crop",
         "аренда парикмахерского кресла": "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=800&auto=format&fit=crop", 
         "коворкинг для мастера": "https://images.unsplash.com/photo-1582095133179-bfd08e2fc6b3?q=80&w=800&auto=format&fit=crop",
-        "места в аренду": "https://images.unsplash.com/photo-1560448075-bb485b067938?q=80&w=800&auto=format&fit=crop",
         "кресло для мастера": "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=800&auto=format&fit=crop",
         "салон красоты": "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=800&auto=format&fit=crop",
         "мелирование": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=800&auto=format&fit=crop",
         "тотал блонд": "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=800&auto=format&fit=crop",
-        "бьюти-коворкинг": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop"
+        "бьюти-коворкинг": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop",
+        "салон-красоты": "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=800&auto=format&fit=crop",
+        "парикмахерское-кресло": "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=800&auto=format&fit=crop"
     };
     
     return imageMap[keyword] || "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=800&auto=format&fit=crop";
@@ -747,7 +755,7 @@ async function main() {
         // ALPHA-STRIKE СТАТИСТИКА (НЕ КАК В BUTLER!)
         console.log(`[ALPHA] ALPHA-STRIKE СТАТИСТИКА:`);
         console.log(`[ALPHA] Потоков задействовано: 20`);
-        console.log(`[ALPHA] Target keywords: 8 (бьюти коворкинг, аренда парикмахерского кресла, коворкинг для мастера, места в аренду, кресло для мастера, салон красоты, мелирование, тотал блонд)`);
+        console.log(`[ALPHA] Target keywords: 8 (бьюти коворкинг, аренда парикмахерского кресла, коворкинг для мастера, кресло для мастера, салон красоты, мелирование, тотал блонд, бьюти-коворкинг)`);
         console.log(`[ALPHA] Успешность: ${Math.round((results.length / targetArticles) * 100)}%`);
         
         // Результаты статей
