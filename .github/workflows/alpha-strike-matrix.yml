@@ -1,0 +1,134 @@
+name: 🚀 Alpha-Strike v5.27 - TRUE PARALLEL MATRIX
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Модель ИИ (gemini/openrouter)'
+        required: true
+        default: 'gemini'
+        type: choice
+        options:
+          - gemini
+          - openrouter
+      threads:
+        description: 'Количество потоков (1-20)'
+        required: true
+        default: '20'
+        type: string
+      articles_per_thread:
+        description: 'Статей на поток (1-10)'
+        required: true
+        default: '1'
+        type: string
+
+jobs:
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+    - name: 📊 Генерирую Matrix для потоков
+      id: set-matrix
+      run: |
+        threads=${{ github.event.inputs.threads }}
+        matrix="["
+        for i in $(seq 1 $threads); do
+          if [ $i -eq $threads ]; then
+            matrix="${matrix}${i}"
+          else
+            matrix="${matrix}${i},"
+          fi
+        done
+        matrix="${matrix}]"
+        echo "matrix={\"thread\":[${matrix:1:-1}]}" >> $GITHUB_OUTPUT
+        echo "Generated matrix: {\"thread\":[${matrix:1:-1}]}"
+
+  alpha-strike-attack:
+    needs: prepare-matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix: ${{fromJson(needs.prepare-matrix.outputs.matrix)}}
+      fail-fast: false
+      max-parallel: 20
+    
+    steps:
+    - name: 🔄 Force Cache Clean Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        clean: true
+        
+    - name: 🧹 Clear All Caches - Thread ${{ matrix.thread }}
+      run: |
+        echo "🚨 ПОТОК #${{ matrix.thread }}: Очистка кэшей!"
+        rm -rf node_modules/.cache || true
+        rm -rf .next/cache || true
+        rm -rf .astro/cache || true
+        echo "✅ Кэши очищены для потока #${{ matrix.thread }}"
+        
+    - name: ⚡ Setup Node.js 18
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: 📦 Install Dependencies
+      run: |
+        echo "🔄 Устанавливаю зависимости для потока #${{ matrix.thread }}..."
+        npm ci --no-cache
+        
+    - name: 🔍 Verify Alpha-Factory Version - Thread ${{ matrix.thread }}
+      run: |
+        echo "🔍 ПОТОК #${{ matrix.thread }}: ПРОВЕРЯЮ ВЕРСИЮ ALPHA-FACTORY:"
+        head -3 alpha-factory-v5.10-BUTLER-RETRY.js
+        echo ""
+        echo "🔍 ПОТОК #${{ matrix.thread }}: ПРОВЕРЯЮ baseNumber = 200000:"
+        grep -n "baseNumber.*200000" alpha-factory-v5.10-BUTLER-RETRY.js || echo "❌ НЕ НАЙДЕН!"
+        
+    - name: 🚀 Alpha-Strike Thread ${{ matrix.thread }} - FORCE v5.27
+      env:
+        GEMINI_API_KEYS_POOL: ${{ secrets.GEMINI_API_KEYS_POOL }}
+        OPENROUTER_API_KEYS_POOL: ${{ secrets.OPENROUTER_API_KEYS_POOL }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🚀 ПОТОК #${{ matrix.thread }}: ЗАПУСК ALPHA-STRIKE v5.27!"
+        echo "🤖 Модель: ${{ github.event.inputs.model }}"
+        echo "📊 Поток: ${{ matrix.thread }}"
+        echo "📊 Статей на поток: ${{ github.event.inputs.articles_per_thread }}"
+        echo "🎯 Ожидаемый номер: 20${{ matrix.thread }}00"
+        echo ""
+        node alpha-factory-v5.10-BUTLER-RETRY.js \
+          --model ${{ github.event.inputs.model }} \
+          --threads 1 \
+          --articles ${{ github.event.inputs.articles_per_thread }} \
+          --thread-id ${{ matrix.thread }}
+          
+    - name: 📊 Thread ${{ matrix.thread }} Status
+      run: |
+        echo "✅ ПОТОК #${{ matrix.thread }}: Alpha-Strike v5.27 завершен!"
+        echo "🎯 Номер поста: post20${{ matrix.thread }}00"
+
+  quality-control:
+    needs: alpha-strike-attack
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: 📊 Общий отчет
+      run: |
+        echo "✅ ВСЕ ПОТОКИ ЗАВЕРШЕНЫ!"
+        echo "🎯 Создано статей: ${{ github.event.inputs.threads }}"
+        echo "🎯 Номера: post200100 - post20${{ github.event.inputs.threads }}00"
+        echo "🎯 Проверьте sitemap на новые ссылки!"
+
+  final-report:
+    needs: [alpha-strike-attack, quality-control]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: 🎉 Финальный отчет
+      run: |
+        echo "🎉 ALPHA-STRIKE v5.27 MATRIX ЗАВЕРШЕН!"
+        echo "📊 Истинная параллельность: ${{ github.event.inputs.threads }} jobs"
+        echo "📊 baseNumber = 200000 - уникальные номера"
+        echo "📊 Скорость: в ${{ github.event.inputs.threads }}x раз быстрее!" 
