@@ -2,6 +2,14 @@ name: 🚀 Alpha-Strike v5.27 - FORCE CACHE CLEAN
 on:
   workflow_dispatch:
     inputs:
+      model:
+        description: 'Модель ИИ (gemini/openrouter)'
+        required: true
+        default: 'gemini'
+        type: choice
+        options:
+          - gemini
+          - openrouter
       threads:
         description: 'Количество потоков (1-20)'
         required: true
@@ -59,11 +67,13 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         echo "🚀 ЗАПУСК ALPHA-STRIKE v5.27 с baseNumber = 200000!"
+        echo "🤖 Модель: ${{ github.event.inputs.model }}"
         echo "📊 Потоков: ${{ github.event.inputs.threads }}"
         echo "📊 Статей на поток: ${{ github.event.inputs.articles_per_thread }}"
         echo "🎯 Ожидаемые номера: 200000-202000"
         echo ""
         node alpha-factory-v5.10-BUTLER-RETRY.js \
+          --model ${{ github.event.inputs.model }} \
           --threads ${{ github.event.inputs.threads }} \
           --articles ${{ github.event.inputs.articles_per_thread }}
           
