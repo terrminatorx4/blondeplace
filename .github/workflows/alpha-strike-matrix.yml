@@ -91,18 +91,19 @@ jobs:
         GEMINI_API_KEYS_POOL: ${{ secrets.GEMINI_API_KEYS_POOL }}
         OPENROUTER_API_KEYS_POOL: ${{ secrets.OPENROUTER_API_KEYS_POOL }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        THREAD_ID: ${{ matrix.thread }}
       run: |
         echo "🚀 ПОТОК #${{ matrix.thread }}: ЗАПУСК ALPHA-STRIKE v5.27!"
         echo "🤖 Модель: ${{ github.event.inputs.model }}"
         echo "📊 Поток: ${{ matrix.thread }}"
         echo "📊 Статей на поток: ${{ github.event.inputs.articles_per_thread }}"
         echo "🎯 Ожидаемый номер: 20${{ matrix.thread }}00"
+        echo "🔧 THREAD_ID environment variable: $THREAD_ID"
         echo ""
         node alpha-factory-v5.10-BUTLER-RETRY.js \
           --model ${{ github.event.inputs.model }} \
           --threads 1 \
-          --articles ${{ github.event.inputs.articles_per_thread }} \
-          --thread-id ${{ matrix.thread }}
+          --articles ${{ github.event.inputs.articles_per_thread }}
           
     - name: 📊 Thread ${{ matrix.thread }} Status
       run: |
