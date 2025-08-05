@@ -1,5 +1,5 @@
-// ===== ALPHA-FACTORY v5.26 - ЭКСТРЕМАЛЬНЫЙ ПЕРЕСПАМ И НАДЕЖНЫЙ GIT =====
-// ИСПРАВЛЕНО: Экстремально агрессивные инструкции для AI + улучшенная git strategy!
+// ===== ALPHA-FACTORY v5.27 - РЕШЕНИЕ GITHUB API ЛИМИТОВ =====
+// ИСПРАВЛЕНО: Фиксированный базовый номер 200000 для обхода GitHub API лимита в 1000 файлов!
 // 1. Title: 40-45 символов ✅
 // 2. Description: 150-164 символа ✅  
 // 3. Keywords: УБРАНЫ (98%→23% с ними!) ✅
@@ -177,8 +177,8 @@ async function getNextAvailablePostNumber(threadId) {
         });
         
         if (!response.ok) {
-            console.log(`[NUMBERS] Thread #${threadId}: ⚠️ GitHub API недоступен, использую базовый номер`);
-            return 30000 + (threadId * 1000);
+            console.log(`[NUMBERS] Thread #${threadId}: ⚠️ GitHub API недоступен, использую безопасный номер 200000`);
+            return 200000 + (threadId * 100);
         }
         
         const files = await response.json();
@@ -197,18 +197,20 @@ async function getNextAvailablePostNumber(threadId) {
             }
         }
         
-        // Каждый поток получает уникальный диапазон
-        const baseNumber = maxNumber + 1000;
+        // ИСПРАВЛЕНИЕ: Используем фиксированный безопасный номер 200000 
+        // чтобы избежать проблем с GitHub API лимитом в 1000 файлов
+        console.log(`[NUMBERS] Thread #${threadId}: GitHub API максимум: ${maxNumber}, но используем безопасный базовый номер 200000`);
+        const baseNumber = 200000; // ФИКСИРОВАННЫЙ БЕЗОПАСНЫЙ НОМЕР
         const uniqueStartNumber = baseNumber + (threadId * 100);
         
-        console.log(`[NUMBERS] Thread #${threadId}: Найден максимальный номер: ${maxNumber}`);
+        console.log(`[NUMBERS] Thread #${threadId}: Безопасный базовый номер: ${baseNumber}`);
         console.log(`[NUMBERS] Thread #${threadId}: Уникальный стартовый номер: ${uniqueStartNumber}`);
         
         return uniqueStartNumber;
         
     } catch (error) {
         console.log(`[NUMBERS] Thread #${threadId}: ⚠️ Ошибка при получении номера: ${error.message}`);
-        return 30000 + (threadId * 1000);
+        return 200000 + (threadId * 100);
     }
 }
 
@@ -631,7 +633,7 @@ async function generateWithAI(prompt) {
                 if (!apiKey) throw new Error('GEMINI_API_KEY_CURRENT не найден');
                 
                 const genAI = new GoogleGenerativeAI(apiKey);
-                const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+                const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
                 
                 const result = await model.generateContent(prompt);
                 return result.response.text();
@@ -781,6 +783,4 @@ export { main };
 // Запуск для прямого вызова
 if (import.meta.url === `file://${process.argv[1]}`) {
     main();
-
 } 
-
