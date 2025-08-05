@@ -112,6 +112,11 @@ jobs:
         export THREAD_ID=${{ matrix.thread-id }}
         export TARGET_ARTICLES=${{ needs.prepare-matrix.outputs.articles-per-thread }}
         node alpha-factory-v5.26-FIXED.js
+      env:
+        GEMINI_API_KEY_CURRENT: ${{ env.GEMINI_API_KEY_CURRENT }}
+        OPENROUTER_API_KEY_CURRENT: ${{ env.OPENROUTER_API_KEY_CURRENT }}
+        MODEL_CHOICE: ${{ env.MODEL_CHOICE }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: BUTLER GIT STRATEGY (IMPROVED RACE PROTECTION!)
       run: |
         # Настройка Git как в Butler
