@@ -682,7 +682,7 @@ async function generateWithAI(prompt) {
                 if (!apiKey) throw new Error('GEMINI_API_KEY_CURRENT не найден');
                 
                 const genAI = new GoogleGenerativeAI(apiKey);
-                const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+                const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
                 
                 const result = await model.generateContent(prompt);
                 return result.response.text();
@@ -832,4 +832,5 @@ export { main };
 // Запуск для прямого вызова
 if (import.meta.url === `file://${process.argv[1]}`) {
     main();
+
 } 
