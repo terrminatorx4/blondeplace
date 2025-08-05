@@ -166,52 +166,92 @@ function getKeywordSpamStrategy(keyword) {
     };
 }
 
-// ===== ФУНКЦИЯ УНИКАЛЬНОЙ НУМЕРАЦИИ =====
+// ===== ФУНКЦИЯ ПОЛУЧЕНИЯ СЛЕДУЮЩЕГО ДОСТУПНОГО НОМЕРА ПОСТА (+ ПРОВЕРКА СУЩЕСТВОВАНИЯ) =====
 async function getNextAvailablePostNumber(threadId) {
     try {
         console.log(`[NUMBERS] Thread #${threadId}: Получаю последний номер поста из GitHub API...`);
-        
-        const response = await fetch('https://api.github.com/repos/terrminatorx4/blondeplace/contents/src/content/posts', {
-            headers: {
-                'User-Agent': 'Alpha-Factory-v5.9'
-            }
-        });
-        
-        if (!response.ok) {
-            console.log(`[NUMBERS] Thread #${threadId}: ⚠️ GitHub API недоступен, использую безопасный номер 200000`);
-            return 200000 + (threadId * 100);
-        }
-        
-        const files = await response.json();
-        const postFiles = files.filter(file => 
-            file.name.startsWith('post') && file.name.endsWith('.md')
-        );
-        
-        let maxNumber = 0;
-        for (const file of postFiles) {
-            const match = file.name.match(/^post(\d+)\.md$/);
-            if (match) {
-                const number = parseInt(match[1], 10);
-                if (number > maxNumber) {
-                    maxNumber = number;
-                }
-            }
-        }
         
         // ИСПРАВЛЕНИЕ: Используем фиксированный безопасный номер 200000 
         // чтобы избежать проблем с GitHub API лимитом в 1000 файлов
         console.log(`[NUMBERS] Thread #${threadId}: GitHub API максимум: ${maxNumber}, но используем безопасный базовый номер 200000`);
         const baseNumber = 200000; // ФИКСИРОВАННЫЙ БЕЗОПАСНЫЙ НОМЕР
-        const uniqueStartNumber = baseNumber + (threadId * 100);
+        const candidateNumber = baseNumber + (threadId * 100);
         
         console.log(`[NUMBERS] Thread #${threadId}: Безопасный базовый номер: ${baseNumber}`);
-        console.log(`[NUMBERS] Thread #${threadId}: Уникальный стартовый номер: ${uniqueStartNumber}`);
+        console.log(`[NUMBERS] Thread #${threadId}: Кандидат на номер: ${candidateNumber}`);
         
-        return uniqueStartNumber;
+        // ⚡ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: ПРОВЕРКА СУЩЕСТВОВАНИЯ ФАЙЛА
+        console.log(`[CHECK] Thread #${threadId}: Проверяю существование файла post${candidateNumber}.md...`);
+        
+        try {
+            const fileUrl = `https://api.github.com/repos/terrminatorx4/blondeplace/contents/src/content/posts/post${candidateNumber}.md`;
+            const response = await fetch(fileUrl, {
+                headers: {
+                    'Authorization': `token ${process.env.GITHUB_TOKEN}`,
+                    'User-Agent': `Alpha-Factory-v5.26-FIXED-Thread-${threadId}`
+                }
+            });
+            
+            if (response.status === 200) {
+                console.log(`[CHECK] Thread #${threadId}: ⚠️  ФАЙЛ post${candidateNumber}.md УЖЕ СУЩЕСТВУЕТ!`);
+                console.log(`[CHECK] Thread #${threadId}: 🔄 Ищу следующий доступный номер...`);
+                
+                // Ищем следующий доступный номер
+                let nextNumber = candidateNumber;
+                let attempts = 0;
+                const maxAttempts = 50; // Максимум 50 попыток
+                
+                while (attempts < maxAttempts) {
+                    nextNumber += 1;
+                    attempts++;
+                    
+                    const nextFileUrl = `https://api.github.com/repos/terrminatorx4/blondeplace/contents/src/content/posts/post${nextNumber}.md`;
+                    const nextResponse = await fetch(nextFileUrl, {
+                        headers: {
+                            'Authorization': `token ${process.env.GITHUB_TOKEN}`,
+                            'User-Agent': `Alpha-Factory-v5.26-FIXED-Thread-${threadId}`
+                        }
+                    });
+                    
+                    if (nextResponse.status === 404) {
+                        console.log(`[CHECK] Thread #${threadId}: ✅ Найден доступный номер: ${nextNumber} (попытка ${attempts})`);
+                        console.log(`[NUMBERS] Thread #${threadId}: Уникальный стартовый номер: ${nextNumber}`);
+                        return nextNumber;
+                    }
+                    
+                    console.log(`[CHECK] Thread #${threadId}: ⏳ post${nextNumber}.md тоже существует, продолжаю поиск...`);
+                }
+                
+                // Если не нашли свободный номер за 50 попыток
+                console.log(`[CHECK] Thread #${threadId}: ❌ Не удалось найти свободный номер за ${maxAttempts} попыток!`);
+                const fallbackNumber = baseNumber + (threadId * 100) + Date.now() % 1000;
+                console.log(`[CHECK] Thread #${threadId}: 🎲 Использую случайный номер: ${fallbackNumber}`);
+                console.log(`[NUMBERS] Thread #${threadId}: Уникальный стартовый номер: ${fallbackNumber}`);
+                return fallbackNumber;
+                
+            } else if (response.status === 404) {
+                console.log(`[CHECK] Thread #${threadId}: ✅ Файл post${candidateNumber}.md НЕ существует - номер свободен!`);
+                console.log(`[NUMBERS] Thread #${threadId}: Уникальный стартовый номер: ${candidateNumber}`);
+                return candidateNumber;
+                
+            } else {
+                console.log(`[CHECK] Thread #${threadId}: ⚠️ Неожиданный статус при проверке файла: ${response.status}`);
+                console.log(`[NUMBERS] Thread #${threadId}: Использую кандидат номер: ${candidateNumber}`);
+                return candidateNumber;
+            }
+            
+        } catch (checkError) {
+            console.log(`[CHECK] Thread #${threadId}: ⚠️ Ошибка при проверке существования: ${checkError.message}`);
+            console.log(`[CHECK] Thread #${threadId}: Продолжаю с кандидатом номером: ${candidateNumber}`);
+            console.log(`[NUMBERS] Thread #${threadId}: Уникальный стартовый номер: ${candidateNumber}`);
+            return candidateNumber;
+        }
         
     } catch (error) {
         console.log(`[NUMBERS] Thread #${threadId}: ⚠️ Ошибка при получении номера: ${error.message}`);
-        return 200000 + (threadId * 100);
+        const fallbackNumber = 200000 + (threadId * 100);
+        console.log(`[NUMBERS] Thread #${threadId}: Fallback номер: ${fallbackNumber}`);
+        return fallbackNumber;
     }
 }
 
