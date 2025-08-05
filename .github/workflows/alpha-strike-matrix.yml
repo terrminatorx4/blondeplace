@@ -100,7 +100,7 @@ jobs:
         echo "🎯 Ожидаемый номер: 20${{ matrix.thread }}00"
         echo "🔧 THREAD_ID environment variable: $THREAD_ID"
         echo ""
-        node alpha-factory-v5.10-BUTLER-RETRY.js \
+        node alpha-factory-v5.28-WORKING.js \
           --model ${{ github.event.inputs.model }} \
           --threads 1 \
           --articles ${{ github.event.inputs.articles_per_thread }}
