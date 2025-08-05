@@ -117,14 +117,14 @@ jobs:
         OPENROUTER_API_KEY_CURRENT: ${{ env.OPENROUTER_API_KEY_CURRENT }}
         MODEL_CHOICE: ${{ env.MODEL_CHOICE }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: BUTLER GIT STRATEGY (IMPROVED RACE PROTECTION!)
+    - name: BUTLER GIT STRATEGY (ULTRA RACE PROTECTION!)
       run: |
         # Настройка Git как в Butler
         git config --global user.name 'Alpha-Strike Bot v5.26-FIXED'
         git config --global user.email 'actions-bot@github.com'
         git config --global pull.rebase false
         
-        echo "🤖 Thread ${{ matrix.thread-id }}: Использую IMPROVED BUTLER git стратегию..."
+        echo "🤖 Thread ${{ matrix.thread-id }}: Использую ULTRA BUTLER git стратегию..."
         
         # Проверяем есть ли изменения
         if [[ -z $(git status --porcelain) ]]; then
@@ -132,40 +132,40 @@ jobs:
           exit 0
         fi
         
-        echo "🔥 Thread ${{ matrix.thread-id }}: Обнаружены новые файлы. IMPROVED BUTLER стратегия..."
+        echo "🔥 Thread ${{ matrix.thread-id }}: Обнаружены новые файлы. ULTRA BUTLER стратегия..."
         
-        # РАНДОМНАЯ НАЧАЛЬНАЯ ЗАДЕРЖКА (предотвращение одновременного старта)
-        RANDOM_DELAY=$((RANDOM % 30 + 10))  # 10-40 секунд
-        echo "⏰ Thread ${{ matrix.thread-id }}: Начальная задержка $RANDOM_DELAY секунд для предотвращения race condition"
+        # МАКСИМАЛЬНАЯ НАЧАЛЬНАЯ ЗАДЕРЖКА (предотвращение одновременного старта)
+        RANDOM_DELAY=$((RANDOM % 60 + 30))  # 30-90 секунд (больше!)
+        echo "⏰ Thread ${{ matrix.thread-id }}: УВЕЛИЧЕННАЯ начальная задержка $RANDOM_DELAY секунд"
         sleep $RANDOM_DELAY
         
-        # IMPROVED BUTLER GIT STRATEGY (ANTI-RACE CONDITION)
-        MAX_RETRIES=8  # Увеличиваем количество попыток
-        BASE_RETRY_DELAY=10  # Базовая задержка между попытками
+        # ULTRA BUTLER GIT STRATEGY (MAXIMUM ANTI-RACE PROTECTION)
+        MAX_RETRIES=12  # Еще больше попыток!
+        BASE_RETRY_DELAY=15  # Увеличенная базовая задержка
         
         for ((i=1; i<=MAX_RETRIES; i++)); do
-          echo "🔄 Thread ${{ matrix.thread-id }}: Improved Butler git попытка $i/$MAX_RETRIES"
+          echo "🔄 Thread ${{ matrix.thread-id }}: Ultra Butler git попытка $i/$MAX_RETRIES"
           
-          # РАНДОМНАЯ ЗАДЕРЖКА МЕЖДУ ПОПЫТКАМИ (анти-синхронизация)
+          # УВЕЛИЧЕННАЯ РАНДОМНАЯ ЗАДЕРЖКА МЕЖДУ ПОПЫТКАМИ
           if [ "$i" -gt 1 ]; then
-            RETRY_DELAY=$((BASE_RETRY_DELAY + (RANDOM % 20)))  # 10-30 секунд
-            echo "⏰ Thread ${{ matrix.thread-id }}: Задержка перед попыткой: $RETRY_DELAY секунд"
+            RETRY_DELAY=$((BASE_RETRY_DELAY + (RANDOM % 45)))  # 15-60 секунд
+            echo "⏰ Thread ${{ matrix.thread-id }}: УВЕЛИЧЕННАЯ задержка: $RETRY_DELAY секунд"
             sleep $RETRY_DELAY
           fi
           
           # 1. Добавляем файлы в staging (КАК В BUTLER)
           echo "📁 Thread ${{ matrix.thread-id }}: Добавляю файлы в staging..."
-          git add src/content/posts/*.md || {
-            echo "⚠️ Thread ${{ matrix.thread-id }}: Ошибка git add"
+          if ! git add src/content/posts/*.md; then
+            echo "⚠️ Thread ${{ matrix.thread-id }}: Ошибка git add, попытка $i"
             continue
-          }
+          fi
           
           # 2. Stash изменения для чистого pull (КЛЮЧЕВАЯ BUTLER СТРАТЕГИЯ!)
           echo "💾 Thread ${{ matrix.thread-id }}: Создаю stash..."
-          git stash push -m "Thread ${{ matrix.thread-id }} - attempt $i" || {
-            echo "⚠️ Thread ${{ matrix.thread-id }}: Ошибка git stash"
+          if ! git stash push -m "Thread ${{ matrix.thread-id }} - attempt $i"; then
+            echo "⚠️ Thread ${{ matrix.thread-id }}: Ошибка git stash, попытка $i"
             continue
-          }
+          fi
           
           # 3. Делаем pull БЕЗ rebase (КАК В BUTLER)
           echo "⬇️ Thread ${{ matrix.thread-id }}: Делаю git pull..."
@@ -183,10 +183,10 @@ jobs:
           
           # 5. Добавляем файлы снова на случай конфликтов (КАК В BUTLER)
           echo "📁 Thread ${{ matrix.thread-id }}: Повторное добавление файлов..."
-          git add src/content/posts/*.md || {
-            echo "⚠️ Thread ${{ matrix.thread-id }}: Ошибка повторного git add"
+          if ! git add src/content/posts/*.md; then
+            echo "⚠️ Thread ${{ matrix.thread-id }}: Ошибка повторного git add, попытка $i"
             continue
-          }
+          fi
           
           # 6. Проверяем что есть что коммитить
           if [[ -z $(git diff --cached) ]]; then
@@ -204,16 +204,31 @@ jobs:
           # 8. Push с проверкой успешности (КАК В BUTLER)
           echo "⬆️ Thread ${{ matrix.thread-id }}: Отправляю в GitHub..."
           if git push origin main; then
-            echo "✅ Thread ${{ matrix.thread-id }}: SUCCESS! Butler git push успешен на попытке $i!"
+            echo "✅ Thread ${{ matrix.thread-id }}: SUCCESS! Ultra Butler git push успешен на попытке $i!"
             
-            # ПРОВЕРЯЕМ ЧТО ФАЙЛЫ РЕАЛЬНО В GITHUB
-            echo "🔍 Thread ${{ matrix.thread-id }}: Проверяю что файлы попали в GitHub..."
-            sleep 5  # Даем время GitHub API обновиться
+            # КРИТИЧЕСКАЯ ПРОВЕРКА: УБЕЖДАЕМСЯ ЧТО ФАЙЛЫ РЕАЛЬНО В GITHUB
+            echo "🔍 Thread ${{ matrix.thread-id }}: КРИТИЧЕСКАЯ ПРОВЕРКА файлов в GitHub..."
+            sleep 10  # Даем больше времени GitHub API обновиться
             
             # Получаем список файлов которые мы только что закоммитили
             COMMITTED_FILES=$(git diff --name-only HEAD~1 HEAD | grep "\.md$" || echo "")
             if [[ -n "$COMMITTED_FILES" ]]; then
               echo "✅ Thread ${{ matrix.thread-id }}: Закоммичены файлы: $COMMITTED_FILES"
+              
+              # ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА ЧЕРЕЗ GITHUB API
+              echo "🔍 Thread ${{ matrix.thread-id }}: Проверяю через GitHub API..."
+              for file in $COMMITTED_FILES; do
+                filename=$(basename "$file")
+                response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+                  -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                  "https://api.github.com/repos/terrminatorx4/blondeplace/contents/src/content/posts/$filename")
+                
+                if [ "$response_code" = "200" ]; then
+                  echo "✅ Thread ${{ matrix.thread-id }}: ПОДТВЕРЖДЕНО: $filename существует в GitHub!"
+                else
+                  echo "❌ Thread ${{ matrix.thread-id }}: КРИТИЧЕСКАЯ ОШИБКА: $filename НЕ НАЙДЕН в GitHub (код: $response_code)!"
+                fi
+              done
             else
               echo "⚠️ Thread ${{ matrix.thread-id }}: Не удается определить закоммиченные файлы"
             fi
@@ -221,12 +236,12 @@ jobs:
             break
           else
             if [ "$i" -eq "$MAX_RETRIES" ]; then
-              echo "❌ Thread ${{ matrix.thread-id }}: КРИТИЧЕСКАЯ ОШИБКА! Все $MAX_RETRIES Butler попыток исчерпаны"
+              echo "❌ Thread ${{ matrix.thread-id }}: КРИТИЧЕСКАЯ ОШИБКА! Все $MAX_RETRIES Ultra Butler попыток исчерпаны"
               echo "❌ Thread ${{ matrix.thread-id }}: ФАЙЛЫ БУДУТ ПОТЕРЯНЫ!"
               exit 1
             fi
-            echo "⚠️ Thread ${{ matrix.thread-id }}: Butler git push неудачен, попытка $i"
-            # 8. Откат коммита и retry (КАК В BUTLER!)
+            echo "⚠️ Thread ${{ matrix.thread-id }}: Ultra Butler git push неудачен, попытка $i"
+            # 9. Откат коммита и retry (КАК В BUTLER!)
             echo "↩️ Thread ${{ matrix.thread-id }}: Откатываю commit для retry..."
             git reset --hard HEAD~1
           fi
