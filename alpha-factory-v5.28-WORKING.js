@@ -35,10 +35,35 @@ const DEEPSEEK_MODEL_NAME = "deepseek/deepseek-r1-0528:free";
 const GEMINI_MODEL_NAME = "gemini-2.5-pro";
 
 // --- Я API  ---
+// --- ПАРСИНГ API КЛЮЧЕЙ ---
 const modelChoice = process.env.MODEL_CHOICE || 'gemini';
 const threadId = parseInt(process.env.THREAD_ID, 10) || 1;
-const GEMINI_API_KEY_CURRENT = process.env.GEMINI_API_KEY_CURRENT;
-const OPENROUTER_API_KEY_CURRENT = process.env.OPENROUTER_API_KEY_CURRENT;
+
+// ПАРСИНГ ПУЛА КЛЮЧЕЙ (если передан пул)
+const GEMINI_KEYS_POOL = process.env.GEMINI_API_KEYS_POOL;
+const OPENROUTER_KEYS_POOL = process.env.OPENROUTER_API_KEYS_POOL;
+
+let GEMINI_API_KEY_CURRENT = process.env.GEMINI_API_KEY_CURRENT;
+let OPENROUTER_API_KEY_CURRENT = process.env.OPENROUTER_API_KEY_CURRENT;
+
+// Если есть пул ключей - парсим и ротируем
+if (GEMINI_KEYS_POOL) {
+    const geminiKeys = GEMINI_KEYS_POOL.split(',').map(key => key.trim()).filter(Boolean);
+    if (geminiKeys.length > 0) {
+        const keyIndex = (threadId - 1) % geminiKeys.length;
+        GEMINI_API_KEY_CURRENT = geminiKeys[keyIndex];
+        console.log(`[KEYS] Thread #${threadId}: Выбран Gemini ключ #${keyIndex + 1} из ${geminiKeys.length}`);
+    }
+}
+
+if (OPENROUTER_KEYS_POOL) {
+    const openrouterKeys = OPENROUTER_KEYS_POOL.split(',').map(key => key.trim()).filter(Boolean);
+    if (openrouterKeys.length > 0) {
+        const keyIndex = (threadId - 1) % openrouterKeys.length;
+        OPENROUTER_API_KEY_CURRENT = openrouterKeys[keyIndex];
+        console.log(`[KEYS] Thread #${threadId}: Выбран OpenRouter ключ #${keyIndex + 1} из ${openrouterKeys.length}`);
+    }
+}
 
 let apiKey;
 if (modelChoice === 'deepseek') {
