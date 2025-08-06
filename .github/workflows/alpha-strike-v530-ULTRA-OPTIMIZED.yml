@@ -1,4 +1,4 @@
-name: ALPHA-STRIKE v5.30-ULTRA-OPTIMIZED (РЕВОЛЮЦИЯ НУМЕРАЦИИ)
+name: ALPHA-STRIKE v5.30-ULTRA-OPTIMIZED-FIXED (ИСПРАВЛЕНА ПЕРЕЗАПИСЬ)
 
 on:
   workflow_dispatch:
@@ -88,7 +88,7 @@ jobs:
 
     - name: Cache clear for new alpha-factory version
       run: |
-        echo "🔄 ОЧИСТКА КЭША для v5.30-ULTRA-OPTIMIZED"
+        echo "🔄 ОЧИСТКА КЭША для v5.30-ULTRA-OPTIMIZED-FIXED"
         rm -rf node_modules package-lock.json 2>/dev/null || true
 
     - name: Install dependencies
@@ -117,16 +117,16 @@ jobs:
         echo "GEMINI_API_KEY_CURRENT=$API_KEY" >> $GITHUB_ENV
         echo "MODEL_CHOICE=${{ github.event.inputs.model_choice }}" >> $GITHUB_ENV
 
-    - name: 🚀 ULTRA-OPTIMIZED Alpha-Strike Generation
+    - name: 🛡️ ИСПРАВЛЕНО Alpha-Strike Generation (без перезаписи)
       run: |
         echo "🎯 ЭСКАДРОН #${{ matrix.thread-id }}: Начинаю Alpha-Strike атаку!"
         echo "📊 Статей на поток: ${{ needs.prepare-matrix.outputs.articles-per-thread }}"
         echo "🤖 Модель: ${{ github.event.inputs.model_choice }}"
         echo "🎯 SEO: PERFECT (Title: 40-45, Description: 150-164, Keywords: ✅)"
-        echo "🚀 НУМЕРАЦИЯ: УЛЬТРА-БЫСТРАЯ (0 API запросов!)"
+        echo "🛡️ НУМЕРАЦИЯ: БЕЗОПАСНАЯ (30000+ без перезаписи!)"
         export THREAD_ID=${{ matrix.thread-id }}
         export TARGET_ARTICLES=${{ needs.prepare-matrix.outputs.articles-per-thread }}
-        node alpha-factory-v5.30-ULTRA-OPTIMIZED.js
+        node alpha-factory-v5.30-ULTRA-OPTIMIZED-FIXED.js
       shell: /usr/bin/bash -e {0}
       env:
         GEMINI_API_KEY: ${{ env.GEMINI_API_KEY_CURRENT }}
@@ -181,7 +181,7 @@ jobs:
             
             # Создаем commit
             echo "💾 Thread ${{ matrix.thread-id }}: Создаю commit..."
-            COMMIT_MSG="🎯 Alpha-Strike v5.30-ULTRA-OPTIMIZED: Thread ${{ matrix.thread-id }} - $(date)"
+            COMMIT_MSG="🛡️ Alpha-Strike v5.30-FIXED: Thread ${{ matrix.thread-id }} - $(date)"
             git commit -m "$COMMIT_MSG" || {
               echo "⚠️ Thread ${{ matrix.thread-id }}: Нет изменений для commit"
               SUCCESS=true
@@ -236,8 +236,8 @@ jobs:
 
     - name: Final Status Report
       run: |
-        echo "✅ ЭСКАДРОН #${{ matrix.thread-id }}: Alpha-Strike v5.30-ULTRA-OPTIMIZED миссия завершена!"
+        echo "✅ ЭСКАДРОН #${{ matrix.thread-id }}: Alpha-Strike v5.30-FIXED миссия завершена!"
         echo "🎯 Model: ${{ github.event.inputs.model_choice }}"
         echo "📊 Target articles: ${{ needs.prepare-matrix.outputs.articles-per-thread }}"
         echo "🎯 SEO: PERFECT OPTIMIZATION"
-        echo "🚀 РЕВОЛЮЦИЯ НУМЕРАЦИИ: 0 API запросов на поиск номеров!" 
+        echo "🛡️ БЕЗОПАСНАЯ НУМЕРАЦИЯ: 30000+ (0 перезаписей!)" 
