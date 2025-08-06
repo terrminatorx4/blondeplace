@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// МИНИМАЛЬНОЕ ИСПРАВЛЕНИЕ - ТОЛЬКО ДЛЯ МЕТАТЕГОВ
+// ОПТИМИЗАЦИЯ ДЛЯ БОЛЬШОГО КОЛИЧЕСТВА СТАТЕЙ (2500+)
 export default defineConfig({
   site: 'https://blondeplace.netlify.app',
   output: 'static',
@@ -11,18 +11,32 @@ export default defineConfig({
     sitemap()
   ],
   
-  // ДОБАВЛЯЕМ КРИТИЧЕСКИЕ НАСТРОЙКИ ДЛЯ HTML HEAD
+  // КРИТИЧЕСКИЕ НАСТРОЙКИ ДЛЯ ПАМЯТИ И ПРОИЗВОДИТЕЛЬНОСТИ
   build: {
-    inlineStylesheets: 'never' // Предотвращаем проблемы с CSS в head
+    inlineStylesheets: 'never', // Предотвращаем проблемы с CSS в head
+    assets: '_astro' // Оптимизация путей к ассетам
   },
   
   // Настройки для корректной обработки путей и метатегов
   trailingSlash: 'ignore',
   
-  // Базовые vite настройки БЕЗ rollupOptions (которые вызывали проблемы)
+  // КРИТИЧЕСКАЯ ОПТИМИЗАЦИЯ VITE ДЛЯ ПАМЯТИ
   vite: {
     build: {
-      sourcemap: false
+      sourcemap: false,
+      minify: 'esbuild', // Быстрая минификация
+      rollupOptions: {
+        output: {
+          // Разбиваем на чанки для экономии памяти
+          manualChunks: {
+            'vendor': ['astro']
+          }
+        }
+      }
+    },
+    // Оптимизация для больших проектов
+    optimizeDeps: {
+      force: true
     }
   }
 }); 
