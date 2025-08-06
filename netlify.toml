@@ -1,5 +1,5 @@
 [build]
-  command = "NODE_OPTIONS=--max_old_space_size=4096 npm run build && node postbuild.js"
+  command = "npm run build:memory && node postbuild.js"
   publish = "dist"
   
 [build.environment]
