@@ -1,4 +1,4 @@
-name: ALPHA-STRIKE v5.30-ULTRA-OPTIMIZED-FIXED (ИСПРАВЛЕНА ПЕРЕЗАПИСЬ)
+name: ALPHA-STRIKE v5.30-ULTRA-OPTIMIZED-FINAL (ИСПРАВЛЕНА ПЕРЕЗАПИСЬ)
 
 on:
   workflow_dispatch:
@@ -88,7 +88,7 @@ jobs:
 
     - name: Cache clear for new alpha-factory version
       run: |
-        echo "🔄 ОЧИСТКА КЭША для v5.30-ULTRA-OPTIMIZED-FIXED"
+        echo "🔄 ОЧИСТКА КЭША для v5.30-ULTRA-OPTIMIZED-FINAL"
         rm -rf node_modules package-lock.json 2>/dev/null || true
 
     - name: Install dependencies
@@ -126,7 +126,7 @@ jobs:
         echo "🛡️ НУМЕРАЦИЯ: БЕЗОПАСНАЯ (30000+ без перезаписи!)"
         export THREAD_ID=${{ matrix.thread-id }}
         export TARGET_ARTICLES=${{ needs.prepare-matrix.outputs.articles-per-thread }}
-        node alpha-factory-v5.30-ULTRA-OPTIMIZED-FIXED.js
+        node alpha-factory-v5.30-ULTRA-OPTIMIZED-FINAL.js
       shell: /usr/bin/bash -e {0}
       env:
         GEMINI_API_KEY: ${{ env.GEMINI_API_KEY_CURRENT }}
