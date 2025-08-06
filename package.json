@@ -1,27 +1,50 @@
 {
-  "name": "blondeplace",
-  "version": "1.0.0",
-  "description": "BlondePlace Beauty Website with SEO Optimization",
+  "name": "blondeplace-blog",
   "type": "module",
+  "version": "1.0.0",
+  "description": "Блог-сателлит для салона красоты BlondePlace.ru - экспертные статьи о красоте, уходе за волосами и трендах",
+  "author": "BlondePlace Beauty Team",
+  "license": "MIT",
   "scripts": {
-    "factory": "node factory.js",
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "node --max-old-space-size=8192 --optimize-for-size ./node_modules/.bin/astro build",
+    "build:memory": "node --max-old-space-size=8192 --gc-interval=100 --optimize-for-size ./node_modules/.bin/astro build",
     "preview": "astro preview",
-    "test:seo": "node test-seo.js",
-    "test:speed": "curl -w '@curl-format.txt' -o /dev/null -s https://blondeplace.netlify.app"
+    "astro": "astro",
+    "factory": "node factory.js",
+    "blitzkrieg": "node blitzkrieg-factory.js",
+    "fix-conflicts": "node fix-merge-conflicts.js",
+    "fix-yaml": "node yaml-fixer.js",
+    "quick-test": "node quick-test-netlify.js",
+    "emergency-clean": "node emergency-cleanup.js",
+    "restore-fix": "node restore-and-fix.js"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.21.0",
-    "node-fetch": "^3.3.2",
-    "gray-matter": "^4.0.3",
-    "execa": "^8.0.1",
-    "astro": "^4.15.12",
     "@astrojs/netlify": "^5.5.3",
-    "@astrojs/sitemap": "^3.2.1"
+    "@astrojs/sitemap": "^3.2.1",
+    "@google/generative-ai": "^0.21.0",
+    "astro": "^4.16.17"
   },
   "devDependencies": {
-    "@netlify/plugin-sitemap": "^0.8.1"
-  }
+    "@types/node": "^20.17.9",
+    "execa": "^9.5.1",
+    "gray-matter": "^4.0.3",
+    "node-fetch": "^2.6.7"
+  },
+  "keywords": [
+    "beauty-blog",
+    "hair-care",
+    "salon",
+    "blonde-hair",
+    "beauty-tips",
+    "hair-coloring",
+    "astro-blog",
+    "beauty-seo"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blondeplace-user/blondeplace-blog.git"
+  },
+  "homepage": "https://blondeplace-blog.netlify.app"
 }
