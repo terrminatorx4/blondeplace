@@ -1,12 +1,12 @@
 [build]
-  command = "npm run build && node postbuild.js"
+  command = "npm ci && npm run build && node postbuild.js"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
   NODE_OPTIONS = "--max-old-space-size=8192"
 
-# КРИТИЧЕСКИЙ ПЛАГИН ДЛЯ КЕШИРОВАНИЯ БОЛЬШИХ САЙТОВ! (ПРАВИЛЬНЫЙ)
+# КРИТИЧЕСКИЙ ПЛАГИН ДЛЯ КЕШИРОВАНИЯ БОЛЬШИХ САЙТОВ!
 [[plugins]]
   package = "netlify-plugin-cache"
   [plugins.inputs]
