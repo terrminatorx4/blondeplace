@@ -1,0 +1,243 @@
+name: ALPHA-STRIKE v5.30-ULTRA-OPTIMIZED-FINAL (ИСПРАВЛЕНА МАТЕМАТИКА)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_articles:
+        description: 'Количество статей для генерации'
+        required: true
+        default: '30'
+        type: string
+      threads:
+        description: 'Количество потоков (1-20)'
+        required: true
+        default: '20'
+        type: choice
+        options:
+          - '5'
+          - '10'
+          - '15'
+          - '20'
+      model_choice:
+        description: 'Выбор AI модели'
+        required: true
+        default: 'gemini'
+        type: choice
+        options:
+        - gemini
+        - openrouter
+
+jobs:
+  # Подготовительный job для создания матрицы потоков
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.create-matrix.outputs.matrix }}
+      articles-per-thread: ${{ steps.calculate.outputs.articles-per-thread }}
+    steps:
+    - name: Create thread matrix
+      id: create-matrix
+      run: |
+        THREADS=${{ github.event.inputs.threads }}
+        MATRIX="["
+        for i in $(seq 1 $THREADS); do
+          if [ $i -eq 1 ]; then
+            MATRIX="${MATRIX}${i}"
+          else
+            MATRIX="${MATRIX},${i}"
+          fi
+        done
+        MATRIX="${MATRIX}]"
+        echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+        echo "Создана матрица потоков: $MATRIX"
+    - name: Calculate articles per thread
+      id: calculate
+      run: |
+        TARGET_ARTICLES=${{ github.event.inputs.target_articles }}
+        THREADS=${{ github.event.inputs.threads }}
+        ARTICLES_PER_THREAD=$(( TARGET_ARTICLES / THREADS ))
+        if [ $(( TARGET_ARTICLES % THREADS )) -ne 0 ]; then
+          ARTICLES_PER_THREAD=$(( ARTICLES_PER_THREAD + 1 ))
+        fi
+        echo "articles-per-thread=$ARTICLES_PER_THREAD" >> $GITHUB_OUTPUT
+        echo "Статей на поток: $ARTICLES_PER_THREAD"
+
+  alpha-strike-attack:
+    needs: prepare-matrix
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    strategy:
+      max-parallel: 20
+      fail-fast: false  # КРИТИЧНО: НЕ отменять остальные jobs при сбое одного
+      matrix:
+        thread-id: ${{ fromJson(needs.prepare-matrix.outputs.matrix) }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Cache clear for new alpha-factory version
+      run: |
+        echo "🔄 ОЧИСТКА КЭША для v5.30-ULTRA-OPTIMIZED-FIXED"
+        rm -rf node_modules package-lock.json 2>/dev/null || true
+
+    - name: Install dependencies
+      run: npm install --force
+
+    - name: Parse API keys and setup environment
+      run: |
+        echo "🔧 НАСТРОЙКА API КЛЮЧЕЙ для потока ${{ matrix.thread-id }}"
+        
+        # Вычисляем индекс ключа для текущего потока (циклично)
+        THREAD_ID=${{ matrix.thread-id }}
+        KEY_INDEX=$(( (THREAD_ID - 1) % 20 + 1 ))
+        
+        echo "Thread: $THREAD_ID, Key Index: $KEY_INDEX"
+        
+        # Парсинг ключей из переменной окружения
+        KEYS_POOL="${{ secrets.GEMINI_API_KEYS_POOL }}"
+        API_KEY=$(echo "$KEYS_POOL" | tr ',' '\n' | sed -n "${KEY_INDEX}p" | xargs)
+        
+        if [ -z "$API_KEY" ]; then
+          echo "❌ API ключ #$KEY_INDEX не найден!"
+          exit 1
+        fi
+        
+        echo "✅ API ключ #$KEY_INDEX получен: ...${API_KEY: -4}"
+        echo "GEMINI_API_KEY_CURRENT=$API_KEY" >> $GITHUB_ENV
+        echo "MODEL_CHOICE=${{ github.event.inputs.model_choice }}" >> $GITHUB_ENV
+
+    - name: 🛡️ ИСПРАВЛЕНО Alpha-Strike Generation (без перезаписи)
+      run: |
+        echo "🎯 ЭСКАДРОН #${{ matrix.thread-id }}: Начинаю Alpha-Strike атаку!"
+        echo "📊 Статей на поток: ${{ needs.prepare-matrix.outputs.articles-per-thread }}"
+        echo "🤖 Модель: ${{ github.event.inputs.model_choice }}"
+        echo "🎯 SEO: PERFECT (Title: 40-45, Description: 150-164, Keywords: ✅)"
+        echo "🛡️ НУМЕРАЦИЯ: БЕЗОПАСНАЯ (30000+ без перезаписи!)"
+        export THREAD_ID=${{ matrix.thread-id }}
+        export TARGET_ARTICLES=${{ needs.prepare-matrix.outputs.articles-per-thread }}
+        node alpha-factory-v5.30-ULTRA-OPTIMIZED-FINAL.js
+      shell: /usr/bin/bash -e {0}
+      env:
+        GEMINI_API_KEY: ${{ env.GEMINI_API_KEY_CURRENT }}
+        MODEL_CHOICE: ${{ env.MODEL_CHOICE }}
+        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: ULTRA BUTLER GIT STRATEGY (Increased delays)
+      run: |
+        echo "🤖 Thread ${{ matrix.thread-id }}: Использую ULTRA BUTLER git стратегию..."
+        
+        # Проверяем наличие новых файлов
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "🔥 Thread ${{ matrix.thread-id }}: Обнаружены новые файлы. ULTRA BUTLER стратегия..."
+          
+          # УВЕЛИЧЕННАЯ начальная задержка: 30-90 секунд
+          INITIAL_DELAY=$((30 + RANDOM % 60))
+          echo "⏰ Thread ${{ matrix.thread-id }}: УВЕЛИЧЕННАЯ начальная задержка $INITIAL_DELAY секунд"
+          sleep $INITIAL_DELAY
+          
+          # ULTRA BUTLER: до 12 попыток с увеличенными задержками
+          MAX_ATTEMPTS=12
+          ATTEMPT=1
+          SUCCESS=false
+          
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ] && [ "$SUCCESS" = false ]; do
+            echo "🔄 Thread ${{ matrix.thread-id }}: Ultra Butler git попытка $ATTEMPT/$MAX_ATTEMPTS"
+            
+            # Настройка Git как в Butler
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action (Thread ${{ matrix.thread-id }})"
+            
+            # Добавляем файлы в staging
+            echo "📁 Thread ${{ matrix.thread-id }}: Добавляю файлы в staging..."
+            git add src/content/posts/post*.md 2>/dev/null || true
+            
+            # Создаем stash для безопасности (Butler strategy)
+            echo "💾 Thread ${{ matrix.thread-id }}: Создаю stash..."
+            git stash --include-untracked --message "Thread ${{ matrix.thread-id }} - attempt $ATTEMPT" || true
+            
+            # Делаем pull для синхронизации
+            echo "⬇️ Thread ${{ matrix.thread-id }}: Делаю git pull..."
+            git pull origin main --rebase || git pull origin main || true
+            
+            # Восстанавливаем stash
+            echo "📤 Thread ${{ matrix.thread-id }}: Восстанавливаю stash..."
+            git stash pop || true
+            
+            # Повторно добавляем файлы после pull
+            echo "📁 Thread ${{ matrix.thread-id }}: Повторное добавление файлов..."
+            git add src/content/posts/post*.md 2>/dev/null || true
+            
+            # Создаем commit
+            echo "💾 Thread ${{ matrix.thread-id }}: Создаю commit..."
+            COMMIT_MSG="🛡️ Alpha-Strike v5.30-FIXED: Thread ${{ matrix.thread-id }} - $(date)"
+            git commit -m "$COMMIT_MSG" || {
+              echo "⚠️ Thread ${{ matrix.thread-id }}: Нет изменений для commit"
+              SUCCESS=true
+              break
+            }
+            
+            # Пытаемся push
+            echo "⬆️ Thread ${{ matrix.thread-id }}: Отправляю в GitHub..."
+            if git push origin main; then
+              echo "✅ Thread ${{ matrix.thread-id }}: SUCCESS! Ultra Butler git push успешен на попытке $ATTEMPT!"
+              SUCCESS=true
+              
+              # КРИТИЧЕСКАЯ ПРОВЕРКА: убеждаемся что файлы дошли до GitHub
+              echo "🔍 Thread ${{ matrix.thread-id }}: КРИТИЧЕСКАЯ ПРОВЕРКА файлов в GitHub..."
+              COMMITTED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD)
+              echo "✅ Thread ${{ matrix.thread-id }}: Закоммичены файлы: $COMMITTED_FILES"
+              
+              # Дополнительная проверка через GitHub API
+              echo "🔍 Thread ${{ matrix.thread-id }}: Проверяю через GitHub API..."
+              for file in $COMMITTED_FILES; do
+                if [[ $file == src/content/posts/post*.md ]]; then
+                  FILENAME=$(basename "$file")
+                  API_URL="https://api.github.com/repos/${{ github.repository }}/contents/$file"
+                  if curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$API_URL" | grep -q '"name"'; then
+                    echo "✅ Thread ${{ matrix.thread-id }}: ПОДТВЕРЖДЕНО: $FILENAME существует в GitHub!"
+                  else
+                    echo "⚠️ Thread ${{ matrix.thread-id }}: WARNING: $FILENAME может не существовать в GitHub"
+                  fi
+                fi
+              done
+              
+            else
+              echo "❌ Thread ${{ matrix.thread-id }}: Push failed на попытке $ATTEMPT"
+              
+              # УВЕЛИЧЕННАЯ задержка между попытками: 15-60 секунд
+              RETRY_DELAY=$((15 + RANDOM % 45))
+              echo "⏳ Thread ${{ matrix.thread-id }}: Жду $RETRY_DELAY секунд перед повторной попыткой..."
+              sleep $RETRY_DELAY
+              
+              ATTEMPT=$((ATTEMPT + 1))
+            fi
+          done
+          
+          if [ "$SUCCESS" = false ]; then
+            echo "💥 Thread ${{ matrix.thread-id }}: КРИТИЧЕСКАЯ ОШИБКА: Не удалось отправить изменения после $MAX_ATTEMPTS попыток!"
+            exit 1
+          fi
+          
+        else
+          echo "📝 Thread ${{ matrix.thread-id }}: Нет новых файлов для commit"
+        fi
+
+    - name: Final Status Report
+      run: |
+        echo "✅ ЭСКАДРОН #${{ matrix.thread-id }}: Alpha-Strike v5.30-FIXED миссия завершена!"
+        echo "🎯 Model: ${{ github.event.inputs.model_choice }}"
+        echo "📊 Target articles: ${{ needs.prepare-matrix.outputs.articles-per-thread }}"
+        echo "🎯 SEO: PERFECT OPTIMIZATION"
+        echo "🛡️ БЕЗОПАСНАЯ НУМЕРАЦИЯ: 30000+ (0 перезаписей!)" 
