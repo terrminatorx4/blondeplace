@@ -30,7 +30,8 @@
     "@types/node": "^20.17.9",
     "execa": "^9.5.1",
     "gray-matter": "^4.0.3",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "@netlify/plugin-cache-folder": "^1.0.1"
   },
   "keywords": [
     "beauty-blog",
