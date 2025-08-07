@@ -6,21 +6,12 @@
   NODE_VERSION = "18"
   NODE_OPTIONS = "--max-old-space-size=8192"
 
-# [[plugins]]
-#   package = "@netlify/plugin-sitemap"
-# УБРАНО: Конфликтовал с postbuild.js, генерировал битый sitemap
-# Теперь sitemap генерируется только через postbuild.js
-
-# [plugins.inputs]
-#   buildDir = "dist"
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+# КРИТИЧЕСКИЙ ПЛАГИН ДЛЯ КЕШИРОВАНИЯ БОЛЬШИХ САЙТОВ!
+[[plugins]]
+  package = "@netlify/plugin-cache-folder"
+  [plugins.inputs]
+    # Кешируем node_modules между сборками
+    folders = ["node_modules", ".astro"]
 
 # КРИТИЧЕСКОЕ КЕШИРОВАНИЕ _ASTRO ФАЙЛОВ!
 [[headers]]
