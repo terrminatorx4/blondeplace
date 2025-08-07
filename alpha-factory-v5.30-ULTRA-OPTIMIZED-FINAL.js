@@ -461,7 +461,7 @@ async function generateUniquePost(keyword, postNumber, threadId) {
     try {
         // Настройка AI клиента
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
         // Генерация с повторными попытками
         let attempts = 0;
@@ -634,4 +634,5 @@ async function main() {
 }
 
 // Запуск программы
+
 main().catch(console.error); 
