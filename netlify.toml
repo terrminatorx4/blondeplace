@@ -1,5 +1,5 @@
 [build]
-  command = "npm ci && npm run build && node postbuild.js"
+  command = "npm install && npm run build && node postbuild.js"
   publish = "dist"
 
 [build.environment]
