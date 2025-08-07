@@ -1,23 +1,25 @@
 [build]
-  command = "npm install && npm run build && node postbuild.js"
+  command = "astro build && node postbuild.js"
   publish = "dist"
-
+  
 [build.environment]
   NODE_VERSION = "18"
-  NODE_OPTIONS = "--max-old-space-size=8192"
 
-# КРИТИЧЕСКИЙ ПЛАГИН ДЛЯ КЕШИРОВАНИЯ БОЛЬШИХ САЙТОВ!
-[[plugins]]
-  package = "netlify-plugin-cache"
-  [plugins.inputs]
-    # Кешируем node_modules и .astro между сборками
-    paths = ["node_modules", ".astro"]
+# [[plugins]]
+#   package = "@netlify/plugin-sitemap"
+# УБРАНО: Конфликтовал с postbuild.js, генерировал битый sitemap
+# Теперь sitemap генерируется только через postbuild.js
 
-# КРИТИЧЕСКОЕ КЕШИРОВАНИЕ _ASTRO ФАЙЛОВ!
+# [plugins.inputs]
+#   buildDir = "dist"
+
 [[headers]]
-  for = "/_astro/*"
+  for = "/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
 [[headers]]
   for = "*.css"
@@ -28,12 +30,12 @@
   for = "*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
+    
 [[headers]]
   for = "*.jpg"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
+    
 [[headers]]
   for = "*.png"
   [headers.values]
@@ -77,4 +79,4 @@
 [[headers]]
   for = "/blog/*"
   [headers.values]
-    Cache-Control = "public, max-age=3600, s-maxage=86400"
+    Cache-Control = "public, max-age=3600, s-maxage=86400" 
