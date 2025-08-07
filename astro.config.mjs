@@ -1,42 +1,46 @@
 import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
 
-// ОПТИМИЗАЦИЯ ДЛЯ БОЛЬШОГО КОЛИЧЕСТВА СТАТЕЙ (2500+)
+// УПРОЩЕННАЯ КОНФИГУРАЦИЯ КАК В БАТЛЕРЕ
 export default defineConfig({
   site: 'https://blondeplace.netlify.app',
+  
+  // Производительность сервера
   output: 'static',
-  
-  // Integrations
-  integrations: [
-    sitemap()
-  ],
-  
-  // КРИТИЧЕСКИЕ НАСТРОЙКИ ДЛЯ ПАМЯТИ И ПРОИЗВОДИТЕЛЬНОСТИ
-  build: {
-    inlineStylesheets: 'never', // Предотвращаем проблемы с CSS в head
-    assets: '_astro' // Оптимизация путей к ассетам
-  },
-  
-  // Настройки для корректной обработки путей и метатегов
-  trailingSlash: 'ignore',
-  
-  // КРИТИЧЕСКАЯ ОПТИМИЗАЦИЯ VITE ДЛЯ ПАМЯТИ
+
   vite: {
+    ssr: {
+      // Оптимизация для статической генерации
+      noExternal: ['@astrojs/*']
+    },
+
+    // НАСТРОЙКИ ДЛЯ РЕШЕНИЯ ПРОБЛЕМЫ ПАМЯТИ (КАК В БАТЛЕРЕ)
     build: {
+      // Отключаем sourcemaps в продакшене для экономии памяти
       sourcemap: false,
-      minify: 'esbuild', // Быстрая минификация
+      // Оптимизация чанков
       rollupOptions: {
         output: {
-          // Разбиваем на чанки для экономии памяти
-          manualChunks: {
-            'vendor': ['astro']
-          }
+          manualChunks: undefined,
+          inlineDynamicImports: false,
+          chunkFileNames: 'assets/[name]-[hash].js',
+          entryFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]'
         }
-      }
+      },
+      // Увеличиваем лимит для больших чанков
+      chunkSizeWarningLimit: 2000,
+      // Минификация только в продакшене
+      minify: process.env.NODE_ENV === 'production' ? 'esbuild' : false,
+      // Оптимизация ассетов
+      assetsInlineLimit: 0, // Отключаем инлайн ассетов для экономии памяти
     },
-    // Оптимизация для больших проектов
-    optimizeDeps: {
-      force: true
+
+    // Увеличиваем лимиты для обработки файлов
+    server: {
+      fs: {
+        // Позволяем читать файлы из проекта
+        allow: ['..']
+      }
     }
   }
 }); 
