@@ -6,12 +6,12 @@
   NODE_VERSION = "18"
   NODE_OPTIONS = "--max-old-space-size=8192"
 
-# КРИТИЧЕСКИЙ ПЛАГИН ДЛЯ КЕШИРОВАНИЯ БОЛЬШИХ САЙТОВ!
+# КРИТИЧЕСКИЙ ПЛАГИН ДЛЯ КЕШИРОВАНИЯ БОЛЬШИХ САЙТОВ! (ПРАВИЛЬНЫЙ)
 [[plugins]]
-  package = "@netlify/plugin-cache-folder"
+  package = "netlify-plugin-cache"
   [plugins.inputs]
-    # Кешируем node_modules между сборками
-    folders = ["node_modules", ".astro"]
+    # Кешируем node_modules и .astro между сборками
+    paths = ["node_modules", ".astro"]
 
 # КРИТИЧЕСКОЕ КЕШИРОВАНИЕ _ASTRO ФАЙЛОВ!
 [[headers]]
