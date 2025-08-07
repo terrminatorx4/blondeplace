@@ -4,7 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  NODE_OPTIONS = "--max-old-space-size=8192 --gc-interval=100"
+  NODE_OPTIONS = "--max-old-space-size=8192"
 
 # [[plugins]]
 #   package = "@netlify/plugin-sitemap"
