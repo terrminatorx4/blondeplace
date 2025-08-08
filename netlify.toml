@@ -7,11 +7,6 @@
   NODE_OPTIONS = "--max-old-space-size=24576"
   UV_THREADPOOL_SIZE = "1"
 
-[[plugins]]
-  package = "netlify-plugin-cache"
-  [plugins.inputs]
-    paths = ["node_modules", ".astro", "dist"]
-
 [[headers]]
   for = "/*"
   [headers.values]
