@@ -1,38 +1,76 @@
 ---
-import { getCollection } from "astro:content";
+// СЫ Т - читаем файлы напрямую без content collections
+import fs from "fs";
+import path from "path";
 
-export async function getStaticPaths() {
+export const prerender = false; // ринудительно серверный рендеринг
+
+// Серверная функция для чтения markdown файлов
+export async function GET({ params }) {
+  const { slug } = params;
+  
   try {
-    const posts = await getCollection("posts");
-    return posts.map((post) => ({
-      params: { slug: post.slug },
-      props: { post }
-    }));
+    // уть к файлу markdown
+    const filePath = path.join(process.cwd(), "src/content/posts", `${slug}.md`);
+    
+    // роверяем существование файла
+    if (!fs.existsSync(filePath)) {
+      return new Response("Статья не найдена", { status: 404 });
+    }
+    
+    // итаем содержимое файла
+    const content = fs.readFileSync(filePath, "utf-8");
+    
+    // ростой парсинг frontmatter
+    const frontmatterMatch = content.match(/^---\\s*\\n([\\s\\S]*?)\\n---\\s*\\n([\\s\\S]*)$/);
+    
+    if (!frontmatterMatch) {
+      return new Response("еверный формат файла", { status: 400 });
+    }
+    
+    const frontmatterLines = frontmatterMatch[1].split("\\n");
+    const markdownContent = frontmatterMatch[2];
+    
+    // арсим title и description
+    let title = "Статья";
+    let description = "писание статьи";
+    
+    frontmatterLines.forEach(line => {
+      if (line.startsWith("title:")) {
+        title = line.replace("title:", "").replace(/"/g, "").trim();
+      }
+      if (line.startsWith("description:")) {
+        description = line.replace("description:", "").replace(/"/g, "").trim();
+      }
+    });
+    
+    // озвращаем HTML
+    return new Response(`
+      <!DOCTYPE html>
+      <html lang="ru">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${title} | BlondePlace</title>
+          <meta name="description" content="${description}">
+      </head>
+      <body>
+          <article>
+              <h1>${title}</h1>
+              <div class="content">
+                  <pre>${markdownContent.substring(0, 1000)}...</pre>
+              </div>
+          </article>
+          <a href="/blog/">ернуться в блог</a>
+      </body>
+      </html>
+    `, {
+      status: 200,
+      headers: { "Content-Type": "text/html" }
+    });
+    
   } catch (error) {
-    console.log("шибка загрузки статей:", error);
-    return [];
+    return new Response("шибка сервера", { status: 500 });
   }
 }
-
-const { post } = Astro.props;
-const { Content } = await post.render();
 ---
-
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{post.data.title} | BlondePlace</title>
-    <meta name="description" content={post.data.description}>
-</head>
-<body>
-    <article>
-        <h1>{post.data.title}</h1>
-        <div class="content">
-            <Content />
-        </div>
-    </article>
-    <a href="/blog/">← ернуться к блогу</a>
-</body>
-</html>
