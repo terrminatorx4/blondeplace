@@ -4,7 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  NODE_OPTIONS = "--max-old-space-size=16384"
+  NODE_OPTIONS = "--max-old-space-size=24576 --disable-dev-shm-usage"
+  UV_THREADPOOL_SIZE = "1"
 
 [[plugins]]
   package = "netlify-plugin-cache"
