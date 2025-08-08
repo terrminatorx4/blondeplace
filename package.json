@@ -6,11 +6,11 @@
   "author": "BlondePlace Beauty Team",
   "license": "MIT",
   "scripts": {
-    "dev": "npx astro@4.16.17 dev",
-    "start": "npx astro@4.16.17 dev", 
-    "build": "npx astro@4.16.17 build",
-    "preview": "npx astro@4.16.17 preview",
-    "astro": "npx astro@4.16.17",
+    "dev": "astro dev",
+    "start": "astro dev", 
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
     "factory": "node factory.js",
     "blitzkrieg": "node blitzkrieg-factory.js",
     "fix-conflicts": "node fix-merge-conflicts.js",
@@ -32,20 +32,5 @@
     "execa": "^9.5.1",
     "gray-matter": "^4.0.3",
     "node-fetch": "^2.6.7"
-  },
-  "keywords": [
-    "beauty-blog",
-    "hair-care",
-    "salon",
-    "blonde-hair", 
-    "beauty-tips",
-    "hair-coloring",
-    "astro-blog",
-    "beauty-seo"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/blondeplace-user/blondeplace-blog.git"
-  },
-  "homepage": "https://blondeplace-blog.netlify.app"
+  }
 }
