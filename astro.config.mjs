@@ -12,7 +12,23 @@ export default defineConfig({
 
   trailingSlash: "ignore",
 
+  // 🔧 КОНФИГУРАЦИЯ СЕРВЕРА ДЛЯ NETLIFY DEV
+  server: {
+    host: true, // Разрешить внешние подключения
+    port: 4321
+  },
+
   vite: {
+    // 🚀 КОНФИГУРАЦИЯ ДЛЯ DEV СЕРВЕРА
+    server: {
+      host: true, // Разрешить внешние хосты
+      allowedHosts: [
+        "devserver-main--blondeplace.netlify.app",
+        "localhost",
+        "127.0.0.1"
+      ]
+    },
+
     build: {
       sourcemap: false,
       minify: 'esbuild',
