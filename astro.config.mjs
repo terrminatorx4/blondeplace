@@ -1,39 +1,37 @@
 import { defineConfig } from "astro/config";
-import sitemap from "@astrojs/sitemap";
 
-// СТЬЯ ТЯ Я 5000+ СТТ - Т MEMORY KILL
+// ЬЯ Я - ТЬ СТТС СТЫ  SITEMAP
 export default defineConfig({
   site: "https://blondeplace.netlify.app",
   output: "static",
   
-  integrations: [
-    sitemap()
-  ],
+  // Т Т - СЬЯ Я ЯТ
+  integrations: [],
   
   // ТС СТ Т MEMORY OVERFLOW
   build: {
     inlineStylesheets: "never", // икогда не инлайнить CSS
     assets: "_astro",
-    concurrency: 1 // ТЬ 1 Т - экономия памяти
+    concurrency: 1 // ТЬ 1 Т
   },
   
-  // СТЬЯ Я ЯТ
   trailingSlash: "ignore",
   
-  // СЬЯ ТЯ VITE Т KILL (VITE 5.1 compatible)
+  // СТЬЯ ТЯ VITE -  Т
   vite: {
     build: {
       sourcemap: false,
-      minify: false, // тключаем минификацию - экономия памяти
+      minify: false, // Т минификации
+      cssMinify: false, // Т CSS минификации
       rollupOptions: {
         output: {
-          // аксимальное разбиение на чанки
+          // аксимальное разбиение на мелкие чанки
           manualChunks: (id) => {
             if (id.includes("node_modules")) {
               return "vendor";
             }
             if (id.includes("src/content/posts")) {
-              // азбиваем посты на группы по 100
+              // азбиваем на 100 мелких чанков вместо 50
               const match = id.match(/posts\/(.+)\.md/);
               if (match) {
                 const postName = match[1];
@@ -41,21 +39,20 @@ export default defineConfig({
                   a = ((a << 5) - a) + b.charCodeAt(0);
                   return a & a;
                 }, 0);
-                return `posts-${Math.abs(hash) % 50}`; // 50 чанков
+                return `posts-${Math.abs(hash) % 100}`; // 100 мелких чанков
               }
             }
             return "main";
           }
         }
       },
-      chunkSizeWarningLimit: 2000 // величиваем лимит чанков
+      chunkSizeWarningLimit: 500 // чень маленькие чанки
     },
-    // VITE 5.1+ compatible настройки
+    // инимальная оптимизация
     optimizeDeps: {
-      noDiscovery: true, // тключаем автообнаружение зависимостей
-      include: [] // устой список для минимизации предбандлинга
+      noDiscovery: true,
+      include: []
     },
-    // граничиваем память для процессов
     server: {
       hmr: false
     }
