@@ -5,8 +5,12 @@ const posts = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    pubDate: z.date().optional(),
+    keywords: z.string().optional(),
+    pubDate: z.string().transform((str) => new Date(str)), // С: преобразуем строку в дату
+    author: z.string().optional(),
     heroImage: z.string().optional(),
+    category: z.string().optional(),
+    schema: z.any().optional(), // азрешаем JSON-LD схему
   }),
 });
 
