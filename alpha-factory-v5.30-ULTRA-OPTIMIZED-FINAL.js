@@ -1,7 +1,7 @@
 // ===== ALPHA-FACTORY v5.30-ULTRA-OPTIMIZED-FINAL - ИСПРАВЛЕНА ФОРМУЛА НУМЕРАЦИИ =====
 // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Корректная формула нумерации для точного соответствия threadId!
-// ПРАВИЛЬНАЯ ФОРМУЛА: 30000 + ((threadId - 1) * 1000) + articleIndex
-// Thread 1: 30000, Thread 2: 31000, Thread 3: 32000, и т.д.
+// ПРАВИЛЬНАЯ ФОРМУЛА: 210000 + ((threadId - 1) * 1000) + articleIndex
+// Thread 1: 210000, Thread 2: 211000, Thread 3: 212000, и т.д.
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
@@ -149,13 +149,13 @@ function getKeywordSpamStrategy(keyword) {
 
 // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ НУМЕРАЦИИ С ПРАВИЛЬНОЙ ФОРМУЛОЙ =====
 function getPerfectPostNumber(threadId, articleIndex) {
-    // ПРАВИЛЬНАЯ ФОРМУЛА: 30000 + ((threadId - 1) * 1000) + articleIndex
-    // Thread 1: 30000, Thread 2: 31000, Thread 3: 32000, и т.д.
-    const safeStartNumber = 30000;
+    // ПРАВИЛЬНАЯ ФОРМУЛА: 210000 + ((threadId - 1) * 1000) + articleIndex
+    // Thread 1: 210000, Thread 2: 211000, Thread 3: 212000, и т.д.
+    const safeStartNumber = 210000; // БЕЗОПАСНЫЙ старт выше ВСЕХ существующих статей (макс: 202070)
     const startNumber = safeStartNumber + ((threadId - 1) * 1000) + articleIndex;
     
     console.log(`[PERFECT-NUMBERS] Thread #${threadId}: 🎯 ИДЕАЛЬНАЯ НУМЕРАЦИЯ!`);
-    console.log(`[PERFECT-NUMBERS] Thread #${threadId}: Формула: 30000 + ((${threadId} - 1) * 1000) + ${articleIndex}`);
+    console.log(`[PERFECT-NUMBERS] Thread #${threadId}: Формула: 210000 + ((${threadId} - 1) * 1000) + ${articleIndex}`);
     console.log(`[PERFECT-NUMBERS] Thread #${threadId}: Блок потока: ${safeStartNumber + ((threadId - 1) * 1000)}-${safeStartNumber + ((threadId - 1) * 1000) + 999}`);
     console.log(`[PERFECT-NUMBERS] Thread #${threadId}: Статья ${articleIndex} → номер ${startNumber}`);
     console.log(`[PERFECT-NUMBERS] Thread #${threadId}: ⚡ МГНОВЕННО! 0 API запросов! 0 задержек!`);
@@ -461,7 +461,7 @@ async function generateUniquePost(keyword, postNumber, threadId) {
     try {
         // Настройка AI клиента
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
         // Генерация с повторными попытками
         let attempts = 0;
@@ -634,5 +634,4 @@ async function main() {
 }
 
 // Запуск программы
-
 main().catch(console.error); 
