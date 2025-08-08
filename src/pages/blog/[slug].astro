@@ -1,38 +1,31 @@
 ---
-// СЫ Т - читаем файлы напрямую
-import fs from "fs";
-import path from "path";
-
+// СЯ СТ - API endpoint
 export const prerender = false;
 
-export async function GET({ params }) {
+export async function GET({ params, request }) {
   const { slug } = params;
   
-  try {
-    const filePath = path.join(process.cwd(), "src/content/posts", `${slug}.md`);
-    
-    if (!fs.existsSync(filePath)) {
-      return new Response("404", { status: 404 });
+  // ростой ответ для тестирования
+  const html = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статья ${slug} | BlondePlace</title>
+</head>
+<body>
+    <h1>Статья: ${slug}</h1>
+    <p>агружено через серверный рендеринг!</p>
+    <p>URL: ${request.url}</p>
+    <a href="/">а главную</a>
+</body>
+</html>`;
+
+  return new Response(html, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
     }
-    
-    const content = fs.readFileSync(filePath, "utf-8");
-    const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
-    
-    if (!match) return new Response("Error", { status: 400 });
-    
-    let title = "Статья";
-    match[1].split("\n").forEach(line => {
-      if (line.startsWith("title:")) {
-        title = line.replace("title:", "").replace(/"/g, "").trim();
-      }
-    });
-    
-    return new Response(`<!DOCTYPE html><html><head><title>${title}</title></head><body><h1>${title}</h1><p>Статья загружена через сервер!</p></body></html>`, {
-      headers: { "Content-Type": "text/html" }
-    });
-    
-  } catch (error) {
-    return new Response("Server Error", { status: 500 });
-  }
+  });
 }
 ---
