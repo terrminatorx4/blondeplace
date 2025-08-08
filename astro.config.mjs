@@ -1,20 +1,16 @@
 import { defineConfig } from "astro/config";
 import netlify from "@astrojs/netlify";
 
-// СТЬ СЫ  - Т статической сборки контента!
+// СЫ  Я NETLIFY - правильная конфигурация
 export default defineConfig({
   site: "https://blondeplace.netlify.app",
-  output: "server", // Ь !
-  adapter: netlify(),
+  output: "server",
+  adapter: netlify({
+    dist: new URL("./dist/", import.meta.url),
+    functionPerRoute: false, // кономия ресурсов
+  }),
   
-  //  Т -  Т
   integrations: [],
-  
-  // Т CONTENT COLLECTIONS
-  experimental: {
-    contentCollectionCache: false,
-    contentCollectionJsonSchema: false
-  },
   
   build: {
     inlineStylesheets: "never",
@@ -30,7 +26,7 @@ export default defineConfig({
       minify: false,
       rollupOptions: {
         output: {
-          manualChunks: () => "main" // дин чанк - минимум обработки
+          manualChunks: () => "main"
         }
       }
     },
