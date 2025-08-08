@@ -4,7 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  NODE_OPTIONS = "--max-old-space-size=24576 --disable-dev-shm-usage"
+  NODE_OPTIONS = "--max-old-space-size=24576"
   UV_THREADPOOL_SIZE = "1"
 
 [[plugins]]
