@@ -1,11 +1,18 @@
 [build]
-  command = "npm install --force && npm run build && node postbuild.js"
+  command = "astro build && node postbuild.js"
   publish = "dist"
-
+  
 [build.environment]
   NODE_VERSION = "18"
-  NODE_OPTIONS = "--max-old-space-size=24576"
-  UV_THREADPOOL_SIZE = "1"
+  NODE_OPTIONS = "--max-old-space-size=8192"
+
+# [[plugins]]
+#   package = "@netlify/plugin-sitemap"
+# УБРАНО: Конфликтовал с postbuild.js, генерировал битый sitemap
+# Теперь sitemap генерируется только через postbuild.js
+
+# [plugins.inputs]
+#   buildDir = "dist"
 
 [[headers]]
   for = "/*"
@@ -16,7 +23,27 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
 [[headers]]
-  for = "/_astro/*"
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.svg"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
@@ -32,8 +59,25 @@
     Cache-Control = "public, max-age=3600"
     Content-Type = "text/plain"
 
+[[redirects]]
+  from = "/blog/index.html"
+  to = "/blog/"
+  status = 301
+
+[[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301
+
+# Security headers для улучшения SEO и безопасности (как в Butler Factory)
 [[headers]]
   for = "/*"
   [headers.values]
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru https://mc.yandex.com https://yastatic.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://mc.yandex.ru https://mc.yandex.com; media-src 'self'; connect-src 'self' https://api.indexnow.org https://mc.yandex.ru https://mc.yandex.com; frame-src https://mc.yandex.com https://mc.yandex.ru;"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# Кеширование для лучшей производительности
+[[headers]]
+  for = "/blog/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, s-maxage=86400" 
