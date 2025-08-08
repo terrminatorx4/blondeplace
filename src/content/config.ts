@@ -6,7 +6,11 @@ const posts = defineCollection({
     title: z.string(),
     description: z.string(),
     keywords: z.string().optional(),
-    pubDate: z.string().transform((str) => new Date(str)), // С: преобразуем строку в дату
+    // СЬЯ СХ: принимает string  date, всегда возвращает Date
+    pubDate: z.union([
+      z.string().transform((str) => new Date(str)),
+      z.date()
+    ]),
     author: z.string().optional(),
     heroImage: z.string().optional(),
     category: z.string().optional(),
