@@ -1,9 +1,11 @@
 import { defineConfig } from "astro/config";
+import netlify from "@astrojs/netlify";
 
-// Ы  - статические страницы + динамические статьи
+// Ы  С NETLIFY - статические + серверные страницы
 export default defineConfig({
   site: "https://blondeplace.netlify.app",
-  output: "hybrid", //  !
+  output: "hybrid",
+  adapter: netlify(),
   
   integrations: [],
   
