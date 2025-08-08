@@ -20,7 +20,7 @@ export default defineConfig({
   // СТЬЯ Я ЯТ
   trailingSlash: "ignore",
   
-  // СЬЯ ТЯ VITE Т KILL
+  // СЬЯ ТЯ VITE Т KILL (VITE 5.1 compatible)
   vite: {
     build: {
       sourcemap: false,
@@ -50,9 +50,10 @@ export default defineConfig({
       },
       chunkSizeWarningLimit: 2000 // величиваем лимит чанков
     },
-    // тключаем оптимизацию зависимостей для экономии памяти
+    // VITE 5.1+ compatible настройки
     optimizeDeps: {
-      disabled: true
+      noDiscovery: true, // тключаем автообнаружение зависимостей
+      include: [] // устой список для минимизации предбандлинга
     },
     // граничиваем память для процессов
     server: {
