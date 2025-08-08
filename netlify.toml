@@ -1,10 +1,10 @@
 [build]
-  command = "npm install && npm run build && node postbuild.js"
+  command = "NODE_OPTIONS='--max-old-space-size=4096' npm install && npm run build && node postbuild.js"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
-  NODE_OPTIONS = "--max-old-space-size=3072"
+  NODE_OPTIONS = "--max-old-space-size=4096"
 
 # Кеширование для ускорения сборки
 [[plugins]]
