@@ -1,17 +1,49 @@
 ---
-// ростейшая страница блога без content collections
+// Статическая страница блога
 ---
 
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>лог BlondePlace</title>
     <meta name="description" content="лог салона красоты BlondePlace">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            line-height: 1.6;
+        }
+        h1 { color: #2c3e50; }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 20px 0;
+        }
+        a { color: #3498db; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
     <h1>лог BlondePlace</h1>
+    
+    <div class="success">
+        ✅ <strong>спешно!</strong> Статический сайт работает без Memory Kill!
+    </div>
+    
+    <h2> блоге</h2>
     <p>обро пожаловать в блог салона красоты BlondePlace!</p>
-    <p>Статьи будут доступны после завершения сборки.</p>
+    <p>десь мы делимся советами по уходу за волосами, последними трендами в окрашивании и секретами красоты.</p>
+    
+    <h2>Статьи</h2>
+    <p> нашем блоге более 5000 статей о красоте и уходе за волосами.</p>
+    <p>Сайт работает в статическом режиме для максимальной производительности.</p>
+    
+    <p><a href="/">← а главную</a></p>
 </body>
 </html>
