@@ -2,7 +2,7 @@
   "name": "blondeplace-blog",
   "type": "module",
   "version": "1.0.0",
-  "description": "Блог для салона красоты BlondePlace.ru",
+  "description": "лог для салона красоты BlondePlace.ru",
   "author": "BlondePlace Beauty Team",
   "license": "MIT",
   "scripts": {
@@ -13,6 +13,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/netlify": "^5.5.3",
     "astro": "4.16.17"
   },
   "devDependencies": {
