@@ -1,76 +1,38 @@
 ---
-// СЫ Т - читаем файлы напрямую без content collections
+// СЫ Т - читаем файлы напрямую
 import fs from "fs";
 import path from "path";
 
-export const prerender = false; // ринудительно серверный рендеринг
+export const prerender = false;
 
-// Серверная функция для чтения markdown файлов
 export async function GET({ params }) {
   const { slug } = params;
   
   try {
-    // уть к файлу markdown
     const filePath = path.join(process.cwd(), "src/content/posts", `${slug}.md`);
     
-    // роверяем существование файла
     if (!fs.existsSync(filePath)) {
-      return new Response("Статья не найдена", { status: 404 });
+      return new Response("404", { status: 404 });
     }
     
-    // итаем содержимое файла
     const content = fs.readFileSync(filePath, "utf-8");
+    const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
     
-    // ростой парсинг frontmatter
-    const frontmatterMatch = content.match(/^---\\s*\\n([\\s\\S]*?)\\n---\\s*\\n([\\s\\S]*)$/);
+    if (!match) return new Response("Error", { status: 400 });
     
-    if (!frontmatterMatch) {
-      return new Response("еверный формат файла", { status: 400 });
-    }
-    
-    const frontmatterLines = frontmatterMatch[1].split("\\n");
-    const markdownContent = frontmatterMatch[2];
-    
-    // арсим title и description
     let title = "Статья";
-    let description = "писание статьи";
-    
-    frontmatterLines.forEach(line => {
+    match[1].split("\n").forEach(line => {
       if (line.startsWith("title:")) {
         title = line.replace("title:", "").replace(/"/g, "").trim();
       }
-      if (line.startsWith("description:")) {
-        description = line.replace("description:", "").replace(/"/g, "").trim();
-      }
     });
     
-    // озвращаем HTML
-    return new Response(`
-      <!DOCTYPE html>
-      <html lang="ru">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${title} | BlondePlace</title>
-          <meta name="description" content="${description}">
-      </head>
-      <body>
-          <article>
-              <h1>${title}</h1>
-              <div class="content">
-                  <pre>${markdownContent.substring(0, 1000)}...</pre>
-              </div>
-          </article>
-          <a href="/blog/">ернуться в блог</a>
-      </body>
-      </html>
-    `, {
-      status: 200,
+    return new Response(`<!DOCTYPE html><html><head><title>${title}</title></head><body><h1>${title}</h1><p>Статья загружена через сервер!</p></body></html>`, {
       headers: { "Content-Type": "text/html" }
     });
     
   } catch (error) {
-    return new Response("шибка сервера", { status: 500 });
+    return new Response("Server Error", { status: 500 });
   }
 }
 ---
