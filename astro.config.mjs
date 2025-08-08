@@ -1,14 +1,9 @@
 import { defineConfig } from "astro/config";
-import netlify from "@astrojs/netlify";
 
-// СЫ  Я NETLIFY - правильная конфигурация
+// СТТС  - самый простой и надежный
 export default defineConfig({
   site: "https://blondeplace.netlify.app",
-  output: "server",
-  adapter: netlify({
-    dist: new URL("./dist/", import.meta.url),
-    functionPerRoute: false, // кономия ресурсов
-  }),
+  output: "static", // СТТС !
   
   integrations: [],
   
