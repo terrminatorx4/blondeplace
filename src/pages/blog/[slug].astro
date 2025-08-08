@@ -1,18 +1,38 @@
 ---
+import { getCollection } from "astro:content";
+
 export async function getStaticPaths() {
-  // озвращаем пустой массив - статьи будут доступны как статические файлы
-  return [];
+  try {
+    const posts = await getCollection("posts");
+    return posts.map((post) => ({
+      params: { slug: post.slug },
+      props: { post }
+    }));
+  } catch (error) {
+    console.log("шибка загрузки статей:", error);
+    return [];
+  }
 }
+
+const { post } = Astro.props;
+const { Content } = await post.render();
 ---
 
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-    <title>Статья недоступна</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{post.data.title} | BlondePlace</title>
+    <meta name="description" content={post.data.description}>
 </head>
 <body>
-    <h1>Статья временно недоступна</h1>
-    <p>ожалуйста, попробуйте позже.</p>
-    <a href="/">ернуться на главную</a>
+    <article>
+        <h1>{post.data.title}</h1>
+        <div class="content">
+            <Content />
+        </div>
+    </article>
+    <a href="/blog/">← ернуться к блогу</a>
 </body>
 </html>
