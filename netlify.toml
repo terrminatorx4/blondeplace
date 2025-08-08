@@ -1,5 +1,5 @@
 [build]
-  command = "NODE_OPTIONS='--max-old-space-size=4096' npm install && echo 'Starting incremental build...' && npm run build && node postbuild.js"
+  command = "NODE_OPTIONS='--max-old-space-size=8192' npm install && echo 'Starting incremental build...' && npm run build && node postbuild.js"
   publish = "dist"
 
 [build.environment]
