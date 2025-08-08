@@ -1,37 +1,35 @@
 import { defineConfig } from "astro/config";
 
-// ЬЯ Я - ТЬ СТТС СТЫ  SITEMAP
+// 🎯 ОПТИМИЗИРОВАННАЯ КОНФИГУРАЦИЯ ДЛЯ 4457 СТАТЕЙ
 export default defineConfig({
   site: "https://blondeplace.netlify.app",
   output: "static",
-  
-  // Т Т - СЬЯ Я ЯТ
-  integrations: [],
-  
-  // ТС СТ Т MEMORY OVERFLOW
+
+  // ⚡ КРИТИЧНО: Настройки для memory optimization
   build: {
-    inlineStylesheets: "never", // икогда не инлайнить CSS
+    concurrency: 4, // Параллельная обработка для ускорения
     assets: "_astro",
-    concurrency: 1 // ТЬ 1 Т
+    inlineStylesheets: "auto" // Автоматическое встраивание стилей
   },
-  
+
   trailingSlash: "ignore",
-  
-  // СТЬЯ ТЯ VITE -  Т
+
+  // 🚀 ОПТИМИЗАЦИЯ VITE ДЛЯ ПРОИЗВОДИТЕЛЬНОСТИ И ПАМЯТИ
   vite: {
     build: {
-      sourcemap: false,
-      minify: false, // Т минификации
-      cssMinify: false, // Т CSS минификации
+      sourcemap: false, // Отключаем sourcemaps для экономии памяти
+      minify: 'esbuild', // ✅ ПРИНУДИТЕЛЬНАЯ МИНИФИКАЦИЯ JS
+      cssMinify: 'esbuild', // ✅ ОБЯЗАТЕЛЬНАЯ МИНИФИКАЦИЯ CSS
+      
       rollupOptions: {
         output: {
-          // аксимальное разбиение на мелкие чанки
+          // 🎯 ОПТИМАЛЬНОЕ РАЗБИЕНИЕ НА ЧАНКИ
           manualChunks: (id) => {
             if (id.includes("node_modules")) {
               return "vendor";
             }
             if (id.includes("src/content/posts")) {
-              // азбиваем на 100 мелких чанков вместо 50
+              // Разбиваем на 20 оптимальных чанков вместо 100
               const match = id.match(/posts\/(.+)\.md/);
               if (match) {
                 const postName = match[1];
@@ -39,22 +37,21 @@ export default defineConfig({
                   a = ((a << 5) - a) + b.charCodeAt(0);
                   return a & a;
                 }, 0);
-                return `posts-${Math.abs(hash) % 100}`; // 100 мелких чанков
+                return `posts-${Math.abs(hash) % 20}`; // 20 оптимальных чанков
               }
             }
             return "main";
           }
         }
       },
-      chunkSizeWarningLimit: 500 // чень маленькие чанки
+      
+      chunkSizeWarningLimit: 2000, // Увеличенный лимит для больших чанков
+      assetsInlineLimit: 0, // Отключаем инлайн ассетов для экономии памяти
     },
-    // инимальная оптимизация
+
+    // 🔧 МИНИМАЛЬНАЯ ОПТИМИЗАЦИЯ DEPS
     optimizeDeps: {
-      noDiscovery: true,
-      include: []
-    },
-    server: {
-      hmr: false
+      include: ['astro/runtime/server/index.js']
     }
   }
 });
