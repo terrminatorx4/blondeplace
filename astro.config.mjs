@@ -1,67 +1,62 @@
 import { defineConfig } from 'astro/config';
 
-// УЛЬТРА-МИНИМАЛИСТИЧНАЯ КОНФИГУРАЦИЯ ДЛЯ 5000+ СТАТЕЙ
-// МАКСИМАЛЬНАЯ ЭКОНОМИЯ CPU И ПАМЯТИ
+// ЭКСТРЕМАЛЬНО МИНИМАЛИСТИЧНАЯ КОНФИГУРАЦИЯ
+// ТОЛЬКО САМЫЕ БАЗОВЫЕ НАСТРОЙКИ ДЛЯ ЭКОНОМИИ ПАМЯТИ
 export default defineConfig({
   site: 'https://blondeplace.netlify.app',
   output: 'static',
   
-  // КРИТИЧЕСКИЕ НАСТРОЙКИ ДЛЯ БОЛЬШИХ ПРОЕКТОВ
+  // ЭКСТРЕМАЛЬНО КОНСЕРВАТИВНЫЕ НАСТРОЙКИ
   build: {
-    concurrency: 1, // СТРОГО ПОСЛЕДОВАТЕЛЬНАЯ СБОРКА
-    inlineStylesheets: 'never', // НИКОГДА НЕ ИНЛАЙНИМ
-    assets: '_astro'
+    concurrency: 1, // СТРОГО ПОСЛЕДОВАТЕЛЬНО
+    inlineStylesheets: 'never',
+    assets: '_astro',
+    // ОТКЛЮЧАЕМ ФОРМАТИРОВАНИЕ
+    format: 'file'
   },
   
   trailingSlash: 'ignore',
   
-  // МИНИМАЛЬНЫЕ НАСТРОЙКИ VITE - БЕЗ ОПТИМИЗАЦИЙ
+  // МИНИМУМ VITE - ОТКЛЮЧАЕМ ВСЁ
   vite: {
+    // ОТКЛЮЧАЕМ ОПТИМИЗАЦИЮ ЗАВИСИМОСТЕЙ ПОЛНОСТЬЮ
+    optimizeDeps: {
+      disabled: 'build' // Отключаем только для билда
+    },
+    
     build: {
-      // ОТКЛЮЧАЕМ ВСЕ ОПТИМИЗАЦИИ
       sourcemap: false,
-      minify: false, // НЕТ МИНИФИКАЦИИ
-      cssMinify: false, // НЕТ CSS МИНИФИКАЦИИ
+      minify: false, // БЕЗ МИНИФИКАЦИИ
+      cssMinify: false,
       
-      // БАЗОВЫЕ НАСТРОЙКИ ROLLUP
+      // ОТКЛЮЧАЕМ ВСЕ ОПТИМИЗАЦИИ
+      target: 'es2015', // Старый стандарт
+      reportCompressedSize: false,
+      cssCodeSplit: false,
+      
       rollupOptions: {
-        // ОТКЛЮЧАЕМ TREE-SHAKING ДЛЯ ЭКОНОМИИ CPU
+        // ОТКЛЮЧАЕМ ВСЕ ОПТИМИЗАЦИИ ROLLUP
         treeshake: false,
         
         output: {
-          // ОДИН БОЛЬШОЙ ЧАНК ДЛЯ ВСЕГО - ЭКОНОМИЯ ПАМЯТИ
+          // НИКАКОГО ЧАНКИНГА - ОДИН ФАЙЛ
           manualChunks: undefined,
+          inlineDynamicImports: true,
           
-          // ПРОСТЫЕ ИМЕНА ФАЙЛОВ
-          entryFileNames: '[name].js',
+          // ПРОСТЫЕ ИМЕНА
+          entryFileNames: 'main.js',
           chunkFileNames: '[name].js',
-          assetFileNames: '[name].[ext]'
+          assetFileNames: '[name][extname]'
         }
       },
       
-      // БОЛЬШИЕ ЛИМИТЫ ЧТОБЫ НЕ БЕСПОКОИТЬСЯ
-      chunkSizeWarningLimit: 10000,
-      assetsInlineLimit: 0, // НИКОГДА НЕ ИНЛАЙНИМ АССЕТЫ
-      
-      // ОТКЛЮЧАЕМ ВСЕ ОПТИМИЗАЦИИ
-      reportCompressedSize: false,
-      cssCodeSplit: false
+      chunkSizeWarningLimit: 50000, // Огромный лимит
+      assetsInlineLimit: 0 // НИЧЕГО НЕ ИНЛАЙНИМ
     },
     
-    // ОТКЛЮЧАЕМ ОПТИМИЗАЦИЮ ЗАВИСИМОСТЕЙ (НОВЫЙ СИНТАКСИС)
-    optimizeDeps: {
-      noDiscovery: true,
-      include: []
-    },
-    
-    // ОТКЛЮЧАЕМ ПРЕПРОЦЕССИНГ
-    esbuild: false,
-    
-    // МИНИМАЛЬНАЯ КОНФИГУРАЦИЯ СЕРВЕРА
+    // ОТКЛЮЧАЕМ СЕРВЕР НАСТРОЙКИ
     server: {
-      fs: {
-        strict: false
-      }
+      fs: { strict: false }
     }
   }
 });
