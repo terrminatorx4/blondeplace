@@ -1,46 +1,49 @@
 import { defineConfig } from 'astro/config';
 
-// УПРОЩЕННАЯ КОНФИГУРАЦИЯ КАК В БАТЛЕРЕ
+// ОТКАТ К СТАРОЙ РАБОЧЕЙ КОНФИГУРАЦИИ ДЛЯ 4457 СТАТЕЙ
 export default defineConfig({
   site: 'https://blondeplace.netlify.app',
-  
-  // Производительность сервера
   output: 'static',
 
-  vite: {
-    ssr: {
-      // Оптимизация для статической генерации
-      noExternal: ['@astrojs/*']
-    },
+  build: {
+    concurrency: 1, // МЕДЛЕННО но стабильно для больших проектов
+    assets: "_astro",
+    inlineStylesheets: "never" // Для экономии памяти
+  },
 
-    // НАСТРОЙКИ ДЛЯ РЕШЕНИЯ ПРОБЛЕМЫ ПАМЯТИ (КАК В БАТЛЕРЕ)
+  trailingSlash: "ignore",
+
+  vite: {
     build: {
-      // Отключаем sourcemaps в продакшене для экономии памяти
-      sourcemap: false,
-      // Оптимизация чанков
+      sourcemap: false, // Отключаем sourcemaps для экономии памяти
+      minify: false, // ОТКЛЮЧЕНА минификация для экономии CPU/памяти
+      cssMinify: false, // ОТКЛЮЧЕНА CSS минификация
+      
       rollupOptions: {
         output: {
-          manualChunks: undefined,
-          inlineDynamicImports: false,
-          chunkFileNames: 'assets/[name]-[hash].js',
-          entryFileNames: 'assets/[name]-[hash].js',
-          assetFileNames: 'assets/[name]-[hash].[ext]'
+          // МНОГО МЕЛКИХ ЧАНКОВ для экономии памяти
+          manualChunks: (id) => {
+            if (id.includes("node_modules")) {
+              return "vendor";
+            }
+            if (id.includes("src/content/posts")) {
+              const match = id.match(/posts\/(.+)\.md/);
+              if (match) {
+                const postName = match[1];
+                const hash = postName.split("").reduce((a, b) => {
+                  a = ((a << 5) - a) + b.charCodeAt(0);
+                  return a & a;
+                }, 0);
+                return `posts-${Math.abs(hash) % 100}`; // 100 мелких чанков
+              }
+            }
+            return "main";
+          }
         }
       },
-      // Увеличиваем лимит для больших чанков
+      
       chunkSizeWarningLimit: 2000,
-      // Минификация только в продакшене
-      minify: process.env.NODE_ENV === 'production' ? 'esbuild' : false,
-      // Оптимизация ассетов
-      assetsInlineLimit: 0, // Отключаем инлайн ассетов для экономии памяти
-    },
-
-    // Увеличиваем лимиты для обработки файлов
-    server: {
-      fs: {
-        // Позволяем читать файлы из проекта
-        allow: ['..']
-      }
+      assetsInlineLimit: 1024
     }
   }
 });
