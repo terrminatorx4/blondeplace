@@ -1,14 +1,14 @@
 [build]
-  # ИСПОЛЬЗУЕМ NPM SCRIPT С ПРИНУДИТЕЛЬНЫМИ НАСТРОЙКАМИ ПАМЯТИ
-  command = "NODE_OPTIONS='--max-old-space-size=4096 --optimize-for-size --gc-interval=50 --expose-gc' npm run build && echo 'Build completed, starting postbuild...' && node postbuild.js"
+  # ИСПОЛЬЗУЕМ NPM SCRIPT БЕЗ ЗАПРЕЩЁННЫХ ФЛАГОВ
+  command = "NODE_OPTIONS='--max-old-space-size=4096 --expose-gc' npm run build && echo 'Build completed, starting postbuild...' && node postbuild.js"
   publish = "dist"
   
 [build.environment]
-  # КОНСЕРВАТИВНЫЕ НАСТРОЙКИ ДЛЯ СТАБИЛЬНОСТИ
+  # ТОЛЬКО РАЗРЕШЁННЫЕ ФЛАГИ ДЛЯ NODE.JS 18
   NODE_VERSION = "18"
   
-  # ПРИНУДИТЕЛЬНЫЕ НАСТРОЙКИ ПАМЯТИ (ДУБЛИРУЕМ ДЛЯ НАДЁЖНОСТИ)
-  NODE_OPTIONS = "--max-old-space-size=4096 --optimize-for-size --gc-interval=50 --expose-gc"
+  # ПРИНУДИТЕЛЬНЫЕ НАСТРОЙКИ ПАМЯТИ (ТОЛЬКО СОВМЕСТИМЫЕ)
+  NODE_OPTIONS = "--max-old-space-size=4096 --expose-gc"
   
   # ОТКЛЮЧАЕМ ВСЁ ЛИШНЕЕ
   ASTRO_TELEMETRY_DISABLED = "1"
