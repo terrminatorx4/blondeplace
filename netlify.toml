@@ -1,5 +1,5 @@
 [build]
-  # ТОЛЬКО БАЗОВАЯ КОМАНДА БЕЗ ВСЕХ ФЛАГОВ
+  # ЭКСТРЕМАЛЬНАЯ ПОПЫТКА С МАКСИМАЛЬНОЙ ПАМЯТЬЮ
   command = "npm run build && echo 'Build completed, starting postbuild...' && node postbuild.js"
   publish = "dist"
   
@@ -7,24 +7,23 @@
   # ПРИНУДИТЕЛЬНАЯ УСТАНОВКА NODE.JS 22
   NODE_VERSION = "22"
   
-  # ТОЛЬКО ПРОВЕРЕННЫЙ ФЛАГ ПАМЯТИ
-  NODE_OPTIONS = "--max-old-space-size=4096"
+  # МАКСИМАЛЬНАЯ ПАМЯТЬ ДЛЯ NETLIFY FREE (7GB)
+  NODE_OPTIONS = "--max-old-space-size=7168"
   
-  # ОТКЛЮЧАЕМ ВСЁ ЛИШНЕЕ
+  # ЭКСТРЕМАЛЬНАЯ ЭКОНОМИЯ РЕСУРСОВ
   ASTRO_TELEMETRY_DISABLED = "1"
   NODE_ENV = "production"
   
-  # ОГРАНИЧИВАЕМ КОЛИЧЕСТВО ПОТОКОВ
-  UV_THREADPOOL_SIZE = "2"
+  # МИНИМУМ ПОТОКОВ
+  UV_THREADPOOL_SIZE = "1"
   
-  # ОТКЛЮЧАЕМ ПРЕДУПРЕЖДЕНИЯ
+  # ОТКЛЮЧАЕМ ВСЁ ВОЗМОЖНОЕ
   NODE_NO_WARNINGS = "1"
-  
-  # ОТКЛЮЧАЕМ VITE CACHE
   VITE_CACHE_DIR = "false"
-  
-  # ОТКЛЮЧАЕМ NETLIFY ОПТИМИЗАЦИИ ДЛЯ ЭКОНОМИИ
   NETLIFY_USE_EDGE = "false"
+  
+  # ОТКЛЮЧАЕМ СБОРЩИКИ МУСОРА V8
+  NODE_OPTIONS_V8 = "--gc-frequency=1"
 
 # БЕЗ ПЛАГИНОВ - ТОЛЬКО БАЗОВЫЕ HEADERS
 [[headers]]
