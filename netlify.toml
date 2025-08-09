@@ -8,12 +8,12 @@
   # Force incremental builds
   ASTRO_TELEMETRY_DISABLED = "1"
 
-# Кеширование для ускорения сборки (исправленное)
-[[plugins]]
-  package = "netlify-plugin-cache"
-  [plugins.inputs]
-    # Исключаем .bin директории чтобы избежать ошибок с символическими ссылками
-    paths = ["node_modules/**/*", "!node_modules/.bin/**", ".astro"]
+# ВРЕМЕННО ОТКЛЮЧЁН CACHE ПЛАГИН - МОЖЕТ МЕШАТЬ СБОРКЕ
+# [[plugins]]
+#   package = "netlify-plugin-cache"
+#   [plugins.inputs]
+#     # Исключаем .bin директории чтобы избежать ошибок с символическими ссылками
+#     paths = ["node_modules/**/*", "!node_modules/.bin/**", ".astro"]
 
 [[headers]]
   for = "/*"
