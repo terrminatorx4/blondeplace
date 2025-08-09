@@ -1,64 +1,46 @@
-import { defineConfig } from "astro/config";
+import { defineConfig } from 'astro/config';
 
+// УПРОЩЕННАЯ КОНФИГУРАЦИЯ КАК В БАТЛЕРЕ
 export default defineConfig({
-  site: "https://blondeplace.netlify.app",
-  output: "static",
-
-  build: {
-    concurrency: 4,
-    assets: "_astro",
-    inlineStylesheets: "never" // ✅ ФИКСИРОВАННОЕ для экономии памяти
-  },
-
-  trailingSlash: "ignore",
-
-  // 🔧 КОНФИГУРАЦИЯ СЕРВЕРА ДЛЯ NETLIFY DEV
-  server: {
-    host: true, // Разрешить внешние подключения
-    port: 4321
-  },
+  site: 'https://blondeplace.netlify.app',
+  
+  // Производительность сервера
+  output: 'static',
 
   vite: {
-    // 🚀 КОНФИГУРАЦИЯ ДЛЯ DEV СЕРВЕРА
-    server: {
-      host: true, // Разрешить внешние хосты
-      allowedHosts: [
-        "devserver-main--blondeplace.netlify.app",
-        "localhost",
-        "127.0.0.1"
-      ]
+    ssr: {
+      // Оптимизация для статической генерации
+      noExternal: ['@astrojs/*']
     },
 
+    // НАСТРОЙКИ ДЛЯ РЕШЕНИЯ ПРОБЛЕМЫ ПАМЯТИ (КАК В БАТЛЕРЕ)
     build: {
+      // Отключаем sourcemaps в продакшене для экономии памяти
       sourcemap: false,
-      minify: 'esbuild',
-      cssMinify: 'esbuild',
-      
+      // Оптимизация чанков
       rollupOptions: {
         output: {
-          manualChunks: (id) => {
-            if (id.includes("node_modules")) {
-              return "vendor";
-            }
-            if (id.includes("src/content/posts")) {
-              const match = id.match(/posts\/(.+)\.md/);
-              if (match) {
-                const postName = match[1];
-                const hash = postName.split("").reduce((a, b) => {
-                  a = ((a << 5) - a) + b.charCodeAt(0);
-                  return a & a;
-                }, 0);
-                return `posts-${Math.abs(hash) % 20}`;
-              }
-            }
-            return "main";
-          }
+          manualChunks: undefined,
+          inlineDynamicImports: false,
+          chunkFileNames: 'assets/[name]-[hash].js',
+          entryFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]'
         }
       },
-      
+      // Увеличиваем лимит для больших чанков
       chunkSizeWarningLimit: 2000,
-      assetsInlineLimit: 1024 // ✅ УЛУЧШЕНО: 1KB для мелких файлов
+      // Минификация только в продакшене
+      minify: process.env.NODE_ENV === 'production' ? 'esbuild' : false,
+      // Оптимизация ассетов
+      assetsInlineLimit: 0, // Отключаем инлайн ассетов для экономии памяти
+    },
+
+    // Увеличиваем лимиты для обработки файлов
+    server: {
+      fs: {
+        // Позволяем читать файлы из проекта
+        allow: ['..']
+      }
     }
-    // ✅ УБРАН лишний optimizeDeps блок
   }
 });
