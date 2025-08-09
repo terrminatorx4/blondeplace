@@ -1,14 +1,14 @@
 [build]
-  # ИСПОЛЬЗУЕМ NPM SCRIPT БЕЗ ЗАПРЕЩЁННЫХ ФЛАГОВ
-  command = "NODE_OPTIONS='--max-old-space-size=4096 --expose-gc' npm run build && echo 'Build completed, starting postbuild...' && node postbuild.js"
+  # ТОЛЬКО БАЗОВАЯ КОМАНДА БЕЗ ВСЕХ ФЛАГОВ
+  command = "npm run build && echo 'Build completed, starting postbuild...' && node postbuild.js"
   publish = "dist"
   
 [build.environment]
-  # ТОЛЬКО РАЗРЕШЁННЫЕ ФЛАГИ ДЛЯ NODE.JS 18
-  NODE_VERSION = "18"
+  # ПРИНУДИТЕЛЬНАЯ УСТАНОВКА NODE.JS 22
+  NODE_VERSION = "22"
   
-  # ПРИНУДИТЕЛЬНЫЕ НАСТРОЙКИ ПАМЯТИ (ТОЛЬКО СОВМЕСТИМЫЕ)
-  NODE_OPTIONS = "--max-old-space-size=4096 --expose-gc"
+  # ТОЛЬКО ПРОВЕРЕННЫЙ ФЛАГ ПАМЯТИ
+  NODE_OPTIONS = "--max-old-space-size=4096"
   
   # ОТКЛЮЧАЕМ ВСЁ ЛИШНЕЕ
   ASTRO_TELEMETRY_DISABLED = "1"
