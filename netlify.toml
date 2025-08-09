@@ -1,22 +1,19 @@
 [build]
-  # УЛЬТРА-ПРОСТАЯ КОМАНДА БЕЗ ЛИШНИХ ОПЕРАЦИЙ
-  command = "astro build && node postbuild.js"
+  # ПРОСТЕЙШАЯ КОМАНДА БЕЗ ПОСТОБРАБОТКИ
+  command = "npm run build"
   publish = "dist"
-
+  
 [build.environment]
-  # КОНСЕРВАТИВНЫЕ НАСТРОЙКИ
   NODE_VERSION = "18"
-  NODE_OPTIONS = "--max-old-space-size=4096 --no-warnings --disable-proto=delete"
-  
-  # ОТКЛЮЧАЕМ ВСЁ ЛИШНЕЕ
+  # КОНСЕРВАТИВНАЯ ПАМЯТЬ
+  NODE_OPTIONS = "--max-old-space-size=6144 --optimize-for-size"
+  # ОТКЛЮЧАЕМ ТЕЛЕМЕТРИЮ ДЛЯ ЭКОНОМИИ
   ASTRO_TELEMETRY_DISABLED = "1"
-  NODE_ENV = "production"
-  
-  # МИНИМИЗИРУЕМ ИСПОЛЬЗОВАНИЕ ПАМЯТИ
-  UV_THREADPOOL_SIZE = "2"
-  NODE_NO_WARNINGS = "1"
+  # ОТКЛЮЧАЕМ VITE CACHE
+  VITE_CACHE_DIR = "false"
 
-# НЕТ ПЛАГИНОВ - НЕТ ПРОБЛЕМ
+# НИКАКИХ ПЛАГИНОВ - МОГУТ МЕШАТЬ
+# [[plugins]]
 
 # МИНИМАЛЬНЫЕ HEADERS
 [[headers]]
@@ -28,12 +25,12 @@
 [[headers]]
   for = "*.css"
   [headers.values]
-    Cache-Control = "public, max-age=86400"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
   for = "*.js"
   [headers.values]
-    Cache-Control = "public, max-age=86400"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
   for = "/sitemap.xml"
@@ -47,7 +44,7 @@
     Cache-Control = "public, max-age=3600"
     Content-Type = "text/plain"
 
-# ОСНОВНЫЕ REDIRECTS
+# ПРОСТЫЕ РЕДИРЕКТЫ
 [[redirects]]
   from = "/blog/index.html"
   to = "/blog/"
