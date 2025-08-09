@@ -1,36 +1,36 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// УЛЬТРА-МИНИМАЛЬНАЯ КОНФИГУРАЦИЯ ДЛЯ МАКСИМАЛЬНОЙ СТАБИЛЬНОСТИ
+// МАКСИМАЛЬНО ПРОСТАЯ КОНФИГУРАЦИЯ ДЛЯ ЭКОНОМИИ ПАМЯТИ
+// ПУСТЬ МЕДЛЕННО, НО СТАБИЛЬНО
 export default defineConfig({
   site: 'https://blondeplace.netlify.app',
   output: 'static',
   
-  // Включаем только sitemap
+  // Используем встроенный sitemap вместо postbuild.js
   integrations: [
     sitemap()
   ],
   
-  // МИНИМАЛЬНЫЕ НАСТРОЙКИ BUILD
+  // КРИТИЧЕСКИЕ НАСТРОЙКИ ДЛЯ ПАМЯТИ
   build: {
-    // НЕ ИСПОЛЬЗУЕМ concurrency - пусть Astro сам решает
-    assets: '_astro',
-    inlineStylesheets: 'never' // Всегда внешние CSS для экономии памяти
+    concurrency: 1, // ТОЛЬКО ПОСЛЕДОВАТЕЛЬНАЯ СБОРКА
+    inlineStylesheets: 'never', // НЕ ИНЛАЙНИМ СТИЛИ
+    assets: '_astro'
   },
   
   trailingSlash: 'ignore',
   
-  // УЛЬТРА-ПРОСТЫЕ НАСТРОЙКИ VITE
+  // МИНИМАЛЬНЫЕ НАСТРОЙКИ VITE
   vite: {
     build: {
-      // ОТКЛЮЧАЕМ ВСЁ ЛИШНЕЕ
-      sourcemap: false,           // Никаких sourcemaps
-      minify: false,              // Никакой минификации
-      cssMinify: false,           // Никакой CSS минификации
+      sourcemap: false, // ОТКЛЮЧАЕМ SOURCEMAPS
+      minify: false, // ОТКЛЮЧАЕМ МИНИФИКАЦИЮ (экономия CPU)
+      cssMinify: false, // ОТКЛЮЧАЕМ CSS МИНИФИКАЦИЮ
       
       rollupOptions: {
         output: {
-          // ПРОСТЕЙШАЯ СХЕМА ЧАНКОВ - НИКАКИХ ФУНКЦИЙ!
+          // ПРОСТЕЙШЕЕ РАЗБИЕНИЕ НА ЧАНКИ - БЕЗ ФУНКЦИЙ!
           manualChunks: {
             'vendor': ['astro'],
             'sitemap': ['@astrojs/sitemap']
@@ -38,34 +38,13 @@ export default defineConfig({
         }
       },
       
-      chunkSizeWarningLimit: 5000,    // Большие чанки разрешены
-      assetsInlineLimit: 0,           // НИКАКИХ inline ассетов
-      
-      // ОТКЛЮЧАЕМ ОПТИМИЗАЦИИ
-      target: 'es2018',               // Простой target
-      cssCodeSplit: false,            // Один CSS файл
-      emptyOutDir: true,              // Очищаем перед сборкой
-      
-      // МИНИМАЛЬНЫЕ НАСТРОЙКИ ROLLUP
-      rollupOptions: {
-        output: {
-          manualChunks: undefined,    // Пусть Rollup сам решает
-          compact: false,             // Не сжимаем код
-          generatedCode: 'es5'        // Простой код
-        }
-      }
+      chunkSizeWarningLimit: 5000, // БОЛЬШИЕ ЧАНКИ ДОПУСТИМЫ
+      assetsInlineLimit: 0 // НЕ ИНЛАЙНИМ АССЕТЫ СОВСЕМ
     },
     
-    // ОТКЛЮЧАЕМ ОПТИМИЗАЦИЮ DEPS
+    // ОТКЛЮЧАЕМ ОПТИМИЗАЦИЮ ЗАВИСИМОСТЕЙ
     optimizeDeps: {
-      disabled: true                  // Никакой pre-bundling
-    },
-    
-    // ПРОСТЫЕ НАСТРОЙКИ СЕРВЕРА
-    server: {
-      fs: {
-        strict: false                 // Менее строгие проверки
-      }
+      disabled: true
     }
   }
 });
