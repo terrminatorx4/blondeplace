@@ -1,37 +1,55 @@
 [build]
-  # ПРОСТЕЙШАЯ КОМАНДА БЕЗ ПОСТОБРАБОТКИ
-  command = "npm run build"
+  # ИСПОЛЬЗУЕМ NPM SCRIPT С ПРИНУДИТЕЛЬНЫМИ НАСТРОЙКАМИ ПАМЯТИ
+  command = "NODE_OPTIONS='--max-old-space-size=4096 --optimize-for-size --gc-interval=50 --expose-gc' npm run build && echo 'Build completed, starting postbuild...' && node postbuild.js"
   publish = "dist"
   
 [build.environment]
+  # КОНСЕРВАТИВНЫЕ НАСТРОЙКИ ДЛЯ СТАБИЛЬНОСТИ
   NODE_VERSION = "18"
-  # КОНСЕРВАТИВНАЯ ПАМЯТЬ
-  NODE_OPTIONS = "--max-old-space-size=6144 --optimize-for-size"
-  # ОТКЛЮЧАЕМ ТЕЛЕМЕТРИЮ ДЛЯ ЭКОНОМИИ
+  
+  # ПРИНУДИТЕЛЬНЫЕ НАСТРОЙКИ ПАМЯТИ (ДУБЛИРУЕМ ДЛЯ НАДЁЖНОСТИ)
+  NODE_OPTIONS = "--max-old-space-size=4096 --optimize-for-size --gc-interval=50 --expose-gc"
+  
+  # ОТКЛЮЧАЕМ ВСЁ ЛИШНЕЕ
   ASTRO_TELEMETRY_DISABLED = "1"
+  NODE_ENV = "production"
+  
+  # ОГРАНИЧИВАЕМ КОЛИЧЕСТВО ПОТОКОВ
+  UV_THREADPOOL_SIZE = "2"
+  
+  # ОТКЛЮЧАЕМ ПРЕДУПРЕЖДЕНИЯ
+  NODE_NO_WARNINGS = "1"
+  
   # ОТКЛЮЧАЕМ VITE CACHE
   VITE_CACHE_DIR = "false"
+  
+  # ОТКЛЮЧАЕМ NETLIFY ОПТИМИЗАЦИИ ДЛЯ ЭКОНОМИИ
+  NETLIFY_USE_EDGE = "false"
 
-# НИКАКИХ ПЛАГИНОВ - МОГУТ МЕШАТЬ
-# [[plugins]]
-
-# МИНИМАЛЬНЫЕ HEADERS
+# БЕЗ ПЛАГИНОВ - ТОЛЬКО БАЗОВЫЕ HEADERS
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
 
+# БАЗОВОЕ КЕШИРОВАНИЕ СТАТИЧЕСКИХ ФАЙЛОВ
 [[headers]]
   for = "*.css"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=86400"
 
 [[headers]]
   for = "*.js"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=86400"
 
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+# ВАЖНЫЕ ФАЙЛЫ
 [[headers]]
   for = "/sitemap.xml"
   [headers.values]
@@ -44,7 +62,7 @@
     Cache-Control = "public, max-age=3600"
     Content-Type = "text/plain"
 
-# ПРОСТЫЕ РЕДИРЕКТЫ
+# МИНИМАЛЬНЫЕ РЕДИРЕКТЫ
 [[redirects]]
   from = "/blog/index.html"
   to = "/blog/"
